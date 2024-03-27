@@ -12,4 +12,6 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="default_web_client_id">196033837175-9bc1n2p6kb8bkagi1fpb0svuqn6vltcn.apps.googleusercontent.com</string>
     <string name="sign_out">Sign Out</string>
+    <string name="title">Welcome to NeverLate</string>
+    <string name="subtitle">Stay Punctual, Never Late!</string>
 </resources>
