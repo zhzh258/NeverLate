@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "196033837175",
+    "project_id": "neverlate-93df1",
+    "storage_bucket": "neverlate-93df1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196033837175:android:6d6e8baa7e64460b392e72",
+        "android_client_info": {
+          "package_name": "com.snowman.neverlate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196033837175-2rbmhcm3219obpnphn7du7fd3la88lsr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.snowman.neverlate",
+            "certificate_hash": "bdc0da71cf477e8340a90c11cbfae5ca80afdb80"
+          }
+        },
+        {
+          "client_id": "196033837175-9bc1n2p6kb8bkagi1fpb0svuqn6vltcn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYGe032a24tM5iHvLGl4tNgjNKwFaXq5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196033837175-9bc1n2p6kb8bkagi1fpb0svuqn6vltcn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
