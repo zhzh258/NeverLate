@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.MainActivity
 import com.snowman.neverlate.R
@@ -78,7 +79,12 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    goHostActivity()
+                    val firebaseUser = auth.currentUser
+                    firebaseUser?.let {
+                        // Save user data to Firestore
+                        saveUserDataToFirestore(it.uid, it.email ?: "", it.displayName)
+                        goHostActivity()
+                    }
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     Toast.makeText(this, "Authentication failed. 2", Toast.LENGTH_SHORT).show()
@@ -95,5 +101,30 @@ class LoginActivity : AppCompatActivity() {
         val i = Intent(this, MainActivity::class.java)
         startActivity(i)
         finish()
+    }
+
+    private fun saveUserDataToFirestore(userId: String, email: String, displayName: String?) {
+        // Access Firestore instance
+        val db = FirebaseFirestore.getInstance()
+
+        // Create a new user document in Firestore
+        val user = hashMapOf(
+            "userId" to userId,
+            "email" to email,
+            "displayName" to displayName
+            // Add other user information as needed (e.g., first name, last name, etc.)
+        )
+
+        // Specify the collection and document path for the user data
+        val userRef = db.collection("users").document(userId)
+
+        // Set the user document with the user data
+        userRef.set(user)
+            .addOnSuccessListener {
+                Log.d(TAG, "User data saved successfully to Firestore")
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error saving user data to Firestore: $e")
+            }
     }
 }
