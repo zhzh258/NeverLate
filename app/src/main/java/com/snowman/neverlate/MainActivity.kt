@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
 
-                        val profilePictureUrl = document.getString("profilePicture")
+                        val profilePictureUrl = document.getString("photoURL")
                         val displayName = document.getString("displayName")
                         val email = document.getString("email")
 
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
                         Glide.with(this)
                             .load(profilePictureUrl)
-                            .placeholder(R.mipmap.ic_launcher_round)
+                            .circleCrop()
                             .error(R.mipmap.ic_launcher_round)
                             .into(profilePictureImageView)
                     }
