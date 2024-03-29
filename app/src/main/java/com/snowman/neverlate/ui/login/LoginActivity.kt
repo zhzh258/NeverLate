@@ -16,10 +16,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.MainActivity
 import com.snowman.neverlate.R
+import com.snowman.neverlate.model.FirebaseManager
 
 
 class LoginActivity : AppCompatActivity() {
@@ -29,12 +28,13 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginBtn: SignInButton
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var signInLauncher: ActivityResultLauncher<Intent>
+    private val firebaseManager = FirebaseManager.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        auth = Firebase.auth
+        auth = firebaseManager.firebaseAuth()
 
         if (auth.currentUser != null) {
             goHostActivity()
@@ -78,7 +78,11 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    goHostActivity()
+                    val firebaseUser = auth.currentUser
+                    firebaseUser?.let {
+                        FirebaseManager().saveUserDataToFirestore(it)
+                        goHostActivity()
+                    }
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
                     Toast.makeText(this, "Authentication failed. 2", Toast.LENGTH_SHORT).show()
