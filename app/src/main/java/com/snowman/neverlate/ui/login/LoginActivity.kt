@@ -15,11 +15,7 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.MainActivity
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
@@ -32,12 +28,13 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginBtn: SignInButton
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var signInLauncher: ActivityResultLauncher<Intent>
+    private val firebaseManager = FirebaseManager.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        auth = Firebase.auth
+        auth = firebaseManager.firebaseAuth()
 
         if (auth.currentUser != null) {
             goHostActivity()

@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.Menu
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -18,10 +18,10 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.databinding.ActivityMainBinding
+import com.snowman.neverlate.model.FirebaseManager
+import com.snowman.neverlate.model.types.UserViewModel
 import com.snowman.neverlate.ui.login.LoginActivity
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var displayNameTextView: TextView
     private lateinit var emailTextView: TextView
     private lateinit var navView: NavigationView
+    private val firebaseManager = FirebaseManager.getInstance()
+    private val userViewModel: UserViewModel by viewModels()
+
 
     private val TAG = "Main Activity"
 
@@ -44,14 +47,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        auth = Firebase.auth
-        firestore = FirebaseFirestore.getInstance()
+        auth = firebaseManager.firebaseAuth()
+        firestore = firebaseManager.getFirestore()
 
         if (auth.currentUser == null) {
             goLoginActivity()
         }
 
         initViews()
+        observeUserData()
         setUpFloatingActionBar()
         setUpSideActionBar()
         loadUserData()
@@ -106,31 +110,30 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadUserData() {
         val userId = auth.currentUser?.uid
-
         if (userId != null) {
-            firestore.collection("users").document(userId)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
+            firebaseManager.loadUserData(userId) { user ->
+                if (user != null) {
+                    user.updateUserViewModel(userViewModel)
+                } else {
+                    Log.e("FirebaseManager", "Failed to retrieve user data")
+                }
+            }
+        }
+    }
 
-                        val profilePictureUrl = document.getString("photoURL")
-                        val displayName = document.getString("displayName")
-                        val email = document.getString("email")
-
-                        displayNameTextView.text = displayName
-                        emailTextView.text = email
-
-                        Glide.with(this)
-                            .load(profilePictureUrl)
+    private fun observeUserData() {
+        userViewModel.userData.observe(this) { user ->
+            if (user != null) {
+                displayNameTextView.text = user.displayName
+                emailTextView.text = user.email
+                Glide.with(this)
+                            .load(user.profilePicture)
                             .circleCrop()
                             .error(R.mipmap.ic_launcher_round)
                             .into(profilePictureImageView)
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Error retrieving user data: $e")
-                    Toast.makeText(this, "failed to retrieve user information", Toast.LENGTH_SHORT).show()
-                }
+            } else {
+                Log.i(TAG, "User data null")
+            }
         }
     }
 

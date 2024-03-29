@@ -5,7 +5,8 @@ interface IUser {
     val phoneNumber: Long
     val firstName: String
     val lastName: String
-    val profilePicture: Any // For storing profile picture, you might need a custom type or a String URL
+    val displayName: String
+    val profilePicture: String // For storing profile picture, you might need a custom type or a String URL
     val email: String
     val passwordHash: String // Encrypted password
     val friends: List<String> // List of UUIDs of other users
@@ -15,4 +16,6 @@ interface IUser {
     // ** val aboutMe: String
     // ** val settingConfig: String
     // ** val profile: String // Other information related to personal profile page; adjust type as necessary
+
+    fun updateUserViewModel(viewModel: UserViewModel)
 }
