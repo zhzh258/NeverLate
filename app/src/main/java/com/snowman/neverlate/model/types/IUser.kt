@@ -12,6 +12,7 @@ interface IUser {
     val friends: List<String> // List of UUIDs of other users
     val totalLateTime: Long // For analysis
     val totalEarlyTime: Long // For analysis
+    val status: String
     // Assuming "About Me" and "Setting Config" are strings for simplicity; adjust as necessary
     // ** val aboutMe: String
     // ** val settingConfig: String
