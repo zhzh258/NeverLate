@@ -14,4 +14,7 @@
     <string name="sign_out">Sign Out</string>
     <string name="title">Welcome to NeverLate</string>
     <string name="subtitle">Stay Punctual, Never Late!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_friends">Friends</string>
 </resources>
