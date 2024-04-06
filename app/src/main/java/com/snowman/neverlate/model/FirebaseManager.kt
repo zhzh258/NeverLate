@@ -129,4 +129,22 @@ class FirebaseManager {
                 onFailure("Error creating friend request")
             }
     }
+
+    fun getFriendRequests(currentUserId: String, callback: (List<User>?, Exception?) -> Unit) {
+        val currentUserRef = db.collection("users").document(currentUserId)
+        val friendRequestsRef = currentUserRef.collection("friendRequests")
+
+        friendRequestsRef.get()
+            .addOnSuccessListener { querySnapshot ->
+                val usersList = mutableListOf<User>()
+                for (document in querySnapshot) {
+                    val user = document.toObject(User::class.java)
+                    usersList.add(user)
+                }
+                callback(usersList, null)
+            }
+            .addOnFailureListener { exception ->
+                callback(null, exception)
+            }
+    }
 }

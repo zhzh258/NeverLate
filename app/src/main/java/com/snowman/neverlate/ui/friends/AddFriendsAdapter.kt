@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.ListItemAddFriendsBinding
+import com.snowman.neverlate.databinding.ListItemFriendRequestsBinding
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IUser
 
@@ -67,4 +68,44 @@ class AddFriendsAdapter(
     override fun getItemCount(): Int {
         return users.size
     }
+}
+
+class FriendRequestsViewHolder(private val binding: ListItemFriendRequestsBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(user: IUser) {
+        binding.displayNameTV.text = user.displayName
+        binding.emailTv.text = user.email
+        Glide.with(binding.profileIV)
+            .load(user.photoURL)
+            .circleCrop()
+            .error(R.mipmap.ic_launcher_round)
+            .into(binding.profileIV)
+        binding.acceptReqBtn.setOnClickListener {
+            // TODO: accept req
+        }
+
+        binding.declineReqBtn.setOnClickListener {
+            // TODO: decline req
+        }
+    }
+}
+
+class FriendRequestsAdapter(private val requests: List<IUser>) :
+    RecyclerView.Adapter<FriendRequestsViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendRequestsViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ListItemFriendRequestsBinding.inflate(inflater, parent, false)
+        return FriendRequestsViewHolder(binding)
+    }
+
+    override fun getItemCount(): Int {
+        return requests.size
+    }
+
+    override fun onBindViewHolder(holder: FriendRequestsViewHolder, position: Int) {
+        val request = requests[position]
+        holder.bind(request)
+    }
+
 }

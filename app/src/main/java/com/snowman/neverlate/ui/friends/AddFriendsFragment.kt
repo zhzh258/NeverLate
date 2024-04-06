@@ -20,9 +20,12 @@ class AddFriendsFragment : Fragment() {
 
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IUser>()
+    private val requestsList = mutableListOf<IUser>()
     private lateinit var addFriendsAdapter: AddFriendsAdapter
+    private lateinit var friendRequestsAdapter: FriendRequestsAdapter
     private lateinit var searchFriendsSV: SearchView
     private lateinit var searchFriendsRV: RecyclerView
+    private lateinit var friendReqRV: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,16 +39,21 @@ class AddFriendsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
-        setUpRecyclerView()
-        setSearchListener()
+        setUpSearchFeature()
+        setUpRequestsFeature()
     }
 
     private fun initViews(view: View) {
         searchFriendsSV = view.findViewById(R.id.searchFriendsSV)
         searchFriendsRV = view.findViewById(R.id.searchFriendsRV)
+        friendReqRV = view.findViewById(R.id.friendReqRV)
     }
 
-    private fun setUpRecyclerView() {
+    private fun setUpSearchFeature() {
+        setUpSearchRecyclerView()
+        setSearchListener()
+    }
+    private fun setUpSearchRecyclerView() {
         searchFriendsRV.layoutManager = LinearLayoutManager(context)
         addFriendsAdapter = AddFriendsAdapter(searchList, requireContext())
         searchFriendsRV.adapter = addFriendsAdapter
@@ -83,5 +91,34 @@ class AddFriendsFragment : Fragment() {
             }
 
         })
+    }
+
+    private fun setUpRequestsFeature() {
+        setUpRequestsRecyclerView()
+        populateRequests()
+    }
+
+    private fun setUpRequestsRecyclerView() {
+        friendReqRV.layoutManager = LinearLayoutManager(context)
+        friendRequestsAdapter = FriendRequestsAdapter(requestsList)
+        friendReqRV.adapter = friendRequestsAdapter
+    }
+
+    private fun populateRequests() {
+        val currentUserID = firebaseManager.auth.currentUser?.uid
+        if (currentUserID != null) {
+            FirebaseManager.getInstance().getFriendRequests(currentUserID) { usersList, exception ->
+                if (exception != null) {
+                    Log.e(TAG, "Error fetching friend requests: $exception")
+                } else {
+                    // Use the usersList containing friend requests
+                    usersList?.let {
+                        requestsList.clear()
+                        requestsList.addAll(usersList)
+                        friendRequestsAdapter.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
     }
 }
