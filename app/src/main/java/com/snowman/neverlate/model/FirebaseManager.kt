@@ -92,4 +92,41 @@ class FirebaseManager {
                 callback(null, exception)
             }
     }
+
+    fun sendFriendRequest(
+        currentUser: FirebaseUser,
+        user: IUser,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        val otherUserRef = db.collection("users").document(user.userId)
+        val friendRequestsRef = otherUserRef.collection("friendRequests")
+
+        friendRequestsRef.document(currentUser.uid).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    onFailure("You already sent a friend request")
+                } else {
+                    val newFriendRequest = hashMapOf(
+                        "userId" to currentUser.uid,
+                        "displayName" to currentUser.displayName,
+                        "email" to currentUser.email,
+                        "photoURL" to currentUser.photoUrl
+                    )
+                    friendRequestsRef.document(currentUser.uid).set(newFriendRequest)
+                        .addOnSuccessListener {
+                            Log.i(TAG, "Friend request created successfully")
+                            onSuccess()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e(TAG, "Error creating friend request: $e")
+                            onFailure("Error creating friend request")
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error getting friend request document: $e")
+                onFailure("Error creating friend request")
+            }
+    }
 }

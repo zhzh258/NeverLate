@@ -47,7 +47,7 @@ class AddFriendsFragment : Fragment() {
 
     private fun setUpRecyclerView() {
         searchFriendsRV.layoutManager = LinearLayoutManager(context)
-        addFriendsAdapter = AddFriendsAdapter(searchList)
+        addFriendsAdapter = AddFriendsAdapter(searchList, requireContext())
         searchFriendsRV.adapter = addFriendsAdapter
     }
 
