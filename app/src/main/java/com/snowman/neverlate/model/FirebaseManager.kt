@@ -25,7 +25,7 @@ class FirebaseManager {
         }
     }
 
-    fun getFirestore() : FirebaseFirestore {
+    fun getFirestore(): FirebaseFirestore {
         return db
     }
 
@@ -43,13 +43,19 @@ class FirebaseManager {
         )
 
         val userRef = db.collection("users").document(firebaseUser.uid)
-
-        userRef.set(user)
-            .addOnSuccessListener {
-                Log.d(TAG, "User data saved successfully to Firestore")
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Error saving user data to Firestore: $e")
+        userRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    Log.d(TAG, "User already exists in Firestore, skipping save operation")
+                } else {
+                    userRef.set(user)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "User data saved successfully to Firestore")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e(TAG, "Error saving user data to Firestore: $e")
+                        }
+                }
             }
     }
 
