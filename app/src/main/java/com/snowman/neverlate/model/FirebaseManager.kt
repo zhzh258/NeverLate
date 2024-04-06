@@ -40,7 +40,7 @@ class FirebaseManager {
             "userId" to firebaseUser.uid,
             "email" to firebaseUser.email,
             "displayName" to firebaseUser.displayName,
-            "photoURL" to firebaseUser.photoUrl.toString() // Convert PhotoUrl to String
+            "photoURL" to firebaseUser.photoUrl.toString()
         )
 
         val userRef = db.collection("users").document(firebaseUser.uid)
@@ -65,20 +65,7 @@ class FirebaseManager {
             .get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    // Parse user data from document
-                    val user = User(
-                        id = document.getString("id") ?: "",
-                        phoneNumber = document.getLong("phoneNumber") ?: 0L,
-                        firstName = document.getString("firstName") ?: "",
-                        lastName = document.getString("lastName") ?: "",
-                        displayName = document.getString("displayName") ?: "",
-                        photoURL = (document.get("photoURL") ?: "") as String,
-                        email = document.getString("email") ?: "",
-                        passwordHash = document.getString("passwordHash") ?: "",
-                        friends = document.get("friends") as? List<String> ?: emptyList(),
-                        totalLateTime = document.getLong("totalLateTime") ?: 0L,
-                        totalEarlyTime = document.getLong("totalEarlyTime") ?: 0L
-                    )
+                    val user = document.toObject(User::class.java)
                     callback(user)
                 } else {
                     callback(null)
@@ -97,14 +84,6 @@ class FirebaseManager {
                 val usersList = mutableListOf<User>()
                 for (document in querySnapshot) {
                     val user = document.toObject(User::class.java)
-
-                    val status = document.getString("status") ?: "Unknown Status"
-                    val email1 = document.getString("email") ?: "Unknown Email"
-                    val photoURL = document.getString("photoURL") ?: "No Photo"
-
-                    Log.i(TAG, "$status $email1 $photoURL")
-
-                    Log.i(TAG, user.displayName + user.email + user.status + user.photoURL)
                     usersList.add(user)
                 }
                 callback(usersList, null)
