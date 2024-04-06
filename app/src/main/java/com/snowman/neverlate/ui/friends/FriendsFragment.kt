@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
@@ -13,6 +15,7 @@ import com.snowman.neverlate.R
 class FriendsFragment : Fragment() {
 
     private lateinit var friendsListRv: RecyclerView
+    private lateinit var addFriendsBtn: Button
     private val friendsViewModel: FriendsListViewModel by viewModels()
 
     override fun onCreateView(
@@ -26,12 +29,16 @@ class FriendsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        addFriendsBtn = view.findViewById(R.id.addFriendsBtn)
         friendsListRv = view.findViewById(R.id.friendsListRv)
         friendsListRv.layoutManager = LinearLayoutManager(context)
         val friends = friendsViewModel.friends
         val adapter = FriendsListAdapter(friends)
         friendsListRv.adapter = adapter
 
+        addFriendsBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_friendsFragment_to_addFriendsFragment)
+        }
     }
 
 }

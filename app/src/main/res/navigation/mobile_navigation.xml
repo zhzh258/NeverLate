@@ -29,4 +29,14 @@
         android:label="@string/menu_friends"
         tools:layout="@layout/fragment_friends"
         />
+
+    <fragment
+        android:id="@+id/addFriendsFragment"
+        android:name="com.snowman.neverlate.ui.friends.AddFriendsFragment"
+        android:label="@string/add_friends"
+        tools:layout="@layout/fragment_add_friends" />
+
+    <action
+        android:id="@+id/action_friendsFragment_to_addFriendsFragment"
+        app:destination="@id/addFriendsFragment" />
 </navigation>
