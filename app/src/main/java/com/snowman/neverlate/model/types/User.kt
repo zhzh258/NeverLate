@@ -1,7 +1,7 @@
 package com.snowman.neverlate.model.types
 
 data class User(
-    override val id: String = "",
+    override val userId: String = "",
     override val phoneNumber: Long = 0L,
     override val firstName: String = "",
     override val lastName: String = "",

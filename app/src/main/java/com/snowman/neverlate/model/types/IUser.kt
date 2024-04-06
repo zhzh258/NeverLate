@@ -1,7 +1,7 @@
 package com.snowman.neverlate.model.types
 
 interface IUser {
-    val id: String // UUID
+    val userId: String // UUID
     val phoneNumber: Long
     val firstName: String
     val lastName: String

@@ -11,7 +11,7 @@ class FriendsListViewModel : ViewModel() {
     init {
         for (i in 0 until 5) {
             val friend1 = User(
-                id = UUID.randomUUID().toString(),
+                userId = UUID.randomUUID().toString(),
                 phoneNumber = 1234567890,
                 displayName = "Mary Choe",
                 photoURL = "https://i.pinimg.com/originals/79/17/27/791727d03448c50f30f17e6da51cce65.png",
@@ -19,7 +19,7 @@ class FriendsListViewModel : ViewModel() {
             )
 
             val friend2 = User(
-                id = UUID.randomUUID().toString(),
+                userId = UUID.randomUUID().toString(),
                 phoneNumber = 1234567890,
                 displayName = "ChinKuan Lin",
                 photoURL = "https://www.rover.com/blog/wp-content/uploads/2019/04/cute-big-eyes-1024x682.jpg",
@@ -27,7 +27,7 @@ class FriendsListViewModel : ViewModel() {
             )
 
             val friend3 = User(
-                id = UUID.randomUUID().toString(),
+                userId = UUID.randomUUID().toString(),
                 phoneNumber = 1234567890,
                 displayName = "ZhaoZhan Huang",
                 photoURL = "https://www.womansworld.com/wp-content/uploads/2024/08/cute-cats.jpg",
