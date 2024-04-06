@@ -18,6 +18,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_friends">Friends</string>
     <string name="add_friends">Add Friends</string>
-    <string name="follow_requests">Follow Requests</string>
+    <string name="friend_requests">Friend Requests</string>
     <string name="add_friends_search_bar_text">Search Friend By Email</string>
+    <string name="send_request">Send Request</string>
 </resources>

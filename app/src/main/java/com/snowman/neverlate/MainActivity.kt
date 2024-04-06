@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 displayNameTextView.text = user.displayName
                 emailTextView.text = user.email
                 Glide.with(this)
-                            .load(user.profilePicture)
+                            .load(user.photoURL)
                             .circleCrop()
                             .error(R.mipmap.ic_launcher_round)
                             .into(profilePictureImageView)

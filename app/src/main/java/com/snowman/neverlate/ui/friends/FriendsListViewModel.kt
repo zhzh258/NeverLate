@@ -14,7 +14,7 @@ class FriendsListViewModel : ViewModel() {
                 id = UUID.randomUUID().toString(),
                 phoneNumber = 1234567890,
                 displayName = "Mary Choe",
-                profilePicture = "https://i.pinimg.com/originals/79/17/27/791727d03448c50f30f17e6da51cce65.png",
+                photoURL = "https://i.pinimg.com/originals/79/17/27/791727d03448c50f30f17e6da51cce65.png",
                 status = "I love cats"
             )
 
@@ -22,7 +22,7 @@ class FriendsListViewModel : ViewModel() {
                 id = UUID.randomUUID().toString(),
                 phoneNumber = 1234567890,
                 displayName = "ChinKuan Lin",
-                profilePicture = "https://www.rover.com/blog/wp-content/uploads/2019/04/cute-big-eyes-1024x682.jpg",
+                photoURL = "https://www.rover.com/blog/wp-content/uploads/2019/04/cute-big-eyes-1024x682.jpg",
                 status = "Sorry I was late last time"
             )
 
@@ -30,7 +30,7 @@ class FriendsListViewModel : ViewModel() {
                 id = UUID.randomUUID().toString(),
                 phoneNumber = 1234567890,
                 displayName = "ZhaoZhan Huang",
-                profilePicture = "https://www.womansworld.com/wp-content/uploads/2024/08/cute-cats.jpg",
+                photoURL = "https://www.womansworld.com/wp-content/uploads/2024/08/cute-cats.jpg",
                 status = "This app is a pain for me"
             )
 

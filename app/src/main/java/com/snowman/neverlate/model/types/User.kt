@@ -6,7 +6,7 @@ data class User(
     override val firstName: String = "",
     override val lastName: String = "",
     override val displayName: String = "",
-    override val profilePicture: String = "",
+    override val photoURL: String = "",
     override val email: String = "",
     override val passwordHash: String = "",
     override val friends: List<String> = emptyList(),

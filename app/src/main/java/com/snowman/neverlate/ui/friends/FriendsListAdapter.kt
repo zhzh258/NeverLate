@@ -15,7 +15,7 @@ class FriendsViewHolder(private val binding: ListItemFriendsBinding) :
         binding.displayNameTV.text = user.displayName
         binding.memoTv.text = user.status
         Glide.with(binding.profileIV)
-            .load(user.profilePicture)
+            .load(user.photoURL)
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.profileIV)

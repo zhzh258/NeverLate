@@ -6,7 +6,7 @@ interface IUser {
     val firstName: String
     val lastName: String
     val displayName: String
-    val profilePicture: String // For storing profile picture, you might need a custom type or a String URL
+    val photoURL: String // For storing profile picture, you might need a custom type or a String URL
     val email: String
     val passwordHash: String // Encrypted password
     val friends: List<String> // List of UUIDs of other users

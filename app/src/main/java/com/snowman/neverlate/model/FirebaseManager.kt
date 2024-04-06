@@ -13,6 +13,7 @@ class FirebaseManager {
     private val TAG = "Firebase Manager"
     val db = FirebaseFirestore.getInstance()
     val auth = Firebase.auth
+    private val usersCollection = db.collection("users")
 
     companion object {
         @Volatile
@@ -71,7 +72,7 @@ class FirebaseManager {
                         firstName = document.getString("firstName") ?: "",
                         lastName = document.getString("lastName") ?: "",
                         displayName = document.getString("displayName") ?: "",
-                        profilePicture = (document.get("photoURL") ?: "") as String,
+                        photoURL = (document.get("photoURL") ?: "") as String,
                         email = document.getString("email") ?: "",
                         passwordHash = document.getString("passwordHash") ?: "",
                         friends = document.get("friends") as? List<String> ?: emptyList(),
@@ -86,6 +87,30 @@ class FirebaseManager {
             .addOnFailureListener { e ->
                 callback(null)
                 Log.e("FirebaseManager", "Failed to retrieve document")
+            }
+    }
+
+    fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
+        usersCollection.whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val usersList = mutableListOf<User>()
+                for (document in querySnapshot) {
+                    val user = document.toObject(User::class.java)
+
+                    val status = document.getString("status") ?: "Unknown Status"
+                    val email1 = document.getString("email") ?: "Unknown Email"
+                    val photoURL = document.getString("photoURL") ?: "No Photo"
+
+                    Log.i(TAG, "$status $email1 $photoURL")
+
+                    Log.i(TAG, user.displayName + user.email + user.status + user.photoURL)
+                    usersList.add(user)
+                }
+                callback(usersList, null)
+            }
+            .addOnFailureListener { exception ->
+                callback(null, exception)
             }
     }
 }

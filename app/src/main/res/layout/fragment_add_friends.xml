@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,20 +12,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/general_small_margin"
-        android:hint="@string/add_friends_search_bar_text" />
+        app:queryHint="@string/add_friends_search_bar_text"
+        app:iconifiedByDefault="false" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchFriendsRV"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/general_small_margin"
-        android:layout_weight="1" />
+        android:layout_height="@dimen/friends_list_item_height"
+        android:layout_margin="@dimen/general_small_margin" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/general_small_margin"
-        android:text="@string/follow_requests"
+        android:text="@string/friend_requests"
         android:textColor="@color/black"
         android:textSize="@dimen/fragment_title_text_size"
         android:textStyle="bold" />
@@ -32,8 +33,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/friendReqRV"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/general_small_margin"
-        android:layout_weight="2" />
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/general_small_margin" />
 
 </LinearLayout>
