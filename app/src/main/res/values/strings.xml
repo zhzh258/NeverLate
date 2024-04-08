@@ -10,6 +10,8 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_map">Map</string>
     <string name="default_web_client_id">196033837175-9bc1n2p6kb8bkagi1fpb0svuqn6vltcn.apps.googleusercontent.com</string>
     <string name="sign_out">Sign Out</string>
     <string name="title">Welcome to NeverLate</string>
