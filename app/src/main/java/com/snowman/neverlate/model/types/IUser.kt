@@ -14,7 +14,7 @@ interface IUser {
     val totalEarlyTime: Long // For analysis
     val status: String
     // Assuming "About Me" and "Setting Config" are strings for simplicity; adjust as necessary
-    // ** val aboutMe: String
+//    val aboutMe: String
     // ** val settingConfig: String
     // ** val profile: String // Other information related to personal profile page; adjust type as necessary
 
