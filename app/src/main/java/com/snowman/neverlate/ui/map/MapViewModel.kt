@@ -25,4 +25,8 @@ class MapViewModel: ViewModel() {
     val markers = MutableLiveData<List<MarkerOptions>>().apply {
         value = dummyData
     }
+
+    val userLocation = MutableLiveData<LatLng?>().apply {
+        value = null
+    }
 }

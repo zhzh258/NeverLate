@@ -1,5 +1,5 @@
 package com.snowman.neverlate.model
 
-class Room {
+class RoomManager {
     // TODO: set up Room database for local storage
 }

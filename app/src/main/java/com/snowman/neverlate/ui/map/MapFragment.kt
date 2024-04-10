@@ -1,6 +1,7 @@
 package com.snowman.neverlate.ui.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -8,25 +9,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.maps.android.PolyUtil
 import com.snowman.neverlate.databinding.FragmentMapBinding
+import com.snowman.neverlate.model.retrofit.DirectionsResponse
+import com.snowman.neverlate.model.retrofit.GoogleMapsDirectionsService
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MapFragment : Fragment(), OnMapReadyCallback {
-
     private var _binding: FragmentMapBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private var _mapViewModel: MapViewModel? = null
     private val mapViewModel get() = _mapViewModel!!
@@ -40,7 +44,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         _mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
         _bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
@@ -67,7 +70,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         setMapConfig()
         bindLiveData()
-        setUpUserLocation()
+        updateUserGPS()
+        if(mapViewModel.userLocation.value != null)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapViewModel.userLocation.value!!, 12f))
         setUpBottomSheet()
     }
 
@@ -96,15 +101,118 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                setUpUserLocation()
+                updateUserGPS()
             } else {
                 // Permission was denied. Handle the situation by showing a message to the user or taking appropriate action.
                 Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
-    private fun setUpUserLocation() {
-        // Check if permission is granted
+
+    @SuppressLint("PotentialBehaviorOverride")
+    private fun setUpBottomSheet() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        map.setOnMarkerClickListener {marker: Marker -> lifecycleScope.launch {
+            marker.showInfoWindow()
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+            Log.d("MY_DEBUG", mapViewModel.userLocation.value.toString())
+            // Start all fetches in parallel
+            val driving = async { fetchDirectionsResponse("driving", marker) }
+            val walking = async { fetchDirectionsResponse("walking", marker) }
+            val bicycling = async { fetchDirectionsResponse("bicycling", marker) }
+            val transit = async { fetchDirectionsResponse("transit", marker) }
+            // await all
+            val responses = awaitAll(driving, walking, bicycling, transit)
+            val (drivingResponse, walkingResponse, bicyclingResponse, transitResponse) = responses
+            binding.driveButton.apply {
+                this.setOnClickListener {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    val polylineOptions = PolylineOptions()
+                    val points = PolyUtil.decode(drivingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
+                    polylineOptions.addAll(points)
+                    map.addPolyline(polylineOptions)
+                }
+                val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                this.text = "Drive: " + duration + " " + distance
+            }
+            binding.walkButton.apply {
+                this.setOnClickListener {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    val polylineOptions = PolylineOptions()
+                    val points = PolyUtil.decode(walkingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
+                    polylineOptions.addAll(points)
+                    map.addPolyline(polylineOptions)
+                }
+                val duration = walkingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                val distance = walkingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                this.text = "Walk: " + duration + " " + distance
+            }
+            binding.bikeButton.apply {
+                this.setOnClickListener {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    val polylineOptions = PolylineOptions()
+                    val points = PolyUtil.decode(bicyclingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
+                    polylineOptions.addAll(points)
+                    map.addPolyline(polylineOptions)
+                }
+                val duration = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                val distance = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                this.text = "Bike: " + duration + " " + distance
+            }
+            binding.transitButton.apply {
+                this.setOnClickListener {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    val polylineOptions = PolylineOptions()
+                    val points = PolyUtil.decode(transitResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
+                    polylineOptions.addAll(points)
+                    map.addPolyline(polylineOptions)
+                }
+                val duration = transitResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                val distance = transitResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                this.text = "Transit: " + duration + " " + distance
+            }
+        }
+            true
+        }
+
+        map.setOnMapClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+    private suspend fun fetchDirectionsResponse(mode: String, marker: Marker): DirectionsResponse? { // show a line from current location to
+        updateUserGPS()
+        val origin = mapViewModel.userLocation.value ?: return null
+        val destination = marker.position
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://maps.googleapis.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(GoogleMapsDirectionsService::class.java)
+
+        try {
+            val apiKey = getMetaData("com.google.android.geo.API_KEY")
+            Log.d("MY_DEBUG", apiKey.toString())
+            val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
+//            Log.d("MY_DEBUG", response.body().toString())
+            if (response.isSuccessful) {
+                if(response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0)
+                    return null
+                else
+                    return response.body()
+            } else {
+                return null
+            }
+        } catch (e: Exception) {
+            // Handle exceptions
+            return null
+        }
+    }
+
+    private fun updateUserGPS() = lifecycleScope.launch {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -115,31 +223,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         ) { // permission is NOT granted
             // Request the permission
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-            return
         } else { // permission is granted, show the location
             map.isMyLocationEnabled = true
-
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-                // Move the camera to the user's current location once it's obtained
-                location?.let {
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 12f))
-                }
-                Toast.makeText(requireContext(), "The user location is: " + location?.toString(), Toast.LENGTH_SHORT).show()
-            }
+            val location = fusedLocationProviderClient.lastLocation.await()
+            mapViewModel.userLocation.value = LatLng(location.latitude, location.longitude)
         }
     }
 
-    private fun setUpBottomSheet() {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        map.setOnMarkerClickListener {marker: Marker ->
-            marker.showInfoWindow()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            true
-        }
-
-        map.setOnMapClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    private fun getMetaData(name: String): String? {
+        val context = context ?: return null
+        return try {
+            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            applicationInfo.metaData.getString(name)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+            null
         }
     }
 }
