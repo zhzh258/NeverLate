@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -16,8 +18,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.snowman.neverlate.databinding.FragmentMapBinding
-import com.snowman.neverlate.ui.map.MapViewModel
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -28,6 +30,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private var _mapViewModel: MapViewModel? = null
     private val mapViewModel get() = _mapViewModel!!
+    private var _bottomSheetBehavior:  BottomSheetBehavior<FrameLayout>? = null
+    private val bottomSheetBehavior get() = _bottomSheetBehavior!!
 
     private lateinit var map: GoogleMap
 
@@ -39,6 +43,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         _mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        _bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+
+        bottomSheetBehavior.isHideable = true
+        bottomSheetBehavior.peekHeight = 300 // How much content to show when it's COLLAPSED
 
         val mapFragment = childFragmentManager
             .findFragmentById(com.snowman.neverlate.R.id.map) as SupportMapFragment?
@@ -60,7 +68,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         setMapConfig()
         bindLiveData()
         setUpUserLocation()
-        setUpBottomCard()
+        setUpBottomSheet()
     }
 
     private fun setMapConfig() {
@@ -117,23 +125,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 location?.let {
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 12f))
                 }
-                Toast.makeText(requireContext(), location?.toString(), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "The user location is: " + location?.toString(), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun setUpBottomCard() {
+    private fun setUpBottomSheet() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         map.setOnMarkerClickListener {marker: Marker ->
             marker.showInfoWindow()
-            showButtonCard(marker);
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             true
         }
-    }
 
-    private fun showButtonCard(marker: Marker){
-        binding.bottomCardContainer.visibility = View.VISIBLE
-        binding.debugLatitude.text = marker.position.latitude.toString()
-        binding.debugLongitude.text = marker.position.longitude.toString()
-        binding.debugTitle.text = marker.title.toString()
+        map.setOnMapClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
     }
 }
+
+
