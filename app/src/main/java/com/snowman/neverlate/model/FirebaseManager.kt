@@ -111,16 +111,32 @@ class FirebaseManager {
                     if (friendRequests.contains(currentUser.uid)) {
                         onFailure("You already sent a friend request")
                     } else {
-                        friendRequests.add(currentUser.uid)
+                        // we want to check if the other user sent us a req already
+                        val currentUserRef = db.collection("users").document(currentUser.uid)
+                        currentUserRef.get()
+                            .addOnSuccessListener { currentUserDocument ->
+                                val otherUserFriendRequests =
+                                    currentUserDocument.get("friendRequests") as? MutableList<String>
+                                        ?: mutableListOf()
 
-                        otherUserRef.update("friendRequests", friendRequests)
-                            .addOnSuccessListener {
-                                Log.i(TAG, "Friend request added successfully")
-                                onSuccess()
+                                if (otherUserFriendRequests.contains(user.userId)) {
+                                    onFailure("User already sent you a friend request, please accept it")
+                                } else {
+                                    // add friend req
+                                    friendRequests.add(currentUser.uid)
+                                    otherUserRef.update("friendRequests", friendRequests)
+                                        .addOnSuccessListener {
+                                            Log.i(TAG, "Friend request added successfully")
+                                            onSuccess()
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.e(TAG, "Error adding friend request: $e")
+                                            onFailure("Error adding friend request")
+                                        }
+                                }
                             }
                             .addOnFailureListener { e ->
-                                Log.e(TAG, "Error adding friend request: $e")
-                                onFailure("Error adding friend request")
+                                onFailure("Error checking friend requests: ${e.message}")
                             }
                     }
                 } else {
@@ -142,7 +158,7 @@ class FirebaseManager {
                     val friendRequests = documentSnapshot.get("friendRequests") as? List<String>
 
                     if (friendRequests.isNullOrEmpty()) {
-                        callback(emptyList(), null) // No friend requests, return an empty list
+                        callback(emptyList(), null)
                     } else {
                         val friendsList = mutableListOf<User>()
                         var friendCount = 0
