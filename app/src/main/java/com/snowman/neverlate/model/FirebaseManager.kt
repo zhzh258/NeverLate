@@ -148,7 +148,12 @@ class FirebaseManager {
             }
     }
 
-    fun removeFriendRequest(currentUserId: String, friendUserId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun removeFriendRequest(
+        currentUserId: String,
+        friendUserId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         val currentUserRef = db.collection("users").document(currentUserId)
         val friendRequestsRef = currentUserRef.collection("friendRequests")
 
@@ -162,16 +167,114 @@ class FirebaseManager {
             }
     }
 
-    fun addFriend(userId: String, friendId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun addFriend(
+        userId: String,
+        friendId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         val currentUserRef = db.collection("users").document(userId)
         val friendUserRef = db.collection("users").document(friendId)
 
-        val batch = db.batch()
-        batch.update(currentUserRef, "friends.$friendId", true)
-        batch.update(friendUserRef, "friends.$userId", true)
+        currentUserRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val currentUser = documentSnapshot.toObject(User::class.java)
+                    val currentFriends = currentUser?.friends?.toMutableList() ?: mutableListOf()
 
-        batch.commit()
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { e -> onFailure(e) }
+                    if (!currentFriends.contains(friendId)) {
+                        currentFriends.add(friendId)
+
+                        currentUserRef.update("friends", currentFriends)
+                            .addOnSuccessListener {
+                                // Update the friend's friends list
+                                friendUserRef.get()
+                                    .addOnSuccessListener { friendDocumentSnapshot ->
+                                        if (friendDocumentSnapshot.exists()) {
+                                            val friendUser = friendDocumentSnapshot.toObject(User::class.java)
+                                            val friendFriends = friendUser?.friends?.toMutableList() ?: mutableListOf()
+
+                                            if (!friendFriends.contains(userId)) {
+                                                friendFriends.add(userId)
+                                                friendUserRef.update("friends", friendFriends)
+                                                    .addOnSuccessListener {
+                                                        onSuccess()
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        onFailure(e)
+                                                    }
+                                            } else {
+                                                onSuccess()
+                                            }
+                                        } else {
+                                            onFailure(Exception("Friend user not found"))
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        onFailure(e)
+                                    }
+                            }
+                            .addOnFailureListener { e ->
+                                onFailure(e)
+                            }
+                    } else {
+                        onSuccess()
+                    }
+                } else {
+                    onFailure(Exception("Current user not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+    fun fetchFriendsDataForCurrentUser(
+        currentUserId: String,
+        callback: (List<User>?, Exception?) -> Unit
+    ) {
+        val currentUserRef = db.collection("users").document(currentUserId)
+
+        currentUserRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val currentUser = documentSnapshot.toObject(User::class.java)
+                    val friendIds = currentUser?.friends ?: listOf()
+
+                    val friendsList = mutableListOf<User>()
+                    var friendCount = 0
+
+                    for (friendId in friendIds) {
+                        val friendRef = db.collection("users").document(friendId)
+                        friendRef.get()
+                            .addOnSuccessListener { friendDocumentSnapshot ->
+                                if (friendDocumentSnapshot.exists()) {
+                                    val friend = friendDocumentSnapshot.toObject(User::class.java)
+                                    friend?.let {
+                                        friendsList.add(it)
+                                        friendCount++
+
+                                        if (friendCount == friendIds.size) {
+                                            callback(
+                                                friendsList,
+                                                null
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                callback(null, e)
+                                return@addOnFailureListener
+                            }
+                    }
+                    callback(friendsList, null)
+                } else {
+                    callback(null, Exception("Current user not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                callback(null, e)
+            }
     }
 }

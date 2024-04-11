@@ -1,40 +1,31 @@
 package com.snowman.neverlate.ui.friends
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.User
 import java.util.UUID
 
 class FriendsListViewModel : ViewModel() {
-    val friends = mutableListOf<IUser>()
+    private val TAG = "friends list vie wmodel"
+    private val firebaseManager = FirebaseManager.getInstance()
 
-    init {
-        for (i in 0 until 5) {
-            val friend1 = User(
-                userId = UUID.randomUUID().toString(),
-                phoneNumber = 1234567890,
-                displayName = "Mary Choe",
-                photoURL = "https://i.pinimg.com/originals/79/17/27/791727d03448c50f30f17e6da51cce65.png",
-                status = "I love cats"
-            )
+    private val _friends = MutableLiveData<List<IUser>>()
+    val friends: LiveData<List<IUser>> = _friends
 
-            val friend2 = User(
-                userId = UUID.randomUUID().toString(),
-                phoneNumber = 1234567890,
-                displayName = "ChinKuan Lin",
-                photoURL = "https://www.rover.com/blog/wp-content/uploads/2019/04/cute-big-eyes-1024x682.jpg",
-                status = "Sorry I was late last time"
-            )
-
-            val friend3 = User(
-                userId = UUID.randomUUID().toString(),
-                phoneNumber = 1234567890,
-                displayName = "ZhaoZhan Huang",
-                photoURL = "https://www.womansworld.com/wp-content/uploads/2024/08/cute-cats.jpg",
-                status = "This app is a pain for me"
-            )
-
-            friends.addAll(listOf(friend1, friend2, friend3))
+    fun fetchFriendsData() {
+        val currentUserId = firebaseManager.firebaseAuth().currentUser
+        if (currentUserId != null) {
+            firebaseManager.fetchFriendsDataForCurrentUser(currentUserId.uid) { friendsList, exception ->
+                if (exception != null) {
+                    Log.i(TAG, "unable to fetch friends $exception")
+                } else {
+                    _friends.value = friendsList.orEmpty()
+                }
+            }
         }
     }
 }
