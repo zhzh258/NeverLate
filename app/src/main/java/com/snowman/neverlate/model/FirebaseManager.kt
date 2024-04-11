@@ -61,21 +61,24 @@ class FirebaseManager {
             }
     }
 
-    fun loadUserData(userId: String, callback: (IUser?) -> Unit) {
-        db.collection("users").document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val user = document.toObject(User::class.java)
-                    callback(user)
-                } else {
-                    callback(null)
+    fun loadUserData(callback: (IUser?) -> Unit) {
+        if (currentUser != null) {
+            val currentUserId = currentUser.uid
+            db.collection("users").document(currentUserId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val user = document.toObject(User::class.java)
+                        callback(user)
+                    } else {
+                        callback(null)
+                    }
                 }
-            }
-            .addOnFailureListener { e ->
-                callback(null)
-                Log.e("FirebaseManager", "Failed to retrieve document")
-            }
+                .addOnFailureListener { e ->
+                    callback(null)
+                    Log.e("FirebaseManager", "Failed to retrieve document")
+                }
+        }
     }
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
