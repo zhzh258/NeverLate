@@ -15,7 +15,7 @@ class FriendsViewHolder(private val binding: ListItemFriendsBinding) :
         binding.displayNameTV.text = user.displayName
         binding.memoTv.text = user.status
         Glide.with(binding.profileIV)
-            .load(user.profilePicture)
+            .load(user.photoURL)
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.profileIV)
@@ -23,7 +23,7 @@ class FriendsViewHolder(private val binding: ListItemFriendsBinding) :
 }
 
 class FriendsListAdapter(
-    private val friends: List<IUser>
+    private var friends: MutableList<IUser>
 ) : RecyclerView.Adapter<FriendsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -38,5 +38,11 @@ class FriendsListAdapter(
     override fun onBindViewHolder(holder: FriendsViewHolder, position: Int) {
         val friend = friends[position]
         holder.bind(friend)
+    }
+
+    fun updateData(newFriends: List<IUser>) {
+        friends.clear()
+        friends.addAll(newFriends)
+        notifyDataSetChanged()
     }
 }

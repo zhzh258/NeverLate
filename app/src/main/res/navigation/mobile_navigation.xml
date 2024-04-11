@@ -30,13 +30,25 @@
         tools:layout="@layout/fragment_friends"
         />
     <fragment
+        android:id="@+id/addFriendsFragment"
+        android:name="com.snowman.neverlate.ui.friends.AddFriendsFragment"
+        android:label="@string/add_friends"
+        tools:layout="@layout/fragment_add_friends" />
+
+    <action
+        android:id="@+id/action_friendsFragment_to_addFriendsFragment"
+        app:destination="@id/addFriendsFragment" />
+  
+    <fragment
         android:id="@+id/nav_profile"
         android:name="com.snowman.neverlate.ui.profile.ProfileFragment"
         android:label="@string/menu_profile"
         tools:layout="@layout/fragment_profile"/>
+  
     <fragment
         android:id="@+id/nav_map"
         android:name="com.snowman.neverlate.ui.map.MapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_map"/>
+  
 </navigation>

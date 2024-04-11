@@ -8,10 +8,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentProfileBinding
+import com.snowman.neverlate.model.types.User
 
 class ProfileFragment : Fragment() {
 
@@ -29,8 +31,7 @@ class ProfileFragment : Fragment() {
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
 
-
-        initProfileData()
+        observeProfile()
         setProfileUpdateListener()
 
         return binding.root
@@ -41,13 +42,21 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 
-    private fun initProfileData() {
-        binding.displayNameET.setText(profileViewModel.me.displayName)
-        binding.phoneNumberET.setText(profileViewModel.me.phoneNumber.toString())
-        binding.emailTV.text = (profileViewModel.me.email)
-        binding.profileStatusET.setText(profileViewModel.me.status)
+    private fun observeProfile() {
+        profileViewModel.me.observe(viewLifecycleOwner) { user ->
+            user?.let {
+                initProfileData(it)
+            }
+        }
+    }
+
+    private fun initProfileData(me: User) {
+        binding.displayNameET.setText(me.displayName)
+        binding.phoneNumberET.setText(me.phoneNumber.toString())
+        binding.emailTV.text = (me.email)
+        binding.profileStatusET.setText(me.status)
         Glide.with(binding.profileIV)
-            .load(profileViewModel.me.profilePicture)
+            .load(me.photoURL)
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.profileIV)

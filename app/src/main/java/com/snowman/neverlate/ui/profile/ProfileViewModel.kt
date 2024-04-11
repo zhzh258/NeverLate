@@ -1,22 +1,30 @@
 package com.snowman.neverlate.ui.profile
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.User
-import java.util.UUID
 
-// TODO: Make this a shared view model. By fetching auth data from firebase. "me" should always be the current user using the App.
 class ProfileViewModel: ViewModel() {
-    lateinit var me: User
+    private val firebaseManager = FirebaseManager.getInstance()
+    private val _me = MutableLiveData<User?>()
+    val me: LiveData<User?> = _me
     var isEdit: Boolean = false
     init {
-        me = User(
-            id = UUID.randomUUID().toString(),
-            phoneNumber = 1234567890,
-            displayName = "ZhaoZhan Huang",
-            email = "nonox530042@gmail.com",
-            profilePicture = "https://www.womansworld.com/wp-content/uploads/2024/08/cute-cats.jpg",
-            status = "This app is a pain for me",
+        loadUserData()
+    }
 
-        )
+    private fun loadUserData() {
+        firebaseManager.loadUserData { user ->
+            if (user != null) {
+                _me.value = user as User?
+            } else {
+                // Handle the exception, e.g., log an error or show a message
+                // For now, just set the LiveData value to null
+                _me.value = null
+            }
+        }
     }
 }

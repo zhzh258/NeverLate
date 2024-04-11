@@ -86,7 +86,12 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_friends, R.id.nav_profile, R.id.nav_map
+                R.id.nav_home,
+                R.id.nav_gallery,
+                R.id.nav_slideshow,
+                R.id.nav_friends,
+                R.id.nav_profile,
+                R.id.nav_map
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -110,14 +115,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadUserData() {
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            firebaseManager.loadUserData(userId) { user ->
-                if (user != null) {
-                    user.updateUserViewModel(userViewModel)
-                } else {
-                    Log.e("FirebaseManager", "Failed to retrieve user data")
-                }
+        firebaseManager.loadUserData { user ->
+            if (user != null) {
+                user.updateUserViewModel(userViewModel)
+            } else {
+                Log.e("FirebaseManager", "Failed to retrieve user data")
             }
         }
     }
@@ -128,10 +130,10 @@ class MainActivity : AppCompatActivity() {
                 displayNameTextView.text = user.displayName
                 emailTextView.text = user.email
                 Glide.with(this)
-                            .load(user.profilePicture)
-                            .circleCrop()
-                            .error(R.mipmap.ic_launcher_round)
-                            .into(profilePictureImageView)
+                    .load(user.photoURL)
+                    .circleCrop()
+                    .error(R.mipmap.ic_launcher_round)
+                    .into(profilePictureImageView)
             } else {
                 Log.i(TAG, "User data null")
             }
