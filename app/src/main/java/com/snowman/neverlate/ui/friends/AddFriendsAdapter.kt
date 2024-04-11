@@ -29,16 +29,12 @@ class AddFriendsViewHolder(
             .into(binding.profileIV)
         binding.sendReqBtn.setOnClickListener {
             val firebaseManager = FirebaseManager.getInstance()
-            val currentUser = firebaseManager.firebaseAuth().currentUser
+            firebaseManager.sendFriendRequest(
+                user,
+                { onSuccessFriendRequest() },
+                { onFailureFriendRequest(it) }
+            )
 
-            if (currentUser != null) {
-                firebaseManager.sendFriendRequest(
-                    currentUser,
-                    user,
-                    { onSuccessFriendRequest() },
-                    { onFailureFriendRequest(it) }
-                )
-            }
         }
     }
 
@@ -87,39 +83,30 @@ class FriendRequestsViewHolder(
             .into(binding.profileIV)
 
         val firebaseManager = FirebaseManager.getInstance()
-        val currentUserID = firebaseManager.firebaseAuth().currentUser?.uid
         val friendUserID = user.userId
 
         binding.acceptReqBtn.setOnClickListener {
-            if (currentUserID != null) {
-                firebaseManager.addFriend(
-                    currentUserID,
-                    user.userId,
-                    { onSuccessAccept(firebaseManager, currentUserID, friendUserID) },
-                    { e -> onFailureDecline(e) }
-                )
-            }
+            firebaseManager.addFriend(
+                user.userId,
+                { onSuccessAccept(firebaseManager, friendUserID) },
+                { e -> onFailureDecline(e) }
+            )
         }
 
         binding.declineReqBtn.setOnClickListener {
-            if (currentUserID != null) {
-                firebaseManager.removeFriendRequest(
-                    currentUserID,
-                    friendUserID,
-                    { onSuccessDecline() },
-                    { e -> onFailDecline(e) }
-                )
-            }
+            firebaseManager.removeFriendRequest(
+                friendUserID,
+                { onSuccessDecline() },
+                { e -> onFailDecline(e) }
+            )
         }
     }
 
     private fun onSuccessAccept(
         firebaseManager: FirebaseManager,
-        currentUserID: String,
         friendUserID: String
     ) {
         firebaseManager.removeFriendRequest(
-            currentUserID,
             friendUserID,
             { removeRequest() },
             { e -> onFailDecline(e) }

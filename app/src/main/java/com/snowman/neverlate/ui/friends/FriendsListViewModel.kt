@@ -17,15 +17,13 @@ class FriendsListViewModel : ViewModel() {
     val friends: LiveData<List<IUser>> = _friends
 
     fun fetchFriendsData() {
-        val currentUserId = firebaseManager.firebaseAuth().currentUser
-        if (currentUserId != null) {
-            firebaseManager.fetchFriendsDataForCurrentUser(currentUserId.uid) { friendsList, exception ->
-                if (exception != null) {
-                    Log.i(TAG, "unable to fetch friends $exception")
-                } else {
-                    _friends.value = friendsList.orEmpty()
-                }
+        firebaseManager.fetchFriendsDataForCurrentUser { friendsList, exception ->
+            if (exception != null) {
+                Log.i(TAG, "unable to fetch friends $exception")
+            } else {
+                _friends.value = friendsList.orEmpty()
             }
         }
+
     }
 }

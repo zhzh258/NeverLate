@@ -53,6 +53,7 @@ class AddFriendsFragment : Fragment() {
         setUpSearchRecyclerView()
         setSearchListener()
     }
+
     private fun setUpSearchRecyclerView() {
         searchFriendsRV.layoutManager = LinearLayoutManager(context)
         addFriendsAdapter = AddFriendsAdapter(searchList, requireContext())
@@ -105,18 +106,15 @@ class AddFriendsFragment : Fragment() {
     }
 
     private fun populateRequests() {
-        val currentUserID = firebaseManager.auth.currentUser?.uid
-        if (currentUserID != null) {
-            FirebaseManager.getInstance().getFriendRequests(currentUserID) { usersList, exception ->
-                if (exception != null) {
-                    Log.e(TAG, "Error fetching friend requests: $exception")
-                } else {
-                    // Use the usersList containing friend requests
-                    usersList?.let {
-                        requestsList.clear()
-                        requestsList.addAll(usersList)
-                        friendRequestsAdapter.notifyDataSetChanged()
-                    }
+        FirebaseManager.getInstance().getFriendRequests() { usersList, exception ->
+            if (exception != null) {
+                Log.e(TAG, "Error fetching friend requests: $exception")
+            } else {
+                // Use the usersList containing friend requests
+                usersList?.let {
+                    requestsList.clear()
+                    requestsList.addAll(usersList)
+                    friendRequestsAdapter.notifyDataSetChanged()
                 }
             }
         }
