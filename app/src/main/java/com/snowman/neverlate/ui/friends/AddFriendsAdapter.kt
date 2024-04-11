@@ -89,8 +89,16 @@ class FriendRequestsViewHolder(
         val firebaseManager = FirebaseManager.getInstance()
         val currentUserID = firebaseManager.firebaseAuth().currentUser?.uid
         val friendUserID = user.userId
+
         binding.acceptReqBtn.setOnClickListener {
-            // TODO: accept req
+            if (currentUserID != null) {
+                firebaseManager.addFriend(
+                    currentUserID,
+                    user.userId,
+                    { onSuccessAccept(firebaseManager, currentUserID, friendUserID) },
+                    { e -> onFailureDecline(e) }
+                )
+            }
         }
 
         binding.declineReqBtn.setOnClickListener {
@@ -105,15 +113,36 @@ class FriendRequestsViewHolder(
         }
     }
 
+    private fun onSuccessAccept(
+        firebaseManager: FirebaseManager,
+        currentUserID: String,
+        friendUserID: String
+    ) {
+        firebaseManager.removeFriendRequest(
+            currentUserID,
+            friendUserID,
+            { removeRequest() },
+            { e -> onFailDecline(e) }
+        )
+    }
+
+    private fun onFailureDecline(e: Exception) {
+        Log.e("FriendReqAdapter", "Error accepting friend request: $e")
+    }
+
     private fun onSuccessDecline() {
+        removeRequest()
+    }
+
+    private fun onFailDecline(e: Exception) {
+        Log.e("FriendReqAdapter", "Error removing friend request: $e")
+    }
+
+    private fun removeRequest() {
         val position = adapterPosition
         if (position != RecyclerView.NO_POSITION) {
             adapter.removeItem(position)
         }
-    }
-
-    private fun onFailDecline(e: Exception) {
-        Log.e("FriendReqAdapter", "Error declining friend request: $e")
     }
 }
 

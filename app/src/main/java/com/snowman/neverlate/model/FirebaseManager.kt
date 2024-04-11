@@ -155,10 +155,23 @@ class FirebaseManager {
         friendRequestsRef.document(friendUserId)
             .delete()
             .addOnSuccessListener {
-                onSuccess() // idk if we want to do anything on success
+                onSuccess()
             }
             .addOnFailureListener { e ->
                 onFailure(e)
             }
+    }
+
+    fun addFriend(userId: String, friendId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val currentUserRef = db.collection("users").document(userId)
+        val friendUserRef = db.collection("users").document(friendId)
+
+        val batch = db.batch()
+        batch.update(currentUserRef, "friends.$friendId", true)
+        batch.update(friendUserRef, "friends.$userId", true)
+
+        batch.commit()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
     }
 }
