@@ -147,4 +147,18 @@ class FirebaseManager {
                 callback(null, exception)
             }
     }
+
+    fun removeFriendRequest(currentUserId: String, friendUserId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val currentUserRef = db.collection("users").document(currentUserId)
+        val friendRequestsRef = currentUserRef.collection("friendRequests")
+
+        friendRequestsRef.document(friendUserId)
+            .delete()
+            .addOnSuccessListener {
+                onSuccess() // idk if we want to do anything on success
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
 }

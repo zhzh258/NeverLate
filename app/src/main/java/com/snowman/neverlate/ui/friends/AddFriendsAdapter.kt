@@ -1,6 +1,7 @@
 package com.snowman.neverlate.ui.friends
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -70,7 +71,10 @@ class AddFriendsAdapter(
     }
 }
 
-class FriendRequestsViewHolder(private val binding: ListItemFriendRequestsBinding) :
+class FriendRequestsViewHolder(
+    private val binding: ListItemFriendRequestsBinding,
+    private val adapter: FriendRequestsAdapter
+) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(user: IUser) {
@@ -81,22 +85,44 @@ class FriendRequestsViewHolder(private val binding: ListItemFriendRequestsBindin
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.profileIV)
+
+        val firebaseManager = FirebaseManager.getInstance()
+        val currentUserID = firebaseManager.firebaseAuth().currentUser?.uid
+        val friendUserID = user.userId
         binding.acceptReqBtn.setOnClickListener {
             // TODO: accept req
         }
 
         binding.declineReqBtn.setOnClickListener {
-            // TODO: decline req
+            if (currentUserID != null) {
+                firebaseManager.removeFriendRequest(
+                    currentUserID,
+                    friendUserID,
+                    { onSuccessDecline() },
+                    { e -> onFailDecline(e) }
+                )
+            }
         }
+    }
+
+    private fun onSuccessDecline() {
+        val position = adapterPosition
+        if (position != RecyclerView.NO_POSITION) {
+            adapter.removeItem(position)
+        }
+    }
+
+    private fun onFailDecline(e: Exception) {
+        Log.e("FriendReqAdapter", "Error declining friend request: $e")
     }
 }
 
-class FriendRequestsAdapter(private val requests: List<IUser>) :
+class FriendRequestsAdapter(private val requests: MutableList<IUser>) :
     RecyclerView.Adapter<FriendRequestsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendRequestsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemFriendRequestsBinding.inflate(inflater, parent, false)
-        return FriendRequestsViewHolder(binding)
+        return FriendRequestsViewHolder(binding, this)
     }
 
     override fun getItemCount(): Int {
@@ -108,4 +134,10 @@ class FriendRequestsAdapter(private val requests: List<IUser>) :
         holder.bind(request)
     }
 
+    fun removeItem(position: Int) {
+        if (position != RecyclerView.NO_POSITION) {
+            requests.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
 }
