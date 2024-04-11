@@ -10,10 +10,13 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_map">Map</string>
     <string name="default_web_client_id">196033837175-9bc1n2p6kb8bkagi1fpb0svuqn6vltcn.apps.googleusercontent.com</string>
     <string name="sign_out">Sign Out</string>
     <string name="title">Welcome to NeverLate</string>
     <string name="subtitle">Stay Punctual, Never Late!</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_friends">Friends</string>
@@ -21,4 +24,6 @@
     <string name="friend_requests">Friend Requests</string>
     <string name="add_friends_search_bar_text">Search Friend By Email</string>
     <string name="send_request">Send Request</string>
+
+
 </resources>

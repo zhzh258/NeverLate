@@ -20,6 +20,15 @@
             android:id="@+id/nav_friends"
             android:icon="@drawable/baseline_people_24"
             android:title="@string/menu_friends" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/baseline_exit_to_app_24"
+            android:title="@string/menu_profile" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/baseline_exit_to_app_24"
+            android:title="Map" />
+
     </group>
 
     <group
