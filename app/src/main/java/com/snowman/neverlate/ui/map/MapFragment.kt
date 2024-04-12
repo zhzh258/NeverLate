@@ -14,8 +14,10 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -76,9 +78,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
             setMapConfig()
             bindLiveData()
-            updateUserGPS() // suspend function
-            if(mapViewModel.userLocation.value != null)
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapViewModel.userLocation.value!!, 12f))
+            val origin = getUserGPS() // suspend function
+            origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
+            if(origin != null){
+                Log.d(TAG, "Moving camera to ${origin.toString()}")
+
+            }
             setUpBottomSheet()
         }
     }
@@ -112,7 +117,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
                 Log.d(TAG, "onRequestPermissionsResult - the user granted permission - go to if")
                 lifecycleScope.launch {
-                    updateUserGPS()
+                    getUserGPS()
                 }
             } else {
                 // Permission was denied. Handle the situation by showing a message to the user or taking appropriate action.
@@ -125,22 +130,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setUpBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         map.setOnMarkerClickListener {marker: Marker -> lifecycleScope.launch {
-//            updateUserGPS() // suspend function
+//            getUserGPS() // suspend function
             marker.showInfoWindow()
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            val origin: LatLng? = getUserGPS()
 
-            Log.d(TAG, mapViewModel.userLocation.value.toString())
             // Start all fetches in parallel
-            val driving = async { fetchDirectionsResponse("driving", marker) }
-            val walking = async { fetchDirectionsResponse("walking", marker) }
-            val bicycling = async { fetchDirectionsResponse("bicycling", marker) }
-            val transit = async { fetchDirectionsResponse("transit", marker) }
+            val driving = async { fetchDirectionsResponse(origin, "driving", marker) }
+            val walking = async { fetchDirectionsResponse(origin, "walking", marker) }
+            val bicycling = async { fetchDirectionsResponse(origin, "bicycling", marker) }
+            val transit = async { fetchDirectionsResponse(origin, "transit", marker) }
             // await all
             val responses = awaitAll(driving, walking, bicycling, transit)
             val (drivingResponse, walkingResponse, bicyclingResponse, transitResponse) = responses
             binding.driveButton.apply {
                 this.setOnClickListener {
+                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
                     val polylineOptions = PolylineOptions()
                     val points = PolyUtil.decode(drivingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
                     polylineOptions.addAll(points)
@@ -152,6 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             binding.walkButton.apply {
                 this.setOnClickListener {
+                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     val polylineOptions = PolylineOptions()
                     val points = PolyUtil.decode(walkingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
@@ -164,6 +172,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             binding.bikeButton.apply {
                 this.setOnClickListener {
+                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     val polylineOptions = PolylineOptions()
                     val points = PolyUtil.decode(bicyclingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
@@ -176,6 +185,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             binding.transitButton.apply {
                 this.setOnClickListener {
+                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     val polylineOptions = PolylineOptions()
                     val points = PolyUtil.decode(transitResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
@@ -194,10 +204,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
-    private suspend fun fetchDirectionsResponse(mode: String, marker: Marker): DirectionsResponse? { // show a line from current location to
+    private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, marker: Marker): DirectionsResponse? { // show a line from current location to
 
-        Log.d(TAG, "Now fetching data with origin = ${mapViewModel.userLocation.value.toString()}")
-        val origin = mapViewModel.userLocation.value ?: return null
+        Log.d(TAG, "Now fetching data with origin = ${origin}")
+        origin ?: return null
         val destination = marker.position
 
         val retrofit = Retrofit.Builder()
@@ -225,7 +235,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private suspend fun updateUserGPS() {
+    private suspend fun getUserGPS(): LatLng? {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -235,17 +245,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             ) != PackageManager.PERMISSION_GRANTED
         ) { // permission is NOT granted
             Toast.makeText(requireContext(), "please enable location permissions in device settings", Toast.LENGTH_SHORT).show()
+            return null;
         } else { // permission is granted, show the location
             map.isMyLocationEnabled = true
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-            val location = fusedLocationProviderClient.lastLocation.await()
-            Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
-            if (location != null) {
+            val priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
+            val cancellationTokenSource = CancellationTokenSource()
+
+            val location = fusedLocationProviderClient.getCurrentLocation(priority, cancellationTokenSource.token).await()
+            if(location != null){
                 Log.d(TAG, "fusedLocationProviderClient successfully fetches a location ${location.toString()}")
-                mapViewModel.userLocation.value = LatLng(location.latitude, location.longitude)
-            } else { // idk why but the location can be null sometimes
+                Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
+                val latLng = LatLng(location.latitude, location.longitude)
+
+                return latLng
+            } else{
                 Toast.makeText(requireContext(), "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.", Toast.LENGTH_LONG).show()
+                Log.d(TAG, "updateUserGPS is called and fusedLocationProviderClient failed to get a location")
                 Log.d(TAG, "No location available at this time.")
+                return null
             }
         }
     }
