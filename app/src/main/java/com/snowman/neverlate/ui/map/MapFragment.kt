@@ -29,6 +29,8 @@ import kotlinx.coroutines.tasks.await
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+private val TAG = "MAP_DEBUG"
+
 class MapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -60,20 +62,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("MY_DEBUG", "MapFragment is destroyed!")
+//        Log.d("MY_DEBUG", "MapFragment is destroyed!")
         _binding = null
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Toast.makeText(requireContext(), "onMapReady() is called", Toast.LENGTH_SHORT).show()
-        map = googleMap
-
-        setMapConfig()
-        bindLiveData()
-        updateUserGPS()
-        if(mapViewModel.userLocation.value != null)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapViewModel.userLocation.value!!, 12f))
-        setUpBottomSheet()
+        Log.d(TAG, "onMapReady() is called. Launching coroutine in lifecycleScope...")
+        lifecycleScope.launch {
+            map = googleMap
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            setMapConfig()
+            bindLiveData()
+            updateUserGPS() // suspend function
+            if(mapViewModel.userLocation.value != null)
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapViewModel.userLocation.value!!, 12f))
+            setUpBottomSheet()
+        }
     }
 
     private fun setMapConfig() {
@@ -99,9 +103,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d(TAG, "onRequestPermissionsResult is called")
         if (requestCode == 1) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                updateUserGPS()
+                Log.d(TAG, "onRequestPermissionsResult - the user granted permission - go to if")
+                lifecycleScope.launch { updateUserGPS() }
             } else {
                 // Permission was denied. Handle the situation by showing a message to the user or taking appropriate action.
                 Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
@@ -113,10 +119,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setUpBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         map.setOnMarkerClickListener {marker: Marker -> lifecycleScope.launch {
+            updateUserGPS() // suspend function
             marker.showInfoWindow()
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-            Log.d("MY_DEBUG", mapViewModel.userLocation.value.toString())
+            Log.d(TAG, mapViewModel.userLocation.value.toString())
             // Start all fetches in parallel
             val driving = async { fetchDirectionsResponse("driving", marker) }
             val walking = async { fetchDirectionsResponse("walking", marker) }
@@ -182,7 +189,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
     private suspend fun fetchDirectionsResponse(mode: String, marker: Marker): DirectionsResponse? { // show a line from current location to
-        updateUserGPS()
+
+        Log.d(TAG, "Now fetching data with origin = ${mapViewModel.userLocation.value.toString()}")
         val origin = mapViewModel.userLocation.value ?: return null
         val destination = marker.position
 
@@ -195,9 +203,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         try {
             val apiKey = getMetaData("com.google.android.geo.API_KEY")
-            Log.d("MY_DEBUG", apiKey.toString())
             val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
-//            Log.d("MY_DEBUG", response.body().toString())
+//            Log.d(TAG, response.body().toString())
             if (response.isSuccessful) {
                 if(response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0)
                     return null
@@ -212,7 +219,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun updateUserGPS() = lifecycleScope.launch {
+    private suspend fun updateUserGPS() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -221,12 +228,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) { // permission is NOT granted
-            // Request the permission
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            Toast.makeText(requireContext(), "please enable location permissions in device settings", Toast.LENGTH_SHORT).show()
         } else { // permission is granted, show the location
             map.isMyLocationEnabled = true
             val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
             val location = fusedLocationProviderClient.lastLocation.await()
+            Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
             mapViewModel.userLocation.value = LatLng(location.latitude, location.longitude)
         }
     }
