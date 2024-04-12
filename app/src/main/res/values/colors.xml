@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary Color Settings -->
+    <color name="colorPrimary">#A3CAFA</color>
+    <color name="colorPrimaryDark">#E7E9E9</color>
+
+    <!-- Button Color Settings -->
+    <color name="buttonBackground">	#97CBFF</color>
+    <color name="buttonText">#FFFFFF</color>
 </resources>

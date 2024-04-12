@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="CustomButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/rounded_btn</item>
+        <item name="android:textColor">@color/buttonText</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">2dp</item>
+        <item name="elevation">4dp</item>
+    </style>
+
+    <style name ="CustomTextViewStyle">
+    </style>
+
+    <style name="CustomEditTextStyle">
+        <item name="android:textColor">#e5e5e5</item>
+        <item name="background">@drawable/rounded_edittext</item>
+    </style>
+
+</resources>
