@@ -18,6 +18,7 @@ import com.snowman.neverlate.model.types.IUser
 class AddFriendsFragment : Fragment() {
 
     private val TAG = "addfriendsfragment"
+    private val RECYCLER_VIEW_MAX_ITEMS = 4
 
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IUser>()
@@ -91,8 +92,8 @@ class AddFriendsFragment : Fragment() {
             } else {
                 users?.let {
                     searchList.clear()
-                    searchList.addAll(it)
-                    addFriendsAdapter.notifyItemChanged(0)
+                    searchList.addAll(it.take(RECYCLER_VIEW_MAX_ITEMS)) // will js show top 4 searches
+                    addFriendsAdapter.notifyDataSetChanged()
                 }
 
                 if (users.isNullOrEmpty()) {
