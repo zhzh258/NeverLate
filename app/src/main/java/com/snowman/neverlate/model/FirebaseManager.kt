@@ -82,20 +82,27 @@ class FirebaseManager {
     }
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
-        usersCollection.get()
-            .addOnSuccessListener { querySnapshot ->
-                val usersList = mutableListOf<User>()
-                for (document in querySnapshot) {
-                    val user = document.toObject(User::class.java)
-                    if (user.email.startsWith(email, ignoreCase = true)) {
-                        usersList.add(user)
+        if (currentUser != null) {
+            usersCollection.get()
+                .addOnSuccessListener { querySnapshot ->
+                    val usersList = mutableListOf<User>()
+                    for (document in querySnapshot) {
+                        val user = document.toObject(User::class.java)
+                        if (user.email.startsWith(
+                                email,
+                                ignoreCase = true
+                            ) && user.email != currentUser.email // lol not friends w self
+                            && !user.friends.contains(currentUser.uid) // not already friends
+                        ) {
+                            usersList.add(user)
+                        }
                     }
+                    callback(usersList, null)
                 }
-                callback(usersList, null)
-            }
-            .addOnFailureListener { exception ->
-                callback(null, exception)
-            }
+                .addOnFailureListener { exception ->
+                    callback(null, exception)
+                }
+        }
     }
 
     fun sendFriendRequest(
