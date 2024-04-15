@@ -1,19 +1,20 @@
 package com.snowman.neverlate.ui.profile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentProfileBinding
+import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.User
+import com.snowman.neverlate.model.types.UserViewModel
 
 class ProfileFragment : Fragment() {
 
@@ -23,6 +24,7 @@ class ProfileFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val profileViewModel: ProfileViewModel by viewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +33,9 @@ class ProfileFragment : Fragment() {
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
 
+        userViewModel.userData.value?.let {
+            initProfileData(it)
+        }
         observeProfile()
         setProfileUpdateListener()
 
@@ -43,14 +48,14 @@ class ProfileFragment : Fragment() {
     }
 
     private fun observeProfile() {
-        profileViewModel.me.observe(viewLifecycleOwner) { user ->
+        userViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
                 initProfileData(it)
             }
         }
     }
 
-    private fun initProfileData(me: User) {
+    private fun initProfileData(me: IUser) {
         binding.displayNameET.setText(me.displayName)
         binding.phoneNumberET.setText(me.phoneNumber.toString())
         binding.emailTV.text = (me.email)
