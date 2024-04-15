@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,13 +27,15 @@ class AddFriendsFragment : Fragment() {
     private lateinit var searchFriendsSV: SearchView
     private lateinit var searchFriendsRV: RecyclerView
     private lateinit var friendReqRV: RecyclerView
+    private lateinit var searchFriendsBtn: Button
+    private var searchQuery = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_friends, container, false)
+        return inflater.inflate(R.layout.fragment_add_friend_v2, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,6 +50,7 @@ class AddFriendsFragment : Fragment() {
         searchFriendsSV = view.findViewById(R.id.searchFriendsSV)
         searchFriendsRV = view.findViewById(R.id.searchFriendsRV)
         friendReqRV = view.findViewById(R.id.friendReqRV)
+        searchFriendsBtn = view.findViewById(R.id.searchFriendsBtn)
     }
 
     private fun setUpSearchFeature() {
@@ -63,35 +67,43 @@ class AddFriendsFragment : Fragment() {
     private fun setSearchListener() {
         searchFriendsSV.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                p0?.let { email ->
-                    firebaseManager.searchUsersByEmail(email) { users, exception ->
-                        if (exception != null) {
-                            Log.e(TAG, "Error searching for users: $exception")
-                        } else {
-                            users?.let {
-                                searchList.clear()
-                                searchList.addAll(it)
-                                addFriendsAdapter.notifyItemChanged(0)
-                            }
-
-                            if (users.isNullOrEmpty()) {
-                                Toast.makeText(
-                                    context,
-                                    "There are no users with that email",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    }
-                }
+                p0?.let { email -> search(email) }
                 return true
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
+                if (p0 != null) {
+                    searchQuery = p0
+                }
                 return true
             }
-
         })
+
+        searchFriendsBtn.setOnClickListener{
+            search(searchQuery)
+        }
+    }
+
+    private fun search(email: String) {
+        firebaseManager.searchUsersByEmail(email) { users, exception ->
+            if (exception != null) {
+                Log.e(TAG, "Error searching for users: $exception")
+            } else {
+                users?.let {
+                    searchList.clear()
+                    searchList.addAll(it)
+                    addFriendsAdapter.notifyItemChanged(0)
+                }
+
+                if (users.isNullOrEmpty()) {
+                    Toast.makeText(
+                        context,
+                        "There are no users with that email",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun setUpRequestsFeature() {

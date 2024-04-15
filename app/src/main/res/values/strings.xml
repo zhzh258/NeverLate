@@ -24,6 +24,7 @@
     <string name="friend_requests">Friend Requests</string>
     <string name="add_friends_search_bar_text">Search Friend By Email</string>
     <string name="send_request">Send Request</string>
+    <string name="search">search</string>
 
 
 </resources>
