@@ -82,8 +82,7 @@ class FirebaseManager {
     }
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
-        usersCollection
-            .get()
+        usersCollection.get()
             .addOnSuccessListener { querySnapshot ->
                 val usersList = mutableListOf<User>()
                 for (document in querySnapshot) {
