@@ -12,6 +12,7 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_profile">Profile</string>
     <string name="menu_map">Map</string>
+    <string name="menu_settings">Settings</string>
     <string name="default_web_client_id">196033837175-9bc1n2p6kb8bkagi1fpb0svuqn6vltcn.apps.googleusercontent.com</string>
     <string name="sign_out">Sign Out</string>
     <string name="title">Welcome to NeverLate</string>
@@ -21,10 +22,18 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_friends">Friends</string>
     <string name="add_friends">Add Friends</string>
+    <string name="edit_profile">Edit Profile</string>
     <string name="friend_requests">Friend Requests</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="rate_us_title">Are you enjoying our app?</string>
+    <string name="save">Save</string>
     <string name="add_friends_search_bar_text">Search Friend By Email</string>
     <string name="send_request">Send Request</string>
     <string name="search">search</string>
+    <string name="username">Username</string>
+    <string name="address">Address</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="about_me">About Me</string>
 
 
 </resources>
