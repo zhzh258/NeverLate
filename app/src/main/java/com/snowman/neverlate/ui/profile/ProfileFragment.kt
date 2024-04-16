@@ -11,12 +11,15 @@ import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentProfileV2Binding
 import com.snowman.neverlate.model.shared.UserViewModel
 import com.snowman.neverlate.model.types.IUser
+import com.snowman.neverlate.model.FirebaseManager
+import android.util.Log
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileV2Binding? = null
     private val binding get() = _binding!!
     private val userViewModel: UserViewModel by activityViewModels()
+    private val firebaseManager = FirebaseManager.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +42,7 @@ class ProfileFragment : Fragment() {
     private fun observeProfile() {
         userViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
+                loadUserData()
                 initProfileData(it)
             }
         }
@@ -55,5 +59,15 @@ class ProfileFragment : Fragment() {
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.profileIV)
+    }
+
+    private fun loadUserData() {
+        firebaseManager.loadUserData { user ->
+            if (user != null) {
+                user.updateUserViewModel(userViewModel)
+            } else {
+                Log.e("FirebaseManager", "Failed to retrieve user data")
+            }
+        }
     }
 }
