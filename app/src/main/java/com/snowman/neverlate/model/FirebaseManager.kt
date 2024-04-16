@@ -108,8 +108,6 @@ class FirebaseManager {
                                         Log.e(TAG, "Error fetching updated user document: $e")
                                         onFailure(e)
                                     }
-
-//                                onSuccess()
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error updating user details: $e")
