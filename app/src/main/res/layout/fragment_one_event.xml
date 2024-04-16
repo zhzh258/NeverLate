@@ -99,6 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Weekly discussion on assignment worksheet and final project for CS 501 Mobile App Development..."
+        app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="232dp" />
 

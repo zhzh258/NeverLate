@@ -48,9 +48,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/event_header">
-        <SearchView
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchEventsSV"
             android:queryBackground="@color/colorPrimaryDark"
-            android:queryHint="search events..."
+            android:hint="Search events by name"
             android:textColorHint="@color/black"
             android:background="@drawable/rounded_btn"
             android:backgroundTint="@color/colorPrimaryDark"
@@ -87,6 +88,7 @@
 
             <ToggleButton
                 style="@style/CustomButtonStyle"
+                android:id="@+id/filterAllBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="All"
@@ -97,6 +99,7 @@
 
             <ToggleButton
                 style="@style/CustomButtonStyle"
+                android:id="@+id/filterDiningBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Dining"
@@ -106,6 +109,7 @@
 
             <ToggleButton
                 style="@style/CustomButtonStyle"
+                android:id="@+id/filterStudyBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Study"
@@ -115,6 +119,7 @@
 
             <ToggleButton
                 style="@style/CustomButtonStyle"
+                android:id="@+id/filterMeetingBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Meeting"
@@ -124,6 +129,7 @@
 
             <ToggleButton
                 style="@style/CustomButtonStyle"
+                android:id="@+id/filterTravelBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Travel"
@@ -170,7 +176,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/friendsListRv"
+        android:id="@+id/eventsListRv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/upcoming_seeall"
@@ -178,7 +184,7 @@
 
     <Button
         style="@style/CustomButtonStyle"
-        android:id="@+id/btn_right_bottom"
+        android:id="@+id/addEventBtn"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="Add Event"

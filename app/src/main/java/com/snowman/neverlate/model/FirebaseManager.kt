@@ -8,12 +8,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.User
+import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.model.types.Event
 
 class FirebaseManager {
     private val TAG = "Firebase Manager"
     val db = FirebaseFirestore.getInstance()
     val auth = Firebase.auth
     private val usersCollection = db.collection("users")
+    private val eventsCollection = db.collection("events")
     private val currentUser = auth.currentUser
 
     companion object {
@@ -412,4 +415,5 @@ class FirebaseManager {
                 }
         }
     }
+
 }
