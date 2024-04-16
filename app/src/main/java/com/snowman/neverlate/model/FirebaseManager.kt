@@ -13,9 +13,6 @@ class FirebaseManager {
     private val TAG = "Firebase Manager"
     val db = FirebaseFirestore.getInstance()
     val auth = Firebase.auth
-    private val usersCollection = db.collection("users")
-    private var _currentUser = auth.currentUser
-    private val currentUser = _currentUser
 
     companion object {
         @Volatile
@@ -54,13 +51,14 @@ class FirebaseManager {
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     Log.d(TAG, "User already exists in Firestore, skipping save operation")
-                    _currentUser = auth.currentUser
+//                    _currentUser = auth.currentUser
+//                    Log.d(TAG, "firebase user _" + _currentUser)
                     onSuccess()
                 } else {
                     userRef.set(user)
                         .addOnSuccessListener {
                             Log.d(TAG, "User data saved successfully to Firestore")
-                            _currentUser = auth.currentUser
+//                            _currentUser = auth.currentUser
                             onSuccess()
                         }
                         .addOnFailureListener { e ->
@@ -72,6 +70,7 @@ class FirebaseManager {
     }
 
     fun loadUserData(callback: (IUser?) -> Unit) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             db.collection("users").document(currentUserId)
@@ -92,8 +91,9 @@ class FirebaseManager {
     }
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
-            usersCollection.get()
+            db.collection("users").get()
                 .addOnSuccessListener { querySnapshot ->
                     val usersList = mutableListOf<User>()
                     for (document in querySnapshot) {
@@ -120,6 +120,7 @@ class FirebaseManager {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val otherUserRef = db.collection("users").document(user.userId)
 
@@ -173,6 +174,7 @@ class FirebaseManager {
     }
 
     fun getFriendRequests(callback: (List<User>?, Exception?) -> Unit) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
@@ -225,6 +227,7 @@ class FirebaseManager {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
@@ -263,6 +266,7 @@ class FirebaseManager {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
@@ -329,6 +333,7 @@ class FirebaseManager {
     fun fetchFriendsDataForCurrentUser(
         callback: (List<User>?, Exception?) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
