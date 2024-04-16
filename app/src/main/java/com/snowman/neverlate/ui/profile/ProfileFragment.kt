@@ -12,12 +12,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
-import com.snowman.neverlate.databinding.FragmentProfileBinding
+import com.snowman.neverlate.databinding.FragmentProfileV2Binding
 import com.snowman.neverlate.model.types.User
 
 class ProfileFragment : Fragment() {
 
-    private var _binding: FragmentProfileBinding? = null
+    private var _binding: FragmentProfileV2Binding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -29,10 +29,10 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        _binding = FragmentProfileV2Binding.inflate(inflater, container, false)
 
         observeProfile()
-        setProfileUpdateListener()
+        //setProfileUpdateListener()
 
         return binding.root
     }
@@ -51,10 +51,12 @@ class ProfileFragment : Fragment() {
     }
 
     private fun initProfileData(me: User) {
-        binding.displayNameET.setText(me.displayName)
-        binding.phoneNumberET.setText(me.phoneNumber.toString())
+        binding.displayNameTV.setText(me.displayName)
+        binding.phoneNumberTV.setText(me.phoneNumber.toString())
+        binding.addressTV.setText(me.address)
         binding.emailTV.text = (me.email)
-        binding.profileStatusET.setText(me.status)
+        binding.aboutMeTV.setText(me.status)
+        binding.PersonalSignatureTV.setText(me.personalSignature)
         Glide.with(binding.profileIV)
             .load(me.photoURL)
             .circleCrop()
@@ -62,22 +64,22 @@ class ProfileFragment : Fragment() {
             .into(binding.profileIV)
     }
 
-    private fun setProfileUpdateListener() {
-        binding.profileEdit.setOnClickListener {
-            if(!profileViewModel.isEdit){
-                profileViewModel.isEdit = true
-                binding.profileEdit.setImageResource(R.drawable.baseline_exit_to_app_24)
-                binding.displayNameET.isEnabled = true
-                binding.phoneNumberET.isEnabled = true
-                binding.profileStatusET.isEnabled = true
-            } else {
-                profileViewModel.isEdit = false
-                binding.profileEdit.setImageResource(R.drawable.ic_edit_24)
-                binding.displayNameET.isEnabled = false
-                binding.phoneNumberET.isEnabled = false
-                binding.profileStatusET.isEnabled = false
-                Toast.makeText(requireContext(), "TODO: save data to db", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+//    private fun setProfileUpdateListener() {
+//        binding.profileEdit.setOnClickListener {
+//            if(!profileViewModel.isEdit){
+//                profileViewModel.isEdit = true
+//                binding.profileEdit.setImageResource(R.drawable.baseline_exit_to_app_24)
+//                binding.displayNameET.isEnabled = true
+//                binding.phoneNumberET.isEnabled = true
+//                binding.profileStatusET.isEnabled = true
+//            } else {
+//                profileViewModel.isEdit = false
+//                binding.profileEdit.setImageResource(R.drawable.ic_edit_24)
+//                binding.displayNameET.isEnabled = false
+//                binding.phoneNumberET.isEnabled = false
+//                binding.profileStatusET.isEnabled = false
+//                Toast.makeText(requireContext(), "TODO: save data to db", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 }

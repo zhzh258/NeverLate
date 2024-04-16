@@ -111,10 +111,10 @@
             android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/profile_about_content"
+            app:layout_constraintBottom_toTopOf="@id/aboutMeTV"
             app:layout_constraintStart_toStartOf="parent" />
         <TextView
-            android:id="@+id/profile_about_content"
+            android:id="@+id/aboutMeTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
@@ -156,11 +156,11 @@
             android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/profile_signature_content"
+            app:layout_constraintBottom_toTopOf="@id/PersonalSignatureTV"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/profile_signature_content"
+            android:id="@+id/PersonalSignatureTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"

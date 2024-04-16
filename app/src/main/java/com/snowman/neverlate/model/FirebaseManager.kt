@@ -81,6 +81,35 @@ class FirebaseManager {
         }
     }
 
+    fun editUserProfile(updatedUserData: Map<String, Any>, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        if (currentUser != null) {
+            val currentUserId = currentUser.uid
+            val userRef = db.collection("users").document(currentUserId)
+            userRef.get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        userRef.update(updatedUserData)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "User details updated successfully")
+                                onSuccess()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error updating user details: $e")
+                                onFailure(e)
+                            }
+                    } else {
+                        Log.e(TAG, "User not found")
+                        onFailure(Exception("User not found"))
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Error fetching user document: $e")
+                    onFailure(e)
+                }
+        }
+    }
+
+
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
         usersCollection.whereEqualTo("email", email)
             .get()
