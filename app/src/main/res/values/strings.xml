@@ -24,6 +24,12 @@
     <string name="friend_requests">Friend Requests</string>
     <string name="add_friends_search_bar_text">Search Friend By Email</string>
     <string name="send_request">Send Request</string>
-
+    <string-array name="EventType">
+        <item>Dining</item>
+        <item>Study</item>
+        <item>Meeting</item>
+        <item>Travel</item>
+        <item>Other</item>
+    </string-array>
 
 </resources>

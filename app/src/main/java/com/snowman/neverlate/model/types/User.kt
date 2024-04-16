@@ -13,6 +13,7 @@ data class User(
     override val totalLateTime: Long = 0L,
     override val totalEarlyTime: Long = 0L,
     override val status: String = "I'm sleepy",
+    override val events: List<String> = emptyList(),
     override val friendRequests: List<String> = emptyList()
 ) : IUser {
 
