@@ -4,7 +4,7 @@ import com.snowman.neverlate.model.shared.UserViewModel
 
 interface IUser {
     val userId: String // UUID
-    val phoneNumber: Long
+    val phoneNumber: String
     val firstName: String
     val lastName: String
     val displayName: String

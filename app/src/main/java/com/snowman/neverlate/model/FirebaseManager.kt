@@ -14,7 +14,8 @@ class FirebaseManager {
     val db = FirebaseFirestore.getInstance()
     val auth = Firebase.auth
     private val usersCollection = db.collection("users")
-    private val currentUser = auth.currentUser
+    private var _currentUser = auth.currentUser
+    private val currentUser = _currentUser
 
     companion object {
         @Volatile
@@ -35,7 +36,11 @@ class FirebaseManager {
         return auth
     }
 
-    fun saveUserDataToFirestore(firebaseUser: FirebaseUser) {
+    fun saveUserDataToFirestore(
+        firebaseUser: FirebaseUser,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
 
         val user = hashMapOf(
             "userId" to firebaseUser.uid,
@@ -49,13 +54,18 @@ class FirebaseManager {
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     Log.d(TAG, "User already exists in Firestore, skipping save operation")
+                    _currentUser = auth.currentUser
+                    onSuccess()
                 } else {
                     userRef.set(user)
                         .addOnSuccessListener {
                             Log.d(TAG, "User data saved successfully to Firestore")
+                            _currentUser = auth.currentUser
+                            onSuccess()
                         }
                         .addOnFailureListener { e ->
                             Log.e(TAG, "Error saving user data to Firestore: $e")
+                            onFailure(e)
                         }
                 }
             }
