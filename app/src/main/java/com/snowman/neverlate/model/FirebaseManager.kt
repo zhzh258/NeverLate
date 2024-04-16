@@ -15,9 +15,6 @@ class FirebaseManager {
     private val TAG = "Firebase Manager"
     val db = FirebaseFirestore.getInstance()
     val auth = Firebase.auth
-    private val usersCollection = db.collection("users")
-    private val eventsCollection = db.collection("events")
-    private val currentUser = auth.currentUser
 
     companion object {
         @Volatile
@@ -38,7 +35,11 @@ class FirebaseManager {
         return auth
     }
 
-    fun saveUserDataToFirestore(firebaseUser: FirebaseUser) {
+    fun saveUserDataToFirestore(
+        firebaseUser: FirebaseUser,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
 
         val user = hashMapOf(
             "userId" to firebaseUser.uid,
@@ -52,19 +53,23 @@ class FirebaseManager {
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     Log.d(TAG, "User already exists in Firestore, skipping save operation")
+                    onSuccess()
                 } else {
                     userRef.set(user)
                         .addOnSuccessListener {
                             Log.d(TAG, "User data saved successfully to Firestore")
+                            onSuccess()
                         }
                         .addOnFailureListener { e ->
                             Log.e(TAG, "Error saving user data to Firestore: $e")
+                            onFailure(e)
                         }
                 }
             }
     }
 
     fun loadUserData(callback: (IUser?) -> Unit) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             db.collection("users").document(currentUserId)
@@ -89,6 +94,7 @@ class FirebaseManager {
         onSuccess: (User) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val userRef = db.collection("users").document(currentUserId)
@@ -130,8 +136,9 @@ class FirebaseManager {
 
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
-            usersCollection.get()
+            db.collection("users").get()
                 .addOnSuccessListener { querySnapshot ->
                     val usersList = mutableListOf<User>()
                     for (document in querySnapshot) {
@@ -158,6 +165,7 @@ class FirebaseManager {
         onSuccess: () -> Unit,
         onFailure: (String) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val otherUserRef = db.collection("users").document(user.userId)
 
@@ -211,6 +219,7 @@ class FirebaseManager {
     }
 
     fun getFriendRequests(callback: (List<User>?, Exception?) -> Unit) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
@@ -263,6 +272,7 @@ class FirebaseManager {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
@@ -301,6 +311,7 @@ class FirebaseManager {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
@@ -367,6 +378,7 @@ class FirebaseManager {
     fun fetchFriendsDataForCurrentUser(
         callback: (List<User>?, Exception?) -> Unit
     ) {
+        val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val currentUserRef = db.collection("users").document(currentUserId)
