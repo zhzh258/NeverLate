@@ -15,6 +15,9 @@ data class User(
     override val totalLateTime: Long = 0L,
     override val totalEarlyTime: Long = 0L,
     override val status: String = "I'm sleepy",
+    override val address: String = "in the middle of Charles River",
+    override val personalSignature: String = "It's all about the Mindset",
+    override val rate: Int = 5,
     override val friendRequests: List<String> = emptyList()
 ) : IUser {
 

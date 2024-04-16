@@ -90,7 +90,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_slideshow,
                 R.id.nav_friends,
                 R.id.nav_profile,
-                R.id.nav_map
+                R.id.nav_map,
+                R.id.nav_settings
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

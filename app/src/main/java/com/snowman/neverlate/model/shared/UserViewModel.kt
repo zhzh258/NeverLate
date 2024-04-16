@@ -11,8 +11,6 @@ class UserViewModel : ViewModel() {
     private val _userData = MutableLiveData<IUser?>()
     val userData: LiveData<IUser?> = _userData
 
-    private val firebaseManager = FirebaseManager.getInstance()
-
     fun setUserData(user: IUser?) {
         _userData.value = user
     }

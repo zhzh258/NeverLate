@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.snowman.neverlate.ui.home.HomeFragment"
+        android:name="com.snowman.neverlate.ui.events.EventsFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_event" />
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -38,17 +38,63 @@
     <action
         android:id="@+id/action_friendsFragment_to_addFriendsFragment"
         app:destination="@id/addFriendsFragment" />
+
+<!--    <action-->
+<!--        android:id="@+id/action_eventFragment_to_eventFragment"-->
+<!--        app:destination="@id/nav_eventDetails">-->
+<!--        <argument-->
+<!--            android:name="eventId"-->
+<!--            app:argType="string" />-->
+<!--    </action>-->
   
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.snowman.neverlate.ui.profile.ProfileFragment"
         android:label="@string/menu_profile"
-        tools:layout="@layout/fragment_profile"/>
+        tools:layout="@layout/fragment_profile_v2"/>
+
+    <fragment
+        android:id="@+id/nav_addEvent"
+        android:name="com.snowman.neverlate.ui.events.AddEventsFragment"
+        android:label="Add Event"
+        tools:layout="@layout/fragment_new_event" />
+
+    <fragment
+        android:id="@+id/nav_eventDetails"
+        android:name="com.snowman.neverlate.ui.events.EventFragment"
+        android:label="Event Details"
+        tools:layout="@layout/fragment_one_event" />
   
     <fragment
         android:id="@+id/nav_map"
         android:name="com.snowman.neverlate.ui.map.MapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_map"/>
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.snowman.neverlate.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_setting"/>
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.snowman.neverlate.ui.settings.EditProfileFragment"
+        android:label="@string/edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
+
+    <action
+        android:id="@+id/settingsFragment_to_editProfileFragment"
+        app:destination="@id/editProfileFragment" />
+
+    <fragment
+        android:id="@+id/rateUsFragment"
+        android:name="com.snowman.neverlate.ui.settings.RateUsFragment"
+        android:label="@string/rate_us"
+        tools:layout="@layout/fragment_rateus" />
+
+    <action
+        android:id="@+id/settingsFragment_to_rateUsFragment"
+        app:destination="@id/rateUsFragment" />
   
 </navigation>
