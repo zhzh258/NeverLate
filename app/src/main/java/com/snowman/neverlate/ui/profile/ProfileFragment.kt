@@ -4,24 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
-import android.util.Log
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentProfileV2Binding
-import com.snowman.neverlate.model.types.User
+import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.types.IUser
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileV2Binding? = null
-
     private val binding get() = _binding!!
-    private val profileViewModel: ProfileViewModel by viewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +24,9 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileV2Binding.inflate(inflater, container, false)
+        userViewModel.userData.value?.let {
+            initProfileData(it)
+        }
         observeProfile()
         return binding.root
     }
@@ -39,30 +37,23 @@ class ProfileFragment : Fragment() {
     }
 
     private fun observeProfile() {
-        profileViewModel.me.observe(viewLifecycleOwner) { user ->
-            Log.d("ProfileFragment", "Updating UI with new user data")
+        userViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
-                profileViewModel.reloadUserData()
                 initProfileData(it)
-                Log.d("ProfileFragment", "running initProfileData")
             }
         }
     }
 
-    private fun initProfileData(me: User?) {
-        me?.let{
-            binding.displayNameTV.setText(me.displayName)
-            binding.phoneNumberTV.setText(me.phoneNumber.toString())
-            binding.addressTV.setText(me.address)
-            binding.emailTV.text = (me.email)
-            binding.aboutMeTV.setText(me.status)
-//            binding.PersonalSignatureTV.setText(me.personalSignature)
-            Glide.with(binding.profileIV)
-                .load(me.photoURL)
-                .circleCrop()
-                .error(R.mipmap.ic_launcher_round)
-                .into(binding.profileIV)
-        }
+    private fun initProfileData(me: IUser) {
+        binding.displayNameTV.text = me.displayName
+        binding.phoneNumberTV.text = me.phoneNumber
+        binding.addressTV.text = me.address
+        binding.emailTV.text = (me.email)
+        binding.aboutMeTV.text = me.status
+        Glide.with(binding.profileIV)
+            .load(me.photoURL)
+            .circleCrop()
+            .error(R.mipmap.ic_launcher_round)
+            .into(binding.profileIV)
     }
-
 }

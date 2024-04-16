@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.Menu
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -22,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.databinding.ActivityMainBinding
 import com.snowman.neverlate.model.FirebaseManager
-import com.snowman.neverlate.model.types.UserViewModel
+import com.snowman.neverlate.model.shared.UserViewModel
 import com.snowman.neverlate.ui.login.LoginActivity
 
 class MainActivity : AppCompatActivity() {

@@ -1,32 +1,24 @@
 package com.snowman.neverlate.ui.settings
 
-import com.snowman.neverlate.ui.settings.SettingsViewModel
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentSettingBinding
-import com.snowman.neverlate.model.types.User
-import com.snowman.neverlate.ui.profile.ProfileViewModel
-import androidx.fragment.app.activityViewModels
+import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.types.IUser
 
 class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
-    private val settingsViewModel: ProfileViewModel by viewModels()
+    private val userViewModel: UserViewModel by activityViewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,9 +40,7 @@ class SettingsFragment : Fragment() {
             }
             activity?.recreate()  // 重新创建Activity以应用主题
         }
-        observeSettings()
-        //setSettingsUpdateListener()
-
+        observeUserData()
         return binding.root
     }
 
@@ -59,17 +49,16 @@ class SettingsFragment : Fragment() {
         _binding = null
     }
 
-    private fun observeSettings() {
-        settingsViewModel.me.observe(viewLifecycleOwner) { user ->
+    private fun observeUserData() {
+        userViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
-                settingsViewModel.reloadUserData()
                 initProfileData(it)
             }
         }
     }
 
-    private fun initProfileData(me: User) {
-        binding.displayNameTV.setText(me.displayName)
+    private fun initProfileData(me: IUser) {
+        binding.displayNameTV.text = me.displayName
         Glide.with(binding.profileIV)
             .load(me.photoURL)
             .circleCrop()

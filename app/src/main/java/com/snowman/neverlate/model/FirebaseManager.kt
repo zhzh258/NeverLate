@@ -81,7 +81,11 @@ class FirebaseManager {
         }
     }
 
-    fun editUserProfile(updatedUserData: Map<String, Any>, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun editUserProfile(
+        updatedUserData: Map<String, Any>,
+        onSuccess: (User) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             val userRef = db.collection("users").document(currentUserId)
@@ -91,7 +95,21 @@ class FirebaseManager {
                         userRef.update(updatedUserData)
                             .addOnSuccessListener {
                                 Log.d(TAG, "User details updated successfully")
-                                onSuccess()
+                                userRef.get()
+                                    .addOnSuccessListener { updatedDocument ->
+                                        if (updatedDocument.exists()) {
+                                            val updatedUser = updatedDocument.toObject(User::class.java)
+                                            onSuccess(updatedUser!!)
+                                        } else {
+                                            onFailure(Exception("Updated user data not found"))
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e(TAG, "Error fetching updated user document: $e")
+                                        onFailure(e)
+                                    }
+
+//                                onSuccess()
                             }
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error updating user details: $e")
@@ -111,19 +129,27 @@ class FirebaseManager {
 
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
-        usersCollection.whereEqualTo("email", email)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val usersList = mutableListOf<User>()
-                for (document in querySnapshot) {
-                    val user = document.toObject(User::class.java)
-                    usersList.add(user)
+        if (currentUser != null) {
+            usersCollection.get()
+                .addOnSuccessListener { querySnapshot ->
+                    val usersList = mutableListOf<User>()
+                    for (document in querySnapshot) {
+                        val user = document.toObject(User::class.java)
+                        if (user.email.startsWith(
+                                email,
+                                ignoreCase = true
+                            ) && user.email != currentUser.email // lol not friends w self
+                            && !user.friends.contains(currentUser.uid) // not already friends
+                        ) {
+                            usersList.add(user)
+                        }
+                    }
+                    callback(usersList, null)
                 }
-                callback(usersList, null)
-            }
-            .addOnFailureListener { exception ->
-                callback(null, exception)
-            }
+                .addOnFailureListener { exception ->
+                    callback(null, exception)
+                }
+        }
     }
 
     fun sendFriendRequest(

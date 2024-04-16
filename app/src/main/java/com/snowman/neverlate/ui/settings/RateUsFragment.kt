@@ -1,32 +1,24 @@
 package com.snowman.neverlate.ui.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentRateusBinding
 import com.snowman.neverlate.model.FirebaseManager
-import com.snowman.neverlate.model.types.User
-import com.snowman.neverlate.ui.profile.ProfileViewModel
+import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.types.IUser
 
 class RateUsFragment : Fragment() {
 
     private var _binding: FragmentRateusBinding? = null
 
     private val binding get() = _binding!!
-    private val profileViewModel: ProfileViewModel by activityViewModels()
-
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,24 +68,18 @@ class RateUsFragment : Fragment() {
 
 
     private fun observeSettings() {
-        profileViewModel.me.observe(viewLifecycleOwner) { user ->
+        userViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
                 initProfileData(it)
-                profileViewModel.reloadUserData()
             }
         }
     }
 
-    private fun initProfileData(me: User) {
-        me?.let{
-            setRating(me.rate)
-        }
+    private fun initProfileData(me: IUser) {
+        setRating(me.rate)
     }
 
     private fun updateUserDetails(rate: Int) {
-
-        //val personalSignature = binding.PersonalSignatureET.text.toString().trim()
-
 
         val updatedUserData = mapOf(
             "rate" to rate
@@ -102,6 +88,7 @@ class RateUsFragment : Fragment() {
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
                 Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
+                it.updateUserViewModel(userViewModel)
             },
             onFailure = { exception ->
                 Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()

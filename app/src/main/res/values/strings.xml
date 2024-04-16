@@ -29,6 +29,11 @@
     <string name="save">Save</string>
     <string name="add_friends_search_bar_text">Search Friend By Email</string>
     <string name="send_request">Send Request</string>
+    <string name="search">search</string>
+    <string name="username">Username</string>
+    <string name="address">Address</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="about_me">About Me</string>
 
 
 </resources>
