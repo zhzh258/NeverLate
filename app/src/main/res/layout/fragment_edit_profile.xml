@@ -7,7 +7,7 @@
     <View
         android:id="@+id/rectangle_shape"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="150dp"
         android:background="@drawable/rounded_btn"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -118,19 +118,7 @@
             android:background="@drawable/rounded_edittext_stoke"
             android:layout_marginTop="5dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Personal Signature"
-            android:textSize="16sp"/>
 
-        <EditText
-            android:id="@+id/PersonalSignatureET"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/rounded_edittext_stoke"
-            android:layout_marginTop="5dp"/>
 
     </LinearLayout>
 

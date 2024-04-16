@@ -16,6 +16,8 @@ import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentSettingBinding
 import com.snowman.neverlate.model.types.User
+import com.snowman.neverlate.ui.profile.ProfileViewModel
+import androidx.fragment.app.activityViewModels
 
 class SettingsFragment : Fragment() {
 
@@ -24,7 +26,7 @@ class SettingsFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private val settingsViewModel: SettingsViewModel by viewModels()
+    private val settingsViewModel: ProfileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +39,14 @@ class SettingsFragment : Fragment() {
         }
         binding.btnRateUs.setOnClickListener(){
             findNavController().navigate(R.id.settingsFragment_to_rateUsFragment)
+        }
+        binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                activity?.setTheme(R.style.Theme_NeverLate)
+            } else {
+                activity?.setTheme(R.style.Theme_NeverLate_Dark)
+            }
+            activity?.recreate()  // 重新创建Activity以应用主题
         }
         observeSettings()
         //setSettingsUpdateListener()
@@ -52,6 +62,7 @@ class SettingsFragment : Fragment() {
     private fun observeSettings() {
         settingsViewModel.me.observe(viewLifecycleOwner) { user ->
             user?.let {
+                settingsViewModel.reloadUserData()
                 initProfileData(it)
             }
         }
@@ -66,7 +77,4 @@ class SettingsFragment : Fragment() {
             .into(binding.profileIV)
     }
 
-    private fun setSettingsUpdateListener() {
-
-    }
 }

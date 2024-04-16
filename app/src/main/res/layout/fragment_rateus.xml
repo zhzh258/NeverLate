@@ -13,7 +13,7 @@
         android:text="@string/rate_us_title"
         android:layout_marginBottom="40dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
-    
+
     <View
         android:id="@+id/rectangle_shape"
         android:layout_width="match_parent"

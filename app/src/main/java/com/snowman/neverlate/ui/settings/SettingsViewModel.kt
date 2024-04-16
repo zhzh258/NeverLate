@@ -26,4 +26,5 @@ class SettingsViewModel: ViewModel() {
             }
         }
     }
+
 }

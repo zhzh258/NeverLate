@@ -15,6 +15,7 @@ interface IUser {
     val status: String //status is aboutMe
     val address: String
     val personalSignature: String
+    val rate: Int
     val friendRequests: List<String>
     // Assuming "About Me" and "Setting Config" are strings for simplicity; adjust as necessary
 //    val aboutMe: String

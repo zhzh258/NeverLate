@@ -27,4 +27,8 @@ class ProfileViewModel: ViewModel() {
             }
         }
     }
+
+    fun reloadUserData() {
+        loadUserData()
+    }
 }
