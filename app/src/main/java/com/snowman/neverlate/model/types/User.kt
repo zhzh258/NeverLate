@@ -1,5 +1,7 @@
 package com.snowman.neverlate.model.types
 
+import com.snowman.neverlate.model.shared.UserViewModel
+
 data class User(
     override val userId: String = "",
     override val phoneNumber: Long = 0L,

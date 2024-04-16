@@ -1,5 +1,7 @@
 package com.snowman.neverlate.model.types
 
+import com.snowman.neverlate.model.shared.UserViewModel
+
 interface IUser {
     val userId: String // UUID
     val phoneNumber: Long
