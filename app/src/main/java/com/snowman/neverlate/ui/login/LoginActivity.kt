@@ -81,8 +81,9 @@ class LoginActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     val firebaseUser = auth.currentUser
                     firebaseUser?.let {
-                        FirebaseManager().saveUserDataToFirestore(it)
-                        goHostActivity()
+                        FirebaseManager().saveUserDataToFirestore(it,
+                            { goHostActivity() },
+                            { e -> Log.e(TAG, "error $e") })
                     }
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
