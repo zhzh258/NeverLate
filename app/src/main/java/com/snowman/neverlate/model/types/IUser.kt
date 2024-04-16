@@ -1,8 +1,10 @@
 package com.snowman.neverlate.model.types
 
+import com.snowman.neverlate.model.shared.UserViewModel
+
 interface IUser {
     val userId: String // UUID
-    val phoneNumber: Long
+    val phoneNumber: String
     val firstName: String
     val lastName: String
     val displayName: String
@@ -12,8 +14,10 @@ interface IUser {
     val friends: List<String> // List of UUIDs of other users
     val totalLateTime: Long // For analysis
     val totalEarlyTime: Long // For analysis
-    val status: String
-    val events: List<String> // List of IDs of their events
+    val status: String //status is aboutMe
+    val address: String
+    val personalSignature: String
+    val rate: Int
     val friendRequests: List<String>
     // Assuming "About Me" and "Setting Config" are strings for simplicity; adjust as necessary
 //    val aboutMe: String

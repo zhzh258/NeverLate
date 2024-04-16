@@ -84,20 +84,73 @@ class FirebaseManager {
         }
     }
 
-    fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
-        usersCollection.whereEqualTo("email", email)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val usersList = mutableListOf<User>()
-                for (document in querySnapshot) {
-                    val user = document.toObject(User::class.java)
-                    usersList.add(user)
+    fun editUserProfile(
+        updatedUserData: Map<String, Any>,
+        onSuccess: (User) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        if (currentUser != null) {
+            val currentUserId = currentUser.uid
+            val userRef = db.collection("users").document(currentUserId)
+            userRef.get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        userRef.update(updatedUserData)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "User details updated successfully")
+                                userRef.get()
+                                    .addOnSuccessListener { updatedDocument ->
+                                        if (updatedDocument.exists()) {
+                                            val updatedUser = updatedDocument.toObject(User::class.java)
+                                            onSuccess(updatedUser!!)
+                                        } else {
+                                            onFailure(Exception("Updated user data not found"))
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e(TAG, "Error fetching updated user document: $e")
+                                        onFailure(e)
+                                    }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error updating user details: $e")
+                                onFailure(e)
+                            }
+                    } else {
+                        Log.e(TAG, "User not found")
+                        onFailure(Exception("User not found"))
+                    }
                 }
-                callback(usersList, null)
-            }
-            .addOnFailureListener { exception ->
-                callback(null, exception)
-            }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Error fetching user document: $e")
+                    onFailure(e)
+                }
+        }
+    }
+
+
+    fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
+        if (currentUser != null) {
+            usersCollection.get()
+                .addOnSuccessListener { querySnapshot ->
+                    val usersList = mutableListOf<User>()
+                    for (document in querySnapshot) {
+                        val user = document.toObject(User::class.java)
+                        if (user.email.startsWith(
+                                email,
+                                ignoreCase = true
+                            ) && user.email != currentUser.email // lol not friends w self
+                            && !user.friends.contains(currentUser.uid) // not already friends
+                        ) {
+                            usersList.add(user)
+                        }
+                    }
+                    callback(usersList, null)
+                }
+                .addOnFailureListener { exception ->
+                    callback(null, exception)
+                }
+        }
     }
 
     fun sendFriendRequest(

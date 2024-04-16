@@ -1,4 +1,4 @@
-package com.snowman.neverlate.ui.friends
+package com.snowman.neverlate.model.shared
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -6,11 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IUser
-import com.snowman.neverlate.model.types.User
-import java.util.UUID
 
-class FriendsListViewModel : ViewModel() {
-    private val TAG = "friends list vie wmodel"
+// This is the shared view model storing the friends list of the current user
+class FriendViewModel : ViewModel() {
+    private val TAG = "FriendViewModel"
     private val firebaseManager = FirebaseManager.getInstance()
 
     private val _friends = MutableLiveData<List<IUser>>()
