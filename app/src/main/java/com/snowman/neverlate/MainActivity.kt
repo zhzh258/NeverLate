@@ -86,8 +86,8 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
-                R.id.nav_gallery,
-                R.id.nav_slideshow,
+                R.id.nav_history,
+                R.id.nav_notification,
                 R.id.nav_friends,
                 R.id.nav_profile,
                 R.id.nav_map,
