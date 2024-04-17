@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.Menu
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -22,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.databinding.ActivityMainBinding
 import com.snowman.neverlate.model.FirebaseManager
-import com.snowman.neverlate.model.types.UserViewModel
+import com.snowman.neverlate.model.shared.UserViewModel
 import com.snowman.neverlate.ui.login.LoginActivity
 
 class MainActivity : AppCompatActivity() {
@@ -87,11 +86,12 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
-                R.id.nav_gallery,
-                R.id.nav_slideshow,
+                R.id.nav_history,
+                R.id.nav_notification,
                 R.id.nav_friends,
                 R.id.nav_profile,
-                R.id.nav_map
+                R.id.nav_map,
+                R.id.nav_settings
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

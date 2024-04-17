@@ -1,13 +1,13 @@
-package com.snowman.neverlate.ui.slideshow
+package com.snowman.neverlate.ui.notification
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class SlideshowViewModel : ViewModel() {
+class NotificationViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is slideshow Fragment"
+        value = "This is notification Fragment"
     }
     val text: LiveData<String> = _text
 }

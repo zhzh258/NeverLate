@@ -12,25 +12,25 @@
   - [x] Basic login and signup with Gmail
   - [x] Creates profile with Gmail display name, and photo and saves it to database (firebase)
   - [x] Logout functionality
-  - **Profile picture upload + save to database**
-  - **User Personalization** (description about me idk that stuff)
-  - **Edit profile**
-  - ****Login with (other) social media (ie. Facebook, WhatsApp, etc.)
+  - [ ] **Profile picture upload + save to database**
+  - [x] **User Personalization** (description about me idk that stuff)
+  - [x] **Edit profile**
 
 ### Friends Fragment
 - **Add friends/contacts**
-  - [ ] Type to add a friend manually
-  - **Are we going to do friend..requests? Does the other person have to approve it? That might be a bit more complex heh**
-  - [ ] Save friend to database
-    - [ ] Double check so we cannot add someone we are already friends with
-  - [ ] Display friends/contacts with basic info (name, pfp)
-  - **Allows for searching friends**
-  - **Allows importing contacts to add friends**
+  - [x] Type to add a friend manually by email
+  - [x] **Adding friends send friend request**
+  - [x] Save friend to database
+    - [x] Double check so we cannot add someone we are already friends with
+  - [x] Display friends/contacts with basic info (name, pfp)
+  - [ ] **Allows for searching friends**
+  - [ ] **Allows importing contacts to add friends**
 
 ### Events List Fragment
-- [ ] Displays list of events
-- [ ] Button to create new event
-- **Allows for filtering by category**
+- [x] Displays list of events
+- [x] Button to create new event
+- [ ] Events connect to data base
+- [x] **Allows for filtering by category**
 - **Search by event details idk**
 
 ### Event Creation Fragment
@@ -38,10 +38,10 @@
   - [ ] Create an event with location, date, address, description, time, and duration
   - [ ] Invite friends to event
 - **API: Integrate Google Maps API**
-  - [ ] Make sure we are able to fetch the user’s coordinates before we do anything more and make functions that can do this
+  - [x] Make sure we are able to fetch the user’s coordinates before we do anything more and make functions that can do this
 
 ### Event Detail Fragment
-- [ ] Display the event with its basic info (location, date, address, time, and duration)
+- [x] Display the event with its basic info (location, date, address, time, and duration)
 - [ ] Participating members
   - [ ] Show their location and when they’ll arrive if they leave <now> rather than a message
   - [ ] Notify button
@@ -69,10 +69,6 @@
 - [ ] Punctuality reports based on event attendance and time late
   - [ ] We need to decide how that is generated
 - **Badges for users based on their punctuality**
-
-### Google Calendar API
-- [ ] Add event to google calendar
-  - [x] Honestly, when we do this, it might be a good time to add the login with google feature
 
 ### Locality?
 - [ ] For extra credit, we incorporate another language

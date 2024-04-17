@@ -9,13 +9,13 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_history"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:title="@string/menu_history" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_notification"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:title="@string/menu_notification" />
         <item
             android:id="@+id/nav_friends"
             android:icon="@drawable/baseline_people_24"
@@ -28,6 +28,10 @@
             android:id="@+id/nav_map"
             android:icon="@drawable/baseline_exit_to_app_24"
             android:title="Map" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings" />
 
     </group>
 
