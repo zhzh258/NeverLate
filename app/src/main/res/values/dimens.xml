@@ -16,4 +16,5 @@
     <dimen name="general_small_margin">8dp</dimen>
     <dimen name="general_xsmall_margin">4dp</dimen>
     <dimen name="friend_text_width">150dp</dimen>
+    <dimen name="notification_text_width">250dp</dimen>
 </resources>
