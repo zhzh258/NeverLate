@@ -41,5 +41,6 @@
     <string name="address">Address</string>
     <string name="phone_number">Phone Number</string>
     <string name="about_me">About Me</string>
+    <string name="hurry_up">Hurry Up!</string>
 
 </resources>

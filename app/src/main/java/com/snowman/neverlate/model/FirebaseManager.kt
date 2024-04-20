@@ -4,12 +4,14 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.User
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.types.Event
+import com.snowman.neverlate.model.types.Message
 
 class FirebaseManager {
     private val TAG = "Firebase Manager"
@@ -89,6 +91,46 @@ class FirebaseManager {
         }
     }
 
+    fun getUserDataForId(userId: String, callback: (IUser?) -> Unit) {
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val user = document.toObject(User::class.java)
+                    callback(user)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { e ->
+                callback(null)
+                Log.e("FirebaseManager", "Failed to retrieve document")
+            }
+    }
+
+    fun getUsersDataForIds(userIds: List<String>, callback: (List<User>) -> Unit) {
+        val usersData = mutableListOf<User>()
+        val usersCollectionRef = db.collection("users")
+
+        for (userId in userIds) {
+            usersCollectionRef.document(userId)
+                .get()
+                .addOnSuccessListener { document ->
+                    val user = document?.toObject(User::class.java)
+                    user?.let {
+                        usersData.add(user)
+                        if (usersData.size == userIds.size) {
+                            callback(usersData)
+                        }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirebaseManager", "Failed to retrieve user document for ID: $userId")
+                    callback(usersData)
+                }
+        }
+    }
+
     fun editUserProfile(
         updatedUserData: Map<String, Any>,
         onSuccess: (User) -> Unit,
@@ -107,7 +149,8 @@ class FirebaseManager {
                                 userRef.get()
                                     .addOnSuccessListener { updatedDocument ->
                                         if (updatedDocument.exists()) {
-                                            val updatedUser = updatedDocument.toObject(User::class.java)
+                                            val updatedUser =
+                                                updatedDocument.toObject(User::class.java)
                                             onSuccess(updatedUser!!)
                                         } else {
                                             onFailure(Exception("Updated user data not found"))
@@ -134,6 +177,58 @@ class FirebaseManager {
         }
     }
 
+    fun sendMessage(message: Message, onSuccess: () -> Unit) {
+        val receiverMessagesRef = db.collection("users").document(message.receiverUid).collection("messages")
+
+        val messageDocRef = receiverMessagesRef.document(message.messageId)
+        messageDocRef.set(message)
+            .addOnSuccessListener {
+                Log.i(TAG, "Message sent successfully! :D")
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error sending message: $e")
+            }
+    }
+
+    fun messageListener(listener: (List<Message>) -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userMessagesRef = db.collection("users").document(userId).collection("messages")
+            userMessagesRef.get()
+                .addOnSuccessListener { snapshot ->
+
+                    userMessagesRef.addSnapshotListener { snapshots, exception ->
+                        if (exception != null) {
+                            Log.e(TAG, "Error listening for messages: $exception")
+                            return@addSnapshotListener
+                        }
+
+                        val messages = mutableListOf<Message>()
+                        for (dc in snapshots!!.documentChanges) {
+                            when (dc.type) {
+                                DocumentChange.Type.ADDED -> {
+                                    val message = dc.document.toObject(Message::class.java)
+                                    if (!messages.contains(message)) {
+                                        messages.add(message)
+                                    }
+                                }
+
+                                else -> {
+                                    // we are not doing modifications or deletions
+                                    Log.i(TAG, "Message was removed or edited")
+                                }
+                            }
+                        }
+                        listener(messages)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error getting initial messages: $exception")
+                }
+        }
+    }
 
     fun searchUsersByEmail(email: String, callback: (List<User>?, Exception?) -> Unit) {
         val currentUser = auth.currentUser

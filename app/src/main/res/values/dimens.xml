@@ -16,4 +16,8 @@
     <dimen name="general_small_margin">8dp</dimen>
     <dimen name="general_xsmall_margin">4dp</dimen>
     <dimen name="friend_text_width">150dp</dimen>
+    <dimen name="notification_text_width">250dp</dimen>
+    <dimen name="event_friend_text_width">125dp</dimen>
+    <dimen name="card_corner_radius">16dp</dimen>
+    <dimen name="card_elevation">1dp</dimen>
 </resources>
