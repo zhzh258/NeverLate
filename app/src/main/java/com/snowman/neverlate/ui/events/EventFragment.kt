@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
@@ -42,12 +43,13 @@ class EventFragment : Fragment() {
 
     private fun setUpFriends(view: View) {
         friendsRV = view.findViewById(R.id.friendsRV)
-        friendsRV.layoutManager = LinearLayoutManager(context)
+        friendsRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         friendsAdapter = EventFriendsAdapter(mutableListOf(), requireContext())
         firebaseManager.getUsersDataForIds(MOCK_DATA_REMOVE_LATER) { users ->
             friendsAdapter.setData(users)
             friendsAdapter.notifyDataSetChanged()
         }
         friendsRV.adapter = friendsAdapter
+        PagerSnapHelper().attachToRecyclerView(friendsRV)
     }
 }

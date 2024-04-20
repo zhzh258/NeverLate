@@ -52,6 +52,12 @@ class EventFriendsViewHolder(
         }
     }
 
+    fun setItemWidth(width: Int) {
+        val layoutParams = binding.root.layoutParams
+        layoutParams.width = width
+        binding.root.layoutParams = layoutParams
+    }
+
 }
 
 class EventFriendsAdapter(
@@ -61,7 +67,14 @@ class EventFriendsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventFriendsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemAttendeeBinding.inflate(inflater, parent, false)
-        return EventFriendsViewHolder(binding, context)
+
+        val recyclerViewWidth = parent.measuredWidth
+        val itemWidth = (recyclerViewWidth * 0.9).toInt()
+
+        val viewHolder = EventFriendsViewHolder(binding, context)
+        viewHolder.setItemWidth(itemWidth)
+
+        return viewHolder
     }
 
     override fun getItemCount(): Int {
