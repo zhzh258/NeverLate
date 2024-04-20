@@ -108,6 +108,29 @@ class FirebaseManager {
             }
     }
 
+    fun getUsersDataForIds(userIds: List<String>, callback: (List<User>) -> Unit) {
+        val usersData = mutableListOf<User>()
+        val usersCollectionRef = db.collection("users")
+
+        for (userId in userIds) {
+            usersCollectionRef.document(userId)
+                .get()
+                .addOnSuccessListener { document ->
+                    val user = document?.toObject(User::class.java)
+                    user?.let {
+                        usersData.add(user)
+                        if (usersData.size == userIds.size) {
+                            callback(usersData)
+                        }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirebaseManager", "Failed to retrieve user document for ID: $userId")
+                    callback(usersData)
+                }
+        }
+    }
+
     fun editUserProfile(
         updatedUserData: Map<String, Any>,
         onSuccess: (User) -> Unit,
