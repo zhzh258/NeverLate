@@ -18,7 +18,7 @@ class NotificationViewHolder(
 }
 
 class NotificationsAdapter(
-    private val messages: List<Message>
+    private var messages: MutableList<Message>
 ) : RecyclerView.Adapter<NotificationViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
         val inflater = LayoutInflater.from(parent.context)

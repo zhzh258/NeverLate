@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentNotificationBinding
+import com.snowman.neverlate.model.FirebaseManager
 
 class NotificationFragment : Fragment() {
 
@@ -19,6 +20,7 @@ class NotificationFragment : Fragment() {
     private lateinit var notificationRV: RecyclerView
     private lateinit var adapter: NotificationsAdapter
     private val notificationsViewModel: NotificationViewModel by viewModels()
+    private val firebaseManager = FirebaseManager.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +35,7 @@ class NotificationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpRecyclerView(view)
+        setUpMessageListener()
     }
 
     override fun onDestroyView() {
@@ -45,5 +48,17 @@ class NotificationFragment : Fragment() {
         notificationRV.layoutManager = LinearLayoutManager(context)
         adapter = NotificationsAdapter(notificationsViewModel.notificationsList)
         notificationRV.adapter = adapter
+    }
+
+    private fun setUpMessageListener() {
+
+        firebaseManager.messageListener { messages ->
+            val newMessages = messages.filter { message ->
+                !notificationsViewModel.notificationsList.any { it.messageId == message.messageId }
+            }
+
+            notificationsViewModel.updateMessages(newMessages)
+            adapter.notifyDataSetChanged()
+        }
     }
 }
