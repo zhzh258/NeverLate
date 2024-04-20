@@ -8,5 +8,10 @@ class NotificationViewModel : ViewModel() {
 
     fun updateMessages(messages: List<Message>) {
         notificationsList.addAll(messages)
+        sortNotificationsByTimestamp()
+    }
+
+    private fun sortNotificationsByTimestamp() {
+        notificationsList.sortByDescending { it.timestamp }
     }
 }

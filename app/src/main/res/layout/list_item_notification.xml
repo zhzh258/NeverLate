@@ -13,10 +13,10 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_profile"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_profile" />
 
     <TextView
         android:id="@+id/senderTV"
@@ -35,9 +35,9 @@
         android:id="@+id/msgTV"
         android:layout_width="@dimen/notification_text_width"
         android:layout_height="wrap_content"
-        android:lines="2"
+        android:lines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/timeTV"
         app:layout_constraintStart_toStartOf="@id/senderTV"
         app:layout_constraintTop_toBottomOf="@id/senderTV"
         tools:text="why are you still at home" />
@@ -46,12 +46,12 @@
         android:id="@+id/timeTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/general_small_margin"
         android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toBottomOf="@+id/msgTV"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/msgTV"
-        app:layout_constraintTop_toTopOf="@+id/msgTV"
-        tools:text="10:35 pm" />
+        app:layout_constraintTop_toBottomOf="parent"
+        tools:text="2024-03-19 10:35 AM" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

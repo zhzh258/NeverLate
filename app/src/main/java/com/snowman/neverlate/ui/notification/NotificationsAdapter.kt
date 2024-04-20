@@ -1,19 +1,37 @@
 package com.snowman.neverlate.ui.notification
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.ListItemNotificationBinding
+import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.Message
+import com.snowman.neverlate.util.TimeUtil
 
 class NotificationViewHolder(
-    private val binding: ListItemNotificationBinding
+    private val binding: ListItemNotificationBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    private val firebaseManager = FirebaseManager.getInstance()
+
     fun bind(message: Message) {
-        binding.senderTV.text = message.senderUid // should be replaced w actual info later but lazy
-        binding.msgTV.text = message.messageText
-        binding.timeTV.text = message.timestamp.toString() // will need to convert this time too lol
+        firebaseManager.getUserDataForId(message.senderUid) { user ->
+            if (user != null) {
+                binding.senderTV.text = user.displayName
+                binding.msgTV.text = message.messageText
+                binding.timeTV.text = TimeUtil().convertMillisToDateTime(message.timestamp)
+                Glide.with(binding.senderIV)
+                    .load(user.photoURL)
+                    .circleCrop()
+                    .error(R.mipmap.ic_launcher_round)
+                    .into(binding.senderIV)
+            } else {
+                Log.e("NotificationsAdapter", "User data is null for sender ID ${message.senderUid}")
+            }
+        }
     }
 }
 

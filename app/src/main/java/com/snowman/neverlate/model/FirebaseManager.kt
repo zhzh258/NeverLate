@@ -91,6 +91,23 @@ class FirebaseManager {
         }
     }
 
+    fun getUserDataForId(userId: String, callback: (IUser?) -> Unit) {
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val user = document.toObject(User::class.java)
+                    callback(user)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { e ->
+                callback(null)
+                Log.e("FirebaseManager", "Failed to retrieve document")
+            }
+    }
+
     fun editUserProfile(
         updatedUserData: Map<String, Any>,
         onSuccess: (User) -> Unit,
