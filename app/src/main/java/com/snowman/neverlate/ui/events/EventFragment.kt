@@ -43,12 +43,11 @@ class EventFragment : Fragment() {
     private fun setUpFriends(view: View) {
         friendsRV = view.findViewById(R.id.friendsRV)
         friendsRV.layoutManager = LinearLayoutManager(context)
-        friendsAdapter = EventFriendsAdapter(mutableListOf())
+        friendsAdapter = EventFriendsAdapter(mutableListOf(), requireContext())
         firebaseManager.getUsersDataForIds(MOCK_DATA_REMOVE_LATER) { users ->
             friendsAdapter.setData(users)
             friendsAdapter.notifyDataSetChanged()
         }
         friendsRV.adapter = friendsAdapter
     }
-
 }

@@ -177,6 +177,20 @@ class FirebaseManager {
         }
     }
 
+    fun sendMessage(message: Message, onSuccess: () -> Unit) {
+        val receiverMessagesRef = db.collection("users").document(message.receiverUid).collection("messages")
+
+        val messageDocRef = receiverMessagesRef.document(message.messageId)
+        messageDocRef.set(message)
+            .addOnSuccessListener {
+                Log.i(TAG, "Message sent successfully! :D")
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error sending message: $e")
+            }
+    }
+
     fun messageListener(listener: (List<Message>) -> Unit) {
         val currentUser = auth.currentUser
         if (currentUser != null) {
