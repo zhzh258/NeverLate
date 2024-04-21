@@ -1,13 +1,17 @@
 package com.snowman.neverlate.ui.notification
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.snowman.neverlate.model.types.Message
 
 class NotificationViewModel : ViewModel() {
+    var notificationsList = mutableListOf<Message>()
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is notification Fragment"
+    fun updateMessages(messages: List<Message>) {
+        notificationsList.addAll(messages)
+        sortNotificationsByTimestamp()
     }
-    val text: LiveData<String> = _text
+
+    private fun sortNotificationsByTimestamp() {
+        notificationsList.sortByDescending { it.timestamp }
+    }
 }
