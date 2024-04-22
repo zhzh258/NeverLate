@@ -11,6 +11,7 @@
     <!-- Primary Color Settings -->
     <color name="colorPrimary">#A3CAFA</color>
     <color name="colorPrimaryDark">#E7E9E9</color>
+    <color name="colorTime">#FF623B</color>
 
     <!-- Button Color Settings -->
     <color name="buttonBackground">	#97CBFF</color>

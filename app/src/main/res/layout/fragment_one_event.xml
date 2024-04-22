@@ -146,24 +146,60 @@
             android:text="Status" />
 
         <TextView
+            android:id="@+id/punctualityTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/colorTime"
             android:text="You will definitely be late! Hurry up!" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Remaining time until the event starts: 5 min" />
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remaining time until the event starts: " />
+            <TextView
+                android:id="@+id/remainingTimeTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorTime"
+                android:text="5 min" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Estimated commute time: 30 min" />
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estimated travel time: " />
 
-        <TextView
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/ett_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorTime"
+                android:text="30 min" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Estimated time of arrival: 9:55 April 16, 2024" />
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estimated time of arrival: " />
+            <TextView
+                android:id="@+id/eta_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorTime"
+                android:text="2024-04-21 20:00:00" />
+        </LinearLayout>
+
 
     </LinearLayout>
 
@@ -182,8 +218,10 @@
             android:text="Current Time" />
 
         <TextView
+            android:id="@+id/current_time_TV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/colorTime"
             android:text="6:50PM April 16, 2024" />
 
 
@@ -195,7 +233,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
-        android:text="Add Event"
+        android:text="I've arrived"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent" />
 

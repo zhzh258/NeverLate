@@ -42,5 +42,11 @@
     <string name="phone_number">Phone Number</string>
     <string name="about_me">About Me</string>
     <string name="hurry_up">Hurry Up!</string>
-
+    <string name="status_1">No need to start getting ready to leave yet</string>
+    <string name="status_2">It is time to start getting ready to leave</string>
+    <string name="status_3">Leaving now would be just right</string>
+    <string name="status_4">Hurry up and leave, or you will be late!</string>
+    <string name="status_5">You are definitely going to be late</string>
+    <string name="status_6">You are already late! Hurry out now</string>
+    <string name="status_7">You, with no sense of time, are hopeless</string>
 </resources>

@@ -13,6 +13,14 @@ interface GoogleMapsDirectionsService {
         @Query("mode") mode: String,
         @Query("key") apiKey: String,
     ): Response<DirectionsResponse>
+
+    @GET("maps/api/directions/json")
+    fun getETA(
+        @Query("origin") origin: String,
+        @Query("destination") destination: String,
+        @Query("mode") mode: String,
+        @Query("key") apiKey: String,
+    ): Response<DirectionsResponse>
 }
 
 data class DirectionsResponse(

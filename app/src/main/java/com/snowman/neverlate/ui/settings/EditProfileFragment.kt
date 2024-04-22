@@ -12,6 +12,17 @@ import com.snowman.neverlate.databinding.FragmentEditProfileBinding
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.shared.UserViewModel
 import com.snowman.neverlate.model.types.IUser
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.content.pm.PackageManager
+import android.content.Intent
+import android.app.Activity
+import androidx.appcompat.app.AlertDialog
+import android.provider.Settings
+import android.net.Uri
+
+
+
 
 class EditProfileFragment : Fragment() {
 
@@ -32,6 +43,18 @@ class EditProfileFragment : Fragment() {
         }
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.changePicture.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
+                openGalleryForImage()
+            } else {
+                requestPermissions(arrayOf(Manifest.permission.READ_MEDIA_IMAGES), STORAGE_PERMISSION_CODE)
+            }
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -58,7 +81,6 @@ class EditProfileFragment : Fragment() {
         val address = binding.addressET.text.toString().trim()
         val phoneNumber = binding.phoneNumberET.text.toString().trim()
         val aboutMe = binding.AboutMeET.text.toString().trim()
-
         val updatedUserData = mapOf(
             "displayName" to username,
             "address" to address,
@@ -76,4 +98,73 @@ class EditProfileFragment : Fragment() {
             }
         )
     }
+
+    companion object {
+        private const val IMAGE_PICK_CODE = 1000
+        private const val STORAGE_PERMISSION_CODE = 1001
+    }
+
+    private fun openGalleryForImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, IMAGE_PICK_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            val imageUri = data.data
+            binding.profilePicture.setImageURI(imageUri)
+            val updatedUserData = mapOf(
+                "photoURL" to imageUri.toString(),
+            )
+
+            FirebaseManager.getInstance().editUserProfile(updatedUserData,
+                onSuccess = {
+                    Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
+                    it.updateUserViewModel(userViewModel)
+                },
+                onFailure = { exception ->
+                    Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
+                }
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openGalleryForImage()
+            } else {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES)) {
+                    showPermissionSettingsDialog()
+                } else {
+                    Toast.makeText(context, "Permission denied. Unable to change picture without permission.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+
+    fun showPermissionSettingsDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Permission Required")
+        builder.setMessage("This permission is needed for accessing your gallery to set a profile picture. Please enable it in app settings.")
+        builder.setPositiveButton("Go to Settings") { dialog, which ->
+            openAppSettings()
+        }
+        builder.setNegativeButton("Cancel", null)
+        builder.show()
+    }
+
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", requireActivity().packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+
+
 }
