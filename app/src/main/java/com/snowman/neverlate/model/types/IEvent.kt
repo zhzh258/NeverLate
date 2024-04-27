@@ -16,5 +16,4 @@ interface IEvent {
     val location: GeoPoint
     val photoURL: String // For storing profile picture, you might need a custom type or a String URL
 
-    fun updateEventViewModel(viewModel: EventViewModel)
 }

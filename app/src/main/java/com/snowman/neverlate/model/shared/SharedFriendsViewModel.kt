@@ -8,7 +8,7 @@ import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IUser
 
 // This is the shared view model storing the friends list of the current user
-class FriendViewModel : ViewModel() {
+class SharedFriendsViewModel : ViewModel() {
     private val TAG = "FriendViewModel"
     private val firebaseManager = FirebaseManager.getInstance()
 

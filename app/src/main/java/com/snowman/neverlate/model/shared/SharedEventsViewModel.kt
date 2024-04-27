@@ -7,7 +7,7 @@ import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IEvent
 
 // This is the shared view model storing the events of the current user
-class EventViewModel: ViewModel() {
+class SharedEventsViewModel: ViewModel() {
     private val _events = MutableLiveData<MutableList<IEvent>>()
     val events: LiveData<MutableList<IEvent>>
         get() = _events

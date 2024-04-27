@@ -1,6 +1,6 @@
 package com.snowman.neverlate.model.types
 
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 
 data class User(
     override val userId: String = "",
@@ -21,7 +21,7 @@ data class User(
     override val friendRequests: List<String> = emptyList()
 ) : IUser {
 
-    override fun updateUserViewModel(viewModel: UserViewModel) {
+    override fun updateUserViewModel(viewModel: SharedUserViewModel) {
         viewModel.setUserData(this)
     }
 }

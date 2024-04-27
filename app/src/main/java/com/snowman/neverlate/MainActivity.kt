@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.databinding.ActivityMainBinding
 import com.snowman.neverlate.model.FirebaseManager
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.ui.login.LoginActivity
 
 class MainActivity : AppCompatActivity() {
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var emailTextView: TextView
     private lateinit var navView: NavigationView
     private val firebaseManager = FirebaseManager.getInstance()
-    private val userViewModel: UserViewModel by viewModels()
+    private val sharedUserViewModel: SharedUserViewModel by viewModels()
 
 
     private val TAG = "Main Activity"
@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadUserData() {
         firebaseManager.loadUserData { user ->
             if (user != null) {
-                user.updateUserViewModel(userViewModel)
+                user.updateUserViewModel(sharedUserViewModel)
             } else {
                 Log.e("FirebaseManager", "Failed to retrieve user data")
             }
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeUserData() {
-        userViewModel.userData.observe(this) { user ->
+        sharedUserViewModel.userData.observe(this) { user ->
             if (user != null) {
                 displayNameTextView.text = user.displayName
                 emailTextView.text = user.email

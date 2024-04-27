@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentProfileV2Binding
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.FirebaseManager
 import android.util.Log
@@ -18,7 +18,7 @@ class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileV2Binding? = null
     private val binding get() = _binding!!
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
     private val firebaseManager = FirebaseManager.getInstance()
 
     override fun onCreateView(
@@ -27,7 +27,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileV2Binding.inflate(inflater, container, false)
-        userViewModel.userData.value?.let {
+        sharedUserViewModel.userData.value?.let {
             initProfileData(it)
         }
         observeProfile()
@@ -40,7 +40,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun observeProfile() {
-        userViewModel.userData.observe(viewLifecycleOwner) { user ->
+        sharedUserViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
                 loadUserData()
                 initProfileData(it)
@@ -64,7 +64,7 @@ class ProfileFragment : Fragment() {
     private fun loadUserData() {
         firebaseManager.loadUserData { user ->
             if (user != null) {
-                user.updateUserViewModel(userViewModel)
+                user.updateUserViewModel(sharedUserViewModel)
             } else {
                 Log.e("FirebaseManager", "Failed to retrieve user data")
             }

@@ -18,7 +18,5 @@ data class Event(
     override val location: GeoPoint = GeoPoint(41.8781, 87.6298),
     override val photoURL: String = "",
 ) : IEvent {
-    override fun updateEventViewModel(viewModel: EventViewModel) {
-        viewModel.setEventData(this)
-    }
+
 }

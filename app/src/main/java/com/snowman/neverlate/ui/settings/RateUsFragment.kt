@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentRateusBinding
 import com.snowman.neverlate.model.FirebaseManager
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.model.types.IUser
 
 class RateUsFragment : Fragment() {
@@ -18,7 +18,7 @@ class RateUsFragment : Fragment() {
     private var _binding: FragmentRateusBinding? = null
 
     private val binding get() = _binding!!
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,7 +68,7 @@ class RateUsFragment : Fragment() {
 
 
     private fun observeSettings() {
-        userViewModel.userData.observe(viewLifecycleOwner) { user ->
+        sharedUserViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
                 initProfileData(it)
             }
@@ -88,7 +88,7 @@ class RateUsFragment : Fragment() {
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
                 Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
-                it.updateUserViewModel(userViewModel)
+                it.updateUserViewModel(sharedUserViewModel)
             },
             onFailure = { exception ->
                 Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
