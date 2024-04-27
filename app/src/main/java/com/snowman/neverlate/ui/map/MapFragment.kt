@@ -3,6 +3,7 @@ package com.snowman.neverlate.ui.map
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -22,20 +24,26 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.api.Billing.BillingDestination
 import com.google.maps.android.PolyUtil
+import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentMapBinding
+import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.retrofit.DirectionsResponse
 import com.snowman.neverlate.model.retrofit.GoogleMapsDirectionsService
+import com.snowman.neverlate.model.types.IEvent
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.Error
 
-private val TAG = "MAP_DEBUG"
+private val TAG = "Map Fragment"
 
 class MapFragment : Fragment(), OnMapReadyCallback {
+    val firebaseManager = FirebaseManager.getInstance()
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
     private var _mapViewModel: MapViewModel? = null
@@ -44,6 +52,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val bottomSheetBehavior get() = _bottomSheetBehavior!!
 
     private lateinit var map: GoogleMap
+    private val marker2event: HashMap<Marker, IEvent> = HashMap()
+    private var polyline: Polyline? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,6 +66,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         bottomSheetBehavior.isHideable = true
         bottomSheetBehavior.peekHeight = 300 // How much content to show when it's COLLAPSED
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         val mapFragment = childFragmentManager
             .findFragmentById(com.snowman.neverlate.R.id.map) as SupportMapFragment?
@@ -89,7 +100,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setMapConfig() {
-        map.isTrafficEnabled = true
+        map.isTrafficEnabled = false
     }
 
     private fun bindLiveData() {
@@ -97,10 +108,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             map.moveCamera(CameraUpdateFactory.newCameraPosition(it))
         }
 
-        mapViewModel.markers.observe(viewLifecycleOwner) {
-            map.clear()
-            it.forEach {
-                map.addMarker(it)
+        mapViewModel.markerData.observe(viewLifecycleOwner) {
+            this.map.clear()
+            this.marker2event.clear()
+            it.forEach { markerData ->
+                val marker = this.map.addMarker(markerData.markerOptions)
+                marker?.let { this.marker2event[marker] = markerData.event }
             }
         }
     }
@@ -129,72 +142,80 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        map.setOnMarkerClickListener {marker: Marker -> lifecycleScope.launch {
-//            getUserGPS() // suspend function
+        map.setOnMarkerClickListener { marker: Marker -> lifecycleScope.launch {
+            val event = marker2event[marker] ?: throw Error("IEvent not found in the marker2event hashmap!")
+
             marker.showInfoWindow()
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             val origin: LatLng? = getUserGPS()
+            // event card
+            binding.eventCard.setOnClickListener {
+                // TODO: navigate to EventDetailFragment
+                Toast.makeText(requireContext(), "TODO: navigate event.id = ${event.id}", Toast.LENGTH_SHORT).show()
+            }
+            binding.eventNameTv.text = event.name
+            Glide.with(requireActivity())
+                .load(event.photoURL)
+                .circleCrop()
+                .error(R.mipmap.ic_launcher_round)
+                .into(binding.eventImageIv)
+            lifecycleScope.launch {
+                var counter = event.members.size
+                val usernameList = mutableListOf<String>()
+                for (userId in event.members) {
+                    firebaseManager.getUserDataForId(userId) { user ->
+                        Log.d(TAG, "The user we get from $userId is${user.toString()}")
+
+                        user?.let { usernameList.add(user.displayName) }
+                        if(--counter == 0) {
+                            binding.eventMembersTv.text = usernameList.joinToString(",")
+                            Log.d(TAG, usernameList.toString())
+                        }
+                    }
+                }
+            }
+            binding.eventPeopleNumberTv.text = event.members.size.toString()
 
             // Start all fetches in parallel
-            val driving = async { fetchDirectionsResponse(origin, "driving", marker) }
-            val walking = async { fetchDirectionsResponse(origin, "walking", marker) }
-            val bicycling = async { fetchDirectionsResponse(origin, "bicycling", marker) }
-            val transit = async { fetchDirectionsResponse(origin, "transit", marker) }
+            val driving = async { fetchDirectionsResponse(origin, "driving", marker.position) }
+            val walking = async { fetchDirectionsResponse(origin, "walking", marker.position) }
+            val bicycling = async { fetchDirectionsResponse(origin, "bicycling", marker.position) }
+            val transit = async { fetchDirectionsResponse(origin, "transit", marker.position) }
+
             // await all
             val responses = awaitAll(driving, walking, bicycling, transit)
             val (drivingResponse, walkingResponse, bicyclingResponse, transitResponse) = responses
             binding.driveButton.apply {
                 this.setOnClickListener {
-                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-                    val polylineOptions = PolylineOptions()
-                    val points = PolyUtil.decode(drivingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
-                    polylineOptions.addAll(points)
-                    map.addPolyline(polylineOptions)
+                    handleTransportButtonClicked("drive", marker, drivingResponse)
                 }
                 val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
                 val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Drive: " + duration + " " + distance
+                this.text = "Drive: " + duration
             }
             binding.walkButton.apply {
                 this.setOnClickListener {
-                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    val polylineOptions = PolylineOptions()
-                    val points = PolyUtil.decode(walkingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
-                    polylineOptions.addAll(points)
-                    map.addPolyline(polylineOptions)
+                    handleTransportButtonClicked("walk", marker, walkingResponse)
                 }
                 val duration = walkingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
                 val distance = walkingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Walk: " + duration + " " + distance
+                this.text = "Walk: " + duration
             }
             binding.bikeButton.apply {
                 this.setOnClickListener {
-                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    val polylineOptions = PolylineOptions()
-                    val points = PolyUtil.decode(bicyclingResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
-                    polylineOptions.addAll(points)
-                    map.addPolyline(polylineOptions)
+                    handleTransportButtonClicked("bike", marker, bicyclingResponse)
                 }
                 val duration = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
                 val distance = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Bike: " + duration + " " + distance
+                this.text = "Bike: " + duration
             }
             binding.transitButton.apply {
                 this.setOnClickListener {
-                    origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    val polylineOptions = PolylineOptions()
-                    val points = PolyUtil.decode(transitResponse?.routes?.get(0)?.overview_polyline?.points ?: "")
-                    polylineOptions.addAll(points)
-                    map.addPolyline(polylineOptions)
+                    handleTransportButtonClicked("transit", marker, transitResponse)
                 }
                 val duration = transitResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
                 val distance = transitResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Transit: " + duration + " " + distance
+                this.text = "Transit: " + duration
             }
         }
             true
@@ -204,11 +225,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
-    private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, marker: Marker): DirectionsResponse? { // show a line from current location to
 
+    private fun handleTransportButtonClicked(transport: String, marker: Marker, response: DirectionsResponse?) = lifecycleScope.launch {
+        this@MapFragment.map.isTrafficEnabled = true
+        val origin: LatLng? = getUserGPS()
+        this@MapFragment.polyline?.remove()
+        origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        val polylineOptions = PolylineOptions().color(Color.BLUE)
+        val points = PolyUtil.decode(response?.routes?.get(0)?.overview_polyline?.points ?: "")
+        polylineOptions.addAll(points)
+        this@MapFragment.polyline = map.addPolyline(polylineOptions)
+        binding.navigationCard.setVisibility(View.VISIBLE)
+
+        binding.destinationMb.text = marker2event[marker]?.address
+        val distance = response?.routes?.get(0)?.legs?.get(0)?.distance?.text
+        binding.transportChip.text = transport
+        binding.distanceChip.text = distance
+        binding.closeButton.setOnClickListener {
+            binding.navigationCard.setVisibility(View.INVISIBLE)
+            this@MapFragment.polyline?.remove()
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            this@MapFragment.map.isTrafficEnabled = false;
+        }
+    }
+
+    private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, destination: LatLng): DirectionsResponse? {
         Log.d(TAG, "Now fetching data with origin = ${origin}")
         origin ?: return null
-        val destination = marker.position
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://maps.googleapis.com/")
@@ -278,6 +322,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             null
         }
     }
+
+
+
+
 }
 
 
