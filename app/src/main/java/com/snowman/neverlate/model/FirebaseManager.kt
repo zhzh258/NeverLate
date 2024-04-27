@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.User
@@ -520,6 +521,37 @@ class FirebaseManager {
                 .addOnFailureListener { e ->
                     callback(null, e)
                 }
+        }
+    }
+
+    // I made a clone of the fetchFriendsDataForCurrentUser
+    fun fetchEventsDataForCurrentUser(
+        callback: (List<IEvent>?, Exception?) -> Unit
+    ) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val currentUserId = currentUser.uid
+            Log.d(TAG, "fetchEventsDataForCurrentUser()... with currentUserId=${currentUserId}")
+            val eventsList = mutableListOf<IEvent>()
+            val res = db.collection("events").whereArrayContains("members", currentUserId).get()
+                .addOnSuccessListener { eventDocumentSnapshots ->
+                    for (eventDocumentSnapshot in eventDocumentSnapshots) {
+                        // document is a snapshot of event
+                        if (eventDocumentSnapshot.exists()) {
+                            val event = eventDocumentSnapshot.toObject(Event::class.java)
+                            eventsList.add(event)
+                        }
+                    }
+                    Log.d(TAG, "fetchEventsDataForCurrentUser() successful")
+                    callback(eventsList, null)
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG, "fetchEventsDataForCurrentUser() failed")
+                    callback(null, e)
+                }
+        } else {
+            Log.d(TAG, "fetchEventsDataForCurrentUser()... Current user not found")
+            callback(null, Exception("Current user not found"))
         }
     }
 

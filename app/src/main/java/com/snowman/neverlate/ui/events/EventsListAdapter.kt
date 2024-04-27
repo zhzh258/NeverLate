@@ -18,8 +18,8 @@ class EventsViewHolder(private val binding: ListItemEventBinding) :
             onClickListener.invoke()
         }
         binding.textEventTitle.text = event.name
-        binding.textEventLocation.text = event.location
-        binding.textEventTime.text = event.time
+        binding.textEventLocation.text = event.address
+        binding.textEventTime.text = event.date.toString()
         binding.textPeopleCount.text = event.members.count().toString()
         Glide.with(binding.imageEvent)
             .load(event.photoURL)

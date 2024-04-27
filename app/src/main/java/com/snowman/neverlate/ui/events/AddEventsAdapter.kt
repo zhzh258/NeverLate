@@ -19,8 +19,8 @@ class AddEventsViewHolder(
 
     fun bind(event: IEvent) {
             binding.textEventTitle.text = event.name
-            binding.textEventLocation.text = event.location
-            binding.textEventTime.text = event.time
+            binding.textEventLocation.text = event.address
+            binding.textEventTime.text = event.date.toString()
             Glide.with(binding.imageEvent)
                 .load(event.photoURL)
                 .circleCrop()
@@ -65,8 +65,8 @@ class EventsCreationViewHolder(
 
     fun bind(event: IEvent) {
         binding.textEventTitle.text = event.name
-        binding.textEventLocation.text = event.location
-        binding.textEventTime.text = event.time
+        binding.textEventLocation.text = event.address
+        binding.textEventTime.text = event.date.toDate().toLocaleString()
         Glide.with(binding.imageEvent)
             .load(event.photoURL)
             .circleCrop()
