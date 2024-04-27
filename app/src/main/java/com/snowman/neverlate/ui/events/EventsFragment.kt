@@ -129,7 +129,7 @@ class EventsFragment : Fragment()  {
             updateEventsList(event, adapter)
         }
         eventsViewModel.fetchEventsData()
-        events = eventsViewModel.events
+        this.events = eventsViewModel.events
     }
 
     private fun updateEventsList(events: List<IEvent>, adapter: EventsListAdapter) {

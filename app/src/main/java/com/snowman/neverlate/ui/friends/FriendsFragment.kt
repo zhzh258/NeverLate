@@ -11,14 +11,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
-import com.snowman.neverlate.model.shared.FriendViewModel
+import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IUser
 
 class FriendsFragment : Fragment() {
 
     private lateinit var friendsListRv: RecyclerView
     private lateinit var addFriendsBtn: Button
-    private val friendsViewModel: FriendViewModel by viewModels()
+    private val friendsViewModel: SharedFriendsViewModel by viewModels()
     private lateinit var adapter: FriendsListAdapter
 
     override fun onCreateView(

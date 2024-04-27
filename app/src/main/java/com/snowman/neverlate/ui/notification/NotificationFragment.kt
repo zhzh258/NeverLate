@@ -51,7 +51,6 @@ class NotificationFragment : Fragment() {
     }
 
     private fun setUpMessageListener() {
-
         firebaseManager.messageListener { messages ->
             val newMessages = messages.filter { message ->
                 !notificationsViewModel.notificationsList.any { it.messageId == message.messageId }

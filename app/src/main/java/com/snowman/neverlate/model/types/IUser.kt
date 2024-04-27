@@ -1,6 +1,6 @@
 package com.snowman.neverlate.model.types
 
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 
 interface IUser {
     val userId: String // UUID
@@ -24,5 +24,5 @@ interface IUser {
     // ** val settingConfig: String
     // ** val profile: String // Other information related to personal profile page; adjust type as necessary
 
-    fun updateUserViewModel(viewModel: UserViewModel)
+    fun updateUserViewModel(viewModel: SharedUserViewModel)
 }

@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.snowman.neverlate.databinding.FragmentEditProfileBinding
 import com.snowman.neverlate.model.FirebaseManager
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.model.types.IUser
 import androidx.core.content.ContextCompat
 import android.Manifest
@@ -29,7 +29,7 @@ class EditProfileFragment : Fragment() {
     private var _binding: FragmentEditProfileBinding? = null
 
     private val binding get() = _binding!!
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,7 +62,7 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun observeSettings() {
-        userViewModel.userData.observe(viewLifecycleOwner) { user ->
+        sharedUserViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
                 initProfileData(it)
             }
@@ -91,7 +91,7 @@ class EditProfileFragment : Fragment() {
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
                 Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
-                it.updateUserViewModel(userViewModel)
+                it.updateUserViewModel(sharedUserViewModel)
             },
             onFailure = { exception ->
                 Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
@@ -122,7 +122,7 @@ class EditProfileFragment : Fragment() {
             FirebaseManager.getInstance().editUserProfile(updatedUserData,
                 onSuccess = {
                     Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
-                    it.updateUserViewModel(userViewModel)
+                    it.updateUserViewModel(sharedUserViewModel)
                 },
                 onFailure = { exception ->
                     Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()

@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentSettingBinding
-import com.snowman.neverlate.model.shared.UserViewModel
+import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.FirebaseManager
 import android.util.Log
@@ -19,7 +19,7 @@ class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    private val userViewModel: UserViewModel by activityViewModels()
+    private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
     private val firebaseManager = FirebaseManager.getInstance()
 
 
@@ -53,7 +53,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun observeUserData() {
-        userViewModel.userData.observe(viewLifecycleOwner) { user ->
+        sharedUserViewModel.userData.observe(viewLifecycleOwner) { user ->
             user?.let {
                 loadUserData()
                 initProfileData(it)
@@ -73,7 +73,7 @@ class SettingsFragment : Fragment() {
     private fun loadUserData() {
         firebaseManager.loadUserData { user ->
             if (user != null) {
-                user.updateUserViewModel(userViewModel)
+                user.updateUserViewModel(sharedUserViewModel)
             } else {
                 Log.e("FirebaseManager", "Failed to retrieve user data")
             }

@@ -4,6 +4,66 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- CardView -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/navigation_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:visibility="invisible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:weightSum="100">
+            <LinearLayout
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_weight="70"
+                android:layout_height="wrap_content">
+                <com.google.android.material.button.MaterialButton
+                    android:enabled="false"
+                    android:id="@+id/origin_mb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your location"
+                    android:textSize="12sp"/>
+                <com.google.android.material.button.MaterialButton
+                    android:enabled="false"
+                    android:id="@+id/destination_mb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="DESTINATION"
+                    android:textSize="12sp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/distance_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="chip"/>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/transport_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="chip"/>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/close_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Close"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -17,54 +77,119 @@
         android:orientation="vertical"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         >
-
-        <com.google.android.material.bottomsheet.BottomSheetDragHandleView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/drag_handle"
-            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/white"
             android:orientation="vertical">
+
             <TextView
+                android:id="@+id/drag_handle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lorem"
-                android:textSize="25sp"
-                android:layout_margin="25sp"/>
+                android:text="TODO: drag handle here"/>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/event_card"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="15dp">
+                <ImageView
+                    android:id="@+id/event_image_iv"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/event_img_test"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
+                <TextView
+                    android:id="@+id/event_name_tv"
+                    style="@style/CustomTextViewStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="96dp"
+                    android:text="Group Project Meeting"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/event_image_iv" />
+
+                <TextView
+                    android:id="@+id/event_members_tv"
+                    style="@style/CustomTextViewStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="8dp"
+                    android:text="EVENT_MEMBERS"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/event_name_tv" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/event_members_tv">
+
+                    <ImageView
+                        android:id="@+id/image_people"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="15dp"
+                        android:src="@drawable/ic_people_white"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/event_people_number_tv"
+                        style="@style/CustomTextViewStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="20dp"
+                        android:text="4 people"
+                        android:textColor="@color/white"
+                        app:layout_constraintBottom_toBottomOf="@id/image_people"
+                        app:layout_constraintStart_toEndOf="@id/image_people"
+                        app:layout_constraintTop_toTopOf="@id/image_people" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/driveButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorPrimaryDark"
                 android:text="Drive"
                 style="@style/Widget.MaterialComponents.Button"/>
-            <com.google.android.material.button.MaterialButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/walkButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorPrimaryDark"
                 android:text="Walk"
                 style="@style/Widget.MaterialComponents.Button"/>
-
-            <!-- Bike Option -->
-            <com.google.android.material.button.MaterialButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bikeButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorPrimaryDark"
                 android:text="Bike"
                 style="@style/Widget.MaterialComponents.Button"/>
-
-            <!-- Bus Option -->
-            <com.google.android.material.button.MaterialButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/transitButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorPrimaryDark"
                 android:text="Bus"
                 style="@style/Widget.MaterialComponents.Button"/>
         </LinearLayout>
