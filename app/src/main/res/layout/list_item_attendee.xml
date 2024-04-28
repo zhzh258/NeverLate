@@ -31,22 +31,36 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/general_small_margin"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="@dimen/message_name_text_size"
+            app:layout_constraintBottom_toTopOf="@id/messageET"
             app:layout_constraintStart_toEndOf="@id/friendIV"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             tools:text="ZhaoZhan" />
 
-        <Button
+        <EditText
+            android:id="@+id/messageET"
+            android:layout_width="@dimen/event_friend_text_width"
+            android:layout_height="wrap_content"
+            android:text="@string/hurry_up"
+            android:textSize="@dimen/message_text_size"
+            android:layout_marginStart="@dimen/general_xsmall_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/friendIV"
+            app:layout_constraintTop_toBottomOf="@id/friendTV"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <ImageButton
             android:id="@+id/hurryBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/general_small_margin"
-            android:text="@string/hurry_up"
+            android:backgroundTint="@color/buttonBackground"
+            android:src="@drawable/baseline_send_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/friendTV"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/friendTV" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
