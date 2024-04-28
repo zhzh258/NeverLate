@@ -1,14 +1,13 @@
 package com.snowman.neverlate.ui.events
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
@@ -16,8 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.ui.events.EventsListAdapter
-import com.snowman.neverlate.ui.events.EventsViewModel
+import com.snowman.neverlate.model.shared.SharedEventViewModel
 
 class EventsFragment : Fragment()  {
     private lateinit var eventsListRv: RecyclerView
@@ -26,6 +24,7 @@ class EventsFragment : Fragment()  {
     private lateinit var adapter: EventsListAdapter
     private lateinit var searchEventsSV: SearchView
     private lateinit var events: MutableLiveData<List<IEvent>>
+    private val sharedEventViewModel: SharedEventViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,13 +115,15 @@ class EventsFragment : Fragment()  {
         addEventBtn = view.findViewById(R.id.addEventBtn)
         eventsListRv = view.findViewById(R.id.eventsListRv)
         eventsListRv.layoutManager = LinearLayoutManager(context)
-        adapter = EventsListAdapter(mutableListOf()) {
-            navigateToAnotherPage()
+        adapter = EventsListAdapter(mutableListOf()) { event ->
+            sharedEventViewModel.setSelectedEvent(event)
+            findNavController().navigate(R.id.nav_eventDetails)
         }
         eventsListRv.adapter = adapter
         searchEventsSV = view.findViewById(R.id.searchEventsSV)
         events = eventsViewModel.events
     }
+
 
     private fun observeEvents() {
         eventsViewModel.events.observe(viewLifecycleOwner) { event ->

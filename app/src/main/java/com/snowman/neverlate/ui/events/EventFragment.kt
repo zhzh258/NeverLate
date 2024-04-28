@@ -2,6 +2,7 @@ package com.snowman.neverlate.ui.events
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,8 +10,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -42,7 +48,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.snowman.neverlate.model.*
-
+import com.snowman.neverlate.model.types.Event
+import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.model.shared.SharedEventViewModel
 
 
 class EventFragment : Fragment() {
@@ -52,15 +60,19 @@ class EventFragment : Fragment() {
     private lateinit var addEventsAdapter: AddEventsAdapter
     private lateinit var friendsRV: RecyclerView
     private lateinit var friendsAdapter: EventFriendsAdapter
+    private lateinit var theEvent: IEvent
 
     private var _binding: FragmentOneEventBinding? = null
     private val binding get() = _binding!!
+
+    private val sharedEventViewModel: SharedEventViewModel by activityViewModels()
 
     private val mockDataEventTime = "2024-04-22 23:30:00" // Replace it with specific event time
 
     private val handler = Handler(Looper.getMainLooper())
     // ------ Get Current Time Every 1000 ms ------ //
     private val updateRunnable = object : Runnable {
+        @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
             val currentDateTime = LocalDateTime.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -73,6 +85,7 @@ class EventFragment : Fragment() {
 
     // ------ Fetch ETA Every 10000 ms ------ //
     private val updateRunnableETA = object : Runnable {
+        @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
             setUpETA()
             calculatePunctualStatus(mockDataEventTime)
@@ -92,14 +105,26 @@ class EventFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedEventViewModel.selectedEvent.observe(viewLifecycleOwner) { event ->
+            event?.let {
+                theEvent = event
+                view.findViewById<TextView>(R.id.text_title).text = theEvent.name
+                view.findViewById<TextView>(R.id.textview_description).text = theEvent.description
+                view.findViewById<TextView>(R.id.text_event_time).text = event.date.toString()
+                view.findViewById<TextView>(R.id.text_event_location).text = event.location.toString()
+                view.findViewById<TextView>(R.id.text_people_count).text = event.members.size.toString() + " people"
+                setUpFriends(view)
+            }
+        }
         setUpETA()
         handler.post(updateRunnable)
         handler.post(updateRunnableETA)
+
 //        val args: EventDetailsFragmentArgs by navArgs()
 //        val eventId = args.eventId
-        setUpFriends(view)
     }
 
     override fun onDestroyView() {
@@ -114,10 +139,11 @@ class EventFragment : Fragment() {
     "rPzbvBIau8OLR9yenHZDyhVNcVX2", "uoFb8MuJOAeAaL2wZqE8PTmrS8M2")
 
     private fun setUpFriends(view: View) {
+        var friendsNames = ""
         friendsRV = view.findViewById(R.id.friendsRV)
         friendsRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         friendsAdapter = EventFriendsAdapter(mutableListOf(), requireContext())
-        firebaseManager.getUsersDataForIds(MOCK_DATA_REMOVE_LATER) { users ->
+        firebaseManager.getUsersDataForIds(theEvent.members) { users ->
             friendsAdapter.setData(users)
             friendsAdapter.notifyDataSetChanged()
         }
@@ -125,6 +151,7 @@ class EventFragment : Fragment() {
         PagerSnapHelper().attachToRecyclerView(friendsRV)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpETA() {
         lifecycleScope.launch {
@@ -189,6 +216,7 @@ class EventFragment : Fragment() {
     }
 
     // ------ Remaining Time = Event Time - Current Time ------ //
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun calculateRemainingTime(eventTime: String) {
         val givenTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
@@ -199,6 +227,7 @@ class EventFragment : Fragment() {
     }
 
     // ------ Punctual Status based on => Event Time - Expected Time of Arrival ------ //
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun calculatePunctualStatus(eventTime: String) {
         val givenTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
@@ -216,6 +245,7 @@ class EventFragment : Fragment() {
             else -> getString(R.string.status_7)
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun formatDuration(duration: Duration): String {
         val seconds = duration.seconds
         val absSeconds = Math.abs(seconds)

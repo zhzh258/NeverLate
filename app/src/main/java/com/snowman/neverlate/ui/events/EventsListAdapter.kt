@@ -1,9 +1,7 @@
 package com.snowman.neverlate.ui.events
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
@@ -13,10 +11,11 @@ import com.snowman.neverlate.model.types.IEvent
 class EventsViewHolder(private val binding: ListItemEventBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(event: IEvent, onClickListener: () -> Unit) {
+    fun bind(event: IEvent, onItemClick: (IEvent) -> Unit) {
         binding.root.setOnClickListener {
-            onClickListener.invoke()
+            onItemClick.invoke(event)
         }
+        // Bind other data to the views
         binding.textEventTitle.text = event.name
         binding.textEventLocation.text = event.address
         binding.textEventTime.text = event.date.toString()
@@ -31,7 +30,7 @@ class EventsViewHolder(private val binding: ListItemEventBinding) :
 
 class EventsListAdapter(
     private var events: MutableList<IEvent>,
-    private val onItemClick: () -> Unit
+    private val onItemClick: (IEvent) -> Unit
 ) : RecyclerView.Adapter<EventsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -46,7 +45,7 @@ class EventsListAdapter(
     override fun onBindViewHolder(holder: EventsViewHolder, position: Int) {
         val event = events[position]
         holder.bind(event) {
-            onItemClick.invoke()
+            onItemClick.invoke(event)
         }
     }
 
