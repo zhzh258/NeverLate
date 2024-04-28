@@ -555,4 +555,32 @@ class FirebaseManager {
         }
     }
 
+    fun fetchEventData(
+        eventId: String,
+        callback: (IEvent?, Exception?) -> Unit
+    ) {
+        if (eventId != "") {
+            var event = Event();
+            Log.d(TAG, "fetchEventData()...")
+            val res = db.collection("events").whereArrayContains("id", eventId).get()
+                .addOnSuccessListener { eventDocumentSnapshots ->
+                    for (eventDocumentSnapshot in eventDocumentSnapshots) {
+                        // document is a snapshot of event
+                        if (eventDocumentSnapshot.exists()) {
+                            event = eventDocumentSnapshot.toObject(Event::class.java)
+                            println("HELLO"+event.name)
+                        }
+                    }
+                    Log.d(TAG, "fetchEventData() successful")
+                    callback(event, null)
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG, "fetchEventData() failed")
+                    callback(null, e)
+                }
+        } else {
+            Log.d(TAG, "fetchEventData()... Event not found")
+            callback(null, Exception("Event not found"))
+        }
+    }
 }

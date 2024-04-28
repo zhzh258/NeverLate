@@ -5,7 +5,7 @@ import com.google.firebase.firestore.GeoPoint
 
 interface IEvent {
     val active: Boolean // History event or ongoing event?
-    val address: String
+    val address: String // Think about the format/how to check if it is accurate
     val category: String // Category that is one of Dining, Study, Meeting. Useful for filtering
     val date: Timestamp // '3/26/2023'; consider using a more suitable date type
     val description: String
@@ -15,5 +15,4 @@ interface IEvent {
     val name: String
     val location: GeoPoint
     val photoURL: String // For storing profile picture, you might need a custom type or a String URL
-
 }
