@@ -56,7 +56,7 @@ class EventFragment : Fragment() {
     private var _binding: FragmentOneEventBinding? = null
     private val binding get() = _binding!!
 
-    private val mockDataEventTime = "2024-04-22 23:30:00" // Replace it with specific event time
+    private val mockDataEventTime = "2024-04-23 21:20:00" // Replace it with specific event time
 
     private val handler = Handler(Looper.getMainLooper())
     // ------ Get Current Time Every 1000 ms ------ //

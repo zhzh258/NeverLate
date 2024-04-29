@@ -162,7 +162,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             lifecycleScope.launch {
                 var counter = event.members.size
                 val usernameList = mutableListOf<String>()
-                for (userId in event.members) {
+                for (memberStatus in event.members) {
+                    val userId = memberStatus.id
+                //for (userId in event.members) {
                     firebaseManager.getUserDataForId(userId) { user ->
                         Log.d(TAG, "The user we get from $userId is${user.toString()}")
 

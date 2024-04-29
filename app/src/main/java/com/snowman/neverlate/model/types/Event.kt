@@ -4,6 +4,14 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import java.util.Date
 
+data class MemberStatus(
+    val id: String = "",
+    val isArrived: Boolean = false,
+    val status: String = "",
+    val arriveTime: Long = 0L
+)
+
+
 data class Event(
     override val active: Boolean = true,
     override val address: String = "",
@@ -12,7 +20,7 @@ data class Event(
     override val description: String = "",
     override val duration: Long = 0L,
     override val id: String = "",
-    override val members: List<String> = emptyList<String>(),
+    override val members: List<MemberStatus> = emptyList(),
     override val name: String = "",
     // Chicago. If you see Chicago on map it means something is wrong
     override val location: GeoPoint = GeoPoint(41.8781, 87.6298),

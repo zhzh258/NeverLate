@@ -526,33 +526,125 @@ class FirebaseManager {
 
     // I made a clone of the fetchFriendsDataForCurrentUser
     fun fetchEventsDataForCurrentUser(
+    callback: (List<IEvent>?, Exception?) -> Unit
+) {
+    val currentUser = auth.currentUser
+    if (currentUser != null) {
+        val currentUserId = currentUser.uid
+        Log.d(TAG, "currentUserId=${currentUserId}")
+        Log.d(TAG, "fetchEventsDataForCurrentUser()... with currentUserId=${currentUserId}")
+        val eventsList = mutableListOf<IEvent>()
+        val ref = db.collection("events").whereEqualTo("category", "Meeting").get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    Log.d(TAG, "Query returned no results.")
+                } else {
+                    Log.d(TAG, "Processing ${result.size()} documents.")
+                    for (document in result) {
+                        val event = document.toObject(Event::class.java)
+                        Log.d(TAG, "Processing event: ${event.id}")
+                        val memberList = document.get("members") as List<*>
+                        val isUserAMember = memberList.mapNotNull { it as? Map<String, Any> }
+                            .any { it["id"] == currentUserId }
+                        if (isUserAMember) {
+                            Log.d(TAG, "User is a member of the event: ${event.id}")
+                            eventsList.add(event)
+                        }
+                    }
+                    callback(eventsList, null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "Query failed with exception: $exception")
+                callback(null, exception)
+            }
+    }
+    }
+
+    fun fetchPastEventsDataForCurrentUser(
         callback: (List<IEvent>?, Exception?) -> Unit
     ) {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
+            Log.d(TAG, "currentUserId=${currentUserId}")
             Log.d(TAG, "fetchEventsDataForCurrentUser()... with currentUserId=${currentUserId}")
             val eventsList = mutableListOf<IEvent>()
-            val res = db.collection("events").whereArrayContains("members", currentUserId).get()
-                .addOnSuccessListener { eventDocumentSnapshots ->
-                    for (eventDocumentSnapshot in eventDocumentSnapshots) {
-                        // document is a snapshot of event
-                        if (eventDocumentSnapshot.exists()) {
-                            val event = eventDocumentSnapshot.toObject(Event::class.java)
-                            eventsList.add(event)
+            val ref = db.collection("events").whereEqualTo("active", false).get()
+                .addOnSuccessListener { result ->
+                    if (result.isEmpty) {
+                        Log.d(TAG, "Query returned no results.")
+                    } else {
+                        Log.d(TAG, "Processing ${result.size()} documents.")
+                        for (document in result) {
+                            val event = document.toObject(Event::class.java)
+                            Log.d(TAG, "Processing event: ${event.id}")
+                            val memberList = document.get("members") as List<*>
+                            val isUserAMember = memberList.mapNotNull { it as? Map<String, Any> }
+                                .any { it["id"] == currentUserId }
+                            if (isUserAMember) {
+                                Log.d(TAG, "User is a member of the event: ${event.id}")
+                                eventsList.add(event)
+                            }
                         }
+                        callback(eventsList, null)
                     }
-                    Log.d(TAG, "fetchEventsDataForCurrentUser() successful")
-                    callback(eventsList, null)
                 }
-                .addOnFailureListener { e ->
-                    Log.d(TAG, "fetchEventsDataForCurrentUser() failed")
-                    callback(null, e)
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "Query failed with exception: $exception")
+                    callback(null, exception)
+                }
+        }
+    }
+
+    fun fetchAverageArrivalTimeForCurrentUser(callback: (Double?, Exception?) -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val currentUserId = currentUser.uid
+            Log.d(TAG, "currentUserId=$currentUserId")
+            val eventsList = mutableListOf<IEvent>()
+            db.collection("events")
+                .whereEqualTo("active", false)
+                .get()
+                .addOnSuccessListener { result ->
+                    if (result.isEmpty) {
+                        Log.d(TAG, "Query returned no results.")
+                        callback(0.0, null) // 返回空列表，无错误
+                    } else {
+                        Log.d(TAG, "Processing ${result.size()} documents.")
+                        val allArriveTimes = mutableListOf<Long>()
+                        for (document in result) {
+                            val event = document.toObject(Event::class.java)
+                            Log.d(TAG, "Processing event: ${event.id}")
+                            val memberList = document.get("members") as List<*>
+                            memberList.mapNotNull { it as? Map<String, Any> }
+                                .filter { it["id"] == currentUserId }
+                                .forEach {
+                                    allArriveTimes.add(it["arriveTime"] as Long)
+                                    eventsList.add(event)
+                                }
+                        }
+
+                        val averageArriveTime = if (allArriveTimes.isNotEmpty()) {
+                            allArriveTimes.average()
+                        } else {
+                            null // 如果没有 arriveTimes，设置平均值为 null
+                        }
+                        Log.d(TAG, "Average arrive time for user $currentUserId is: $averageArriveTime")
+                        callback(averageArriveTime, null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "Query failed with exception: $exception")
+                    callback(null, exception)
                 }
         } else {
-            Log.d(TAG, "fetchEventsDataForCurrentUser()... Current user not found")
+            Log.d(TAG, "Current user not found")
             callback(null, Exception("Current user not found"))
         }
     }
 
+
 }
+
+

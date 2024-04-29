@@ -141,8 +141,8 @@
 
     <ImageView
         android:id="@+id/badge_img"
-        android:layout_width="@dimen/nav_header_image_size"
-        android:layout_height="@dimen/nav_header_image_size"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_margin="@dimen/general_small_margin"
         android:layout_marginTop="260dp"
         android:layout_marginLeft="180dp"
@@ -150,24 +150,27 @@
         app:layout_constraintTop_toBottomOf="@id/badge_title"
         tools:srcCompat="@drawable/ic_badge_1" />
 
+
     <TextView
         android:id="@+id/badge_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/general_small_margin"
 
+        android:layout_marginStart="3dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBottom_toTopOf="@id/badge_content"
+        app:layout_constraintBottom_toTopOf="@id/badge_context"
         app:layout_constraintStart_toEndOf="@id/badge_img"
+
         app:layout_constraintTop_toTopOf="@id/badge_img"
         tools:text="Always Late" />
 
-
     <TextView
-        android:id="@+id/badge_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/badge_context"
+        android:layout_width="220dp"
+        android:layout_height="50dp"
         android:layout_marginLeft="@dimen/general_small_margin"
+        android:layout_marginTop="50dp"
         app:layout_constraintStart_toEndOf="@+id/badge_img"
         app:layout_constraintTop_toBottomOf="@id/badge_name"
         android:textColor="@color/colorPrimary"
