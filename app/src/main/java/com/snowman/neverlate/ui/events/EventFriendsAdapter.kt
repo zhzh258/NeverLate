@@ -28,19 +28,22 @@ class EventFriendsViewHolder(
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.friendIV)
-
         binding.hurryBtn.setOnClickListener {
-            hurryFriend(user)
+            if (binding.messageET.text.toString() == "") {
+                hurryFriend(user, "Hurry up!!")
+            } else {
+                hurryFriend(user, binding.messageET.text.toString())
+            }
         }
     }
 
-    private fun hurryFriend(user: IUser) {
+    private fun hurryFriend(user: IUser, messageText: String) {
         firebaseManager.auth.uid?.let {
             val msg = Message(
                 messageId = UUID.randomUUID().toString(),
                 senderUid = it,
                 receiverUid = user.userId,
-                messageText = "Hurry up!!" // TODO: decide what to do lol
+                messageText = messageText
             )
             firebaseManager.sendMessage(msg) {
                 Toast.makeText(
