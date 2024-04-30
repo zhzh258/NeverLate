@@ -35,7 +35,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginBottom="-50dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_menu_profile"
+        android:src="@drawable/ic_widget_profile"
         app:layout_constraintBottom_toBottomOf="@id/rectangle_shape"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -58,7 +58,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginEnd="@dimen/general_small_margin"
-            android:src="@drawable/ic_edit_24"/>
+            android:src="@drawable/ic_util_edit_24"/>
     </LinearLayout>
 
     <LinearLayout
