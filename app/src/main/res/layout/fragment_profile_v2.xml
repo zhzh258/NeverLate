@@ -148,7 +148,7 @@
         android:layout_marginLeft="180dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:layout_constraintTop_toBottomOf="@id/badge_title"
-        tools:srcCompat="@drawable/ic_badge_1" />
+        tools:srcCompat="@drawable/ic_colorful_badge_1" />
 
 
     <TextView

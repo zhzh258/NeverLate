@@ -61,7 +61,7 @@ class RateUsFragment : Fragment() {
         )
 
         stars.forEachIndexed { index, imageView ->
-            val imageRes = if (index < starCount) R.drawable.ic_star else R.drawable.ic_empty_star
+            val imageRes = if (index < starCount) R.drawable.ic_widget_star else R.drawable.ic_widget_empty_star
             imageView.setImageResource(imageRes)
         }
     }

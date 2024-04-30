@@ -23,7 +23,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_menu_profile" />
+            tools:src="@drawable/ic_widget_profile" />
 
         <TextView
             android:id="@+id/friendTV"
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/general_small_margin"
             android:backgroundTint="@color/buttonBackground"
-            android:src="@drawable/baseline_send_24"
+            android:src="@drawable/ic_util_send_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/friendTV"
