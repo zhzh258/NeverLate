@@ -11,18 +11,26 @@ import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
+import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.model.types.User
 import com.snowman.neverlate.ui.events.AddEventsAdapter
 import java.util.Calendar
 
 class AddEventsFragment : Fragment() {
     private val TAG = "addeventsfragment"
 
+    private lateinit var attendeeRV: RecyclerView
+    private lateinit var addAttendeeCV: CardView
+    private var attendees = mutableListOf<User>()
+    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IEvent>()
     private lateinit var addEventsAdapter: AddEventsAdapter
@@ -54,6 +62,8 @@ class AddEventsFragment : Fragment() {
         calendarIcon.setOnClickListener {
             showCalendar()
         }
+
+        setUpAddAttendees(view)
     }
 
     private fun showCalendar() {
@@ -68,6 +78,19 @@ class AddEventsFragment : Fragment() {
             calendar.get(Calendar.DAY_OF_MONTH)
         )
         datePickerDialog.show()
+    }
+
+    private fun setUpAddAttendees(view: View) {
+        addAttendeeCV = view.findViewById(R.id.addAttendeeCV)
+        attendeeRV = view.findViewById(R.id.attendeeRV)
+        attendeeRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        addAttendeesClickListener()
+    }
+
+    private fun addAttendeesClickListener() {
+        addAttendeeCV.setOnClickListener{
+            Log.i("add attendees", friendsViewModel.friends.value.toString())
+        }
     }
 
 }

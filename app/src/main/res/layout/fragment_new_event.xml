@@ -1,53 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp">
-    
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add New Event"/>
 
     <ImageView
         android:id="@+id/event_image"
         android:layout_width="0dp"
         android:layout_height="200dp"
-        android:src="@drawable/event_img_test"
         android:scaleType="centerCrop"
-        android:layout_marginTop="30dp"
+        android:src="@drawable/event_img_test"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="@id/event_image"
         app:layout_constraintTop_toTopOf="@id/event_image">
 
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_add_img"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_add_img" />
 
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_edit"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_edit" />
 
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_delete"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_delete" />
 
     </LinearLayout>
 
@@ -60,7 +55,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DATE"/>
+            android:text="DATE" />
     </LinearLayout>
 
 
@@ -68,11 +63,10 @@
         android:id="@+id/calendar_row"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="3dp"
-        app:layout_constraintTop_toBottomOf="@id/date"
-        app:layout_constraintStart_toStartOf="parent">
-
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date">
 
 
         <ImageButton
@@ -80,33 +74,33 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_calendar"/>
+            android:src="@drawable/ic_calendar" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="10dp">
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
 
             <EditText
                 android:layout_width="300dp"
                 android:layout_height="25dp"
+                android:layout_marginTop="0dp"
                 android:background="@drawable/rounded_edittext"
                 android:hint="       Your Event Name       "
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:textSize="12dp"
-                android:layout_marginTop="0dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
 
             <EditText
                 android:layout_width="300dp"
                 android:layout_height="25dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Write A Short Description For The Event"
-                android:textSize="12dp"
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:layout_marginTop="10dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
 
         </LinearLayout>
 
@@ -124,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="TIME"/>
+            android:text="TIME" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -134,52 +128,53 @@
             <EditText
                 android:layout_width="0dp"
                 android:layout_height="20dp"
+                android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Start Time"
-                android:textSize="12dp"
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:layout_margin="3dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
+
             <EditText
                 android:layout_width="0dp"
                 android:layout_height="20dp"
+                android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/rounded_edittext"
                 android:hint="End Time"
-                android:textSize="12dp"
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:layout_margin="3dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
+
             <EditText
                 android:layout_width="0dp"
                 android:layout_height="20dp"
+                android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Duration"
-                android:textSize="12dp"
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:layout_margin="3dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
 
         </LinearLayout>
 
     </LinearLayout>
 
 
-
     <LinearLayout
         android:id="@+id/address_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/time_row"
-        android:layout_marginTop="20dp">
+        app:layout_constraintTop_toBottomOf="@id/time_row">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ADDRESS"/>
+            android:text="ADDRESS" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -189,21 +184,22 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Address Line 1"
-                android:textSize="12dp"
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:layout_marginTop="5dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Address Line 2"
-                android:textSize="12dp"
-                android:textColor="#b4b2b2"
                 android:textAlignment="center"
-                android:layout_marginTop="10dp"/>
+                android:textColor="#b4b2b2"
+                android:textSize="12dp" />
 
         </LinearLayout>
 
@@ -213,32 +209,97 @@
         android:id="@+id/event_type_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/address_row"
-        android:layout_marginTop="20dp">
+        app:layout_constraintTop_toBottomOf="@id/address_row">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="EVENT TYPE"/>
+            android:text="EVENT TYPE" />
 
         <Spinner
             android:id="@+id/spinner1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:background="@drawable/rounded_edittext"
-            android:textSize="12dp"
             android:textAlignment="center"
-            android:layout_marginTop="10dp" />
+            android:textSize="12sp" />
 
 
     </LinearLayout>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add New Event"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/attendeeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="start"
+        android:text="@string/attendees"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/event_type_row" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/addAttendeeCV"
+        android:layout_width="@dimen/add_event_attendee_item_width"
+        android:layout_height="@dimen/add_event_attendee_item_height"
+        android:backgroundTint="#f2dede"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="@dimen/card_elevation"
+        android:layout_marginEnd="@dimen/general_small_margin"
+        app:layout_constraintEnd_toStartOf="@id/attendeeRV"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/attendeeText">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/friendIV"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/baseline_person_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/addBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/general_small_margin"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@drawable/baseline_add_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/friendIV"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attendeeRV"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/add_event_attendee_item_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addAttendeeCV"
+        app:layout_constraintTop_toBottomOf="@id/attendeeText" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
