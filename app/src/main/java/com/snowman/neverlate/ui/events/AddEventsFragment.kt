@@ -31,7 +31,7 @@ class AddEventsFragment : Fragment() {
     private lateinit var attendeesAdapter: EventAttendeesAdapter
     private var attendees = mutableListOf<IUser>()
     private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
-    private val hashedIdToUserMap = mutableMapOf<Int, IUser>() // Assuming IUser is your user interface/model
+    private val hashedIdToUserMap = mutableMapOf<Int, IUser>()
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IEvent>()
     private lateinit var addEventsAdapter: AddEventsAdapter
