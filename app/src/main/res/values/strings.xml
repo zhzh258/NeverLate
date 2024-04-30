@@ -49,4 +49,25 @@
     <string name="status_5">You are definitely going to be late</string>
     <string name="status_6">You are already late! Hurry out now</string>
     <string name="status_7">You, with no sense of time, are hopeless</string>
+    <string name="badge_1">LATE GIIOTING</string>
+    <string name="badge_2">LATE GENERAL</string>
+    <string name="badge_3">LATE DUDKEL</string>
+    <string name="badge_4">LATE SOILDIER</string>
+    <string name="badge_5">LATE SOILDIER</string>
+    <string name="badge_6">ON-TIME JANTHNE</string>
+    <string name="badge_7">ON-TIME ERRCIRL</string>
+    <string name="badge_8">ON-TIME PANDA</string>
+    <string name="badge_9">ON-TIME JANITTA</string>
+    <string name="badge_10">ON-TIME MAMORN</string>
+    <string name="badge_1s">be LATE for an average of > 30 mins to earn this</string>
+    <string name="badge_2s">be LATE for an average of 20 -30 mins to earn this</string>
+    <string name="badge_3s">be LATE for an average of 15 - 20 mins to earn this</string>
+    <string name="badge_4s">be LATE for an average of 5 - 15 mins to earn this</string>
+    <string name="badge_5s">be LATE for an average of 0 - 5 mins to earn this</string>
+    <string name="badge_6s">be Punctual for an average of 0 - 5 mins earlier to earn this</string>
+    <string name="badge_7s">be Punctual for an average of 5 - 15 mins earlier to earn this</string>
+    <string name="badge_8s">be Punctual for an average of 15 - 20 mins earlier to earn this</string>
+    <string name="badge_9s">be Punctual for an average of 20 - 30 mins earlier to earn this</string>
+    <string name="badge_10s">be Punctual for an average of > 30 mins earlier to earn this</string>
+
 </resources>

@@ -2,6 +2,7 @@ package com.snowman.neverlate.model.types
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
+import com.snowman.neverlate.model.types.Event
 
 interface IEvent {
     val active: Boolean // History event or ongoing event?
@@ -11,7 +12,7 @@ interface IEvent {
     val description: String
     val duration: Long // Duration in milliseconds
     val id: String // UUID
-    val members: List<String> // List of members userid
+    val members: List<MemberStatus> // List of members userid
     val name: String
     val location: GeoPoint
     val photoURL: String // For storing profile picture, you might need a custom type or a String URL
