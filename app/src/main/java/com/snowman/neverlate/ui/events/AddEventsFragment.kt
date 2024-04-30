@@ -9,27 +9,24 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.Spinner
-import android.widget.Toast
-import androidx.appcompat.widget.SearchView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.model.types.User
-import com.snowman.neverlate.ui.events.AddEventsAdapter
+import com.snowman.neverlate.model.types.IUser
 import java.util.Calendar
 
 class AddEventsFragment : Fragment() {
     private val TAG = "addeventsfragment"
 
     private lateinit var attendeeRV: RecyclerView
-    private lateinit var addAttendeeCV: CardView
-    private var attendees = mutableListOf<User>()
+    private lateinit var addAttendeeCV: MaterialCardView
+    private var attendees = mutableListOf<IUser>()
     private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IEvent>()
@@ -84,6 +81,8 @@ class AddEventsFragment : Fragment() {
         addAttendeeCV = view.findViewById(R.id.addAttendeeCV)
         attendeeRV = view.findViewById(R.id.attendeeRV)
         attendeeRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val attendeesAdapter = EventAttendeesAdapter(attendees)
+        attendeeRV.adapter = attendeesAdapter
         addAttendeesClickListener()
     }
 
