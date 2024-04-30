@@ -34,7 +34,7 @@ class EventsViewModel : ViewModel() {
 
 
     fun fetchEventsData() {
-        firebaseManager.fetchEventsDataForCurrentUser { eventsList, exception ->
+        firebaseManager.fetchEventsDataForCurrentUser(true, "All") { eventsList, exception ->
             if (exception != null) {
                 Log.i(TAG, "unable to fetch events $exception")
             } else {

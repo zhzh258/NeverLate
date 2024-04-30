@@ -22,7 +22,7 @@ class HistoryViewModel : ViewModel() {
     }
 
     fun fetchEventsData() {
-        firebaseManager.fetchPastEventsDataForCurrentUser { eventsList, exception ->
+        firebaseManager.fetchEventsDataForCurrentUser(false, null) { eventsList, exception ->
             if (exception != null) {
                 Log.i(TAG, "unable to fetch events $exception")
             } else {

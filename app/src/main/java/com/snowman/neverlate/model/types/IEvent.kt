@@ -4,6 +4,13 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import com.snowman.neverlate.model.types.Event
 
+data class MemberStatus(
+    val id: String = "",
+    val isArrived: Boolean = false,
+    val status: String = "",
+    val arriveTime: Long = 0L
+)
+
 interface IEvent {
     val active: Boolean // History event or ongoing event?
     val address: String // Think about the format/how to check if it is accurate

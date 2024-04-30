@@ -6,12 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -22,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.databinding.FragmentOneEventBinding
@@ -33,27 +29,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.Duration
-import com.google.android.gms.location.CurrentLocationRequest
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.maps.android.PolyUtil
-import com.snowman.neverlate.databinding.FragmentMapBinding
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import com.snowman.neverlate.model.*
-import com.snowman.neverlate.model.types.Event
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.model.shared.SharedEventViewModel
+import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 
 
-class EventFragment : Fragment() {
+class OneEventFragment : Fragment() {
     private val TAG = "eventdetailsfragment"
 
     private val firebaseManager = FirebaseManager.getInstance()
@@ -65,7 +51,7 @@ class EventFragment : Fragment() {
     private var _binding: FragmentOneEventBinding? = null
     private val binding get() = _binding!!
 
-    private val sharedEventViewModel: SharedEventViewModel by activityViewModels()
+    private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
 
     private val mockDataEventTime = "2024-04-22 23:30:00" // Replace it with specific event time
 
@@ -108,7 +94,7 @@ class EventFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sharedEventViewModel.selectedEvent.observe(viewLifecycleOwner) { event ->
+        sharedOneEventViewModel.selectedEvent.observe(viewLifecycleOwner) { event ->
             event?.let {
                 theEvent = event
                 view.findViewById<TextView>(R.id.text_title).text = theEvent.name
@@ -143,7 +129,11 @@ class EventFragment : Fragment() {
         friendsRV = view.findViewById(R.id.friendsRV)
         friendsRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         friendsAdapter = EventFriendsAdapter(mutableListOf(), requireContext())
-        firebaseManager.getUsersDataForIds(theEvent.members) { users ->
+        val memberStatusList = theEvent.members
+        val userIdList = memberStatusList.map { memberStatus ->
+            memberStatus.id
+        }
+        firebaseManager.getUsersDataForIds(userIdList) { users ->
             friendsAdapter.setData(users)
             friendsAdapter.notifyDataSetChanged()
         }

@@ -4,14 +4,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import java.util.Date
 
-data class MemberStatus(
-    val id: String = "",
-    val isArrived: Boolean = false,
-    val status: String = "",
-    val arriveTime: Long = 0L
-)
-
-
 data class Event(
     override val active: Boolean = true,
     override val address: String = "",

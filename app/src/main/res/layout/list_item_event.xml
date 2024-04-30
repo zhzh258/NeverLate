@@ -65,7 +65,7 @@
                 android:id="@+id/image_people"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_people"
+                android:src="@drawable/ic_menu_friends"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />

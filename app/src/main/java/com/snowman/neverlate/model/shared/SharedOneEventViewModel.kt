@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.snowman.neverlate.model.types.Event
 
-class SharedEventViewModel : ViewModel() {
+class SharedOneEventViewModel : ViewModel() {
     private val _selectedEvent = MutableLiveData<Event?>()
     val selectedEvent: LiveData<Event?> get() = _selectedEvent
 

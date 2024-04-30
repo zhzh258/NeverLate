@@ -34,7 +34,7 @@ class MapViewModel: ViewModel() {
     }
 
     init {
-        firebaseManager.fetchEventsDataForCurrentUser { iEventList, exception ->
+        firebaseManager.fetchEventsDataForCurrentUser(true,"All") { iEventList, exception ->
             if (exception != null) {
                 Log.i(TAG, "unable to fetch events $exception")
                 this.markerData.value = listOf()

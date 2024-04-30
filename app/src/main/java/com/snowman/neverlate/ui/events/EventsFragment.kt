@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.model.shared.SharedEventViewModel
+import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 
 class EventsFragment : Fragment()  {
     private lateinit var eventsListRv: RecyclerView
@@ -24,7 +24,7 @@ class EventsFragment : Fragment()  {
     private lateinit var adapter: EventsListAdapter
     private lateinit var searchEventsSV: SearchView
     private lateinit var events: MutableLiveData<List<IEvent>>
-    private val sharedEventViewModel: SharedEventViewModel by activityViewModels()
+    private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,7 +116,7 @@ class EventsFragment : Fragment()  {
         eventsListRv = view.findViewById(R.id.eventsListRv)
         eventsListRv.layoutManager = LinearLayoutManager(context)
         adapter = EventsListAdapter(mutableListOf()) { event ->
-            sharedEventViewModel.setSelectedEvent(event)
+            sharedOneEventViewModel.setSelectedEvent(event)
             findNavController().navigate(R.id.nav_eventDetails)
         }
         eventsListRv.adapter = adapter

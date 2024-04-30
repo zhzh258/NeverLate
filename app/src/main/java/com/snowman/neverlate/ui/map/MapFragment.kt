@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationRequest
@@ -31,6 +32,7 @@ import com.snowman.neverlate.databinding.FragmentMapBinding
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.retrofit.DirectionsResponse
 import com.snowman.neverlate.model.retrofit.GoogleMapsDirectionsService
+import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 import com.snowman.neverlate.model.types.IEvent
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -48,6 +50,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private var _mapViewModel: MapViewModel? = null
     private val mapViewModel get() = _mapViewModel!!
+    private var _sharedOneEventViewModel: SharedOneEventViewModel? = null
+    private val sharedOneEventViewModel get() = _sharedOneEventViewModel!!
+
     private var _bottomSheetBehavior:  BottomSheetBehavior<FrameLayout>? = null
     private val bottomSheetBehavior get() = _bottomSheetBehavior!!
 
@@ -61,7 +66,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
-        _mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        _mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
+        _sharedOneEventViewModel = ViewModelProvider(this)[SharedOneEventViewModel::class.java]
         _bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
 
         bottomSheetBehavior.isHideable = true
@@ -151,7 +157,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             // event card
             binding.eventCard.setOnClickListener {
                 // TODO: navigate to EventDetailFragment
-                Toast.makeText(requireContext(), "TODO: navigate event.id = ${event.id}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "navigates to event.id = ${event.id}", Toast.LENGTH_SHORT).show()
+                sharedOneEventViewModel.setSelectedEvent(event)
+                findNavController().navigate(R.id.nav_eventDetails)
             }
             binding.eventNameTv.text = event.name
             Glide.with(requireActivity())
@@ -250,6 +258,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             this@MapFragment.map.isTrafficEnabled = false;
         }
+        binding.bikeButton.isChecked = false
+        binding.walkButton.isChecked = false
+        binding.driveButton.isChecked = false
+        binding.transitButton.isChecked = false
+        when (transport) {
+            "bike" -> binding.bikeButton.isChecked = true
+            "walk" -> binding.walkButton.isChecked = true
+            "drive" -> binding.driveButton.isChecked = true
+            "transit" -> binding.transitButton.isChecked = true
+        }
     }
 
     private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, destination: LatLng): DirectionsResponse? {
@@ -324,10 +342,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             null
         }
     }
-
-
-
-
 }
 
 

@@ -1,11 +1,13 @@
 package com.snowman.neverlate.model
 
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.model.types.IUser
@@ -524,63 +526,45 @@ class FirebaseManager {
         }
     }
 
-    // I made a clone of the fetchFriendsDataForCurrentUser
-    fun fetchEventsDataForCurrentUser(
-    callback: (List<IEvent>?, Exception?) -> Unit
-) {
-    val currentUser = auth.currentUser
-    if (currentUser != null) {
-        val currentUserId = currentUser.uid
-        Log.d(TAG, "currentUserId=${currentUserId}")
-        Log.d(TAG, "fetchEventsDataForCurrentUser()... with currentUserId=${currentUserId}")
-        val eventsList = mutableListOf<IEvent>()
-        val ref = db.collection("events").whereEqualTo("category", "Meeting").get()
-            .addOnSuccessListener { result ->
-                if (result.isEmpty) {
-                    Log.d(TAG, "Query returned no results.")
-                } else {
-                    Log.d(TAG, "Processing ${result.size()} documents.")
-                    for (document in result) {
-                        val event = document.toObject(Event::class.java)
-                        Log.d(TAG, "Processing event: ${event.id}")
-                        val memberList = document.get("members") as List<*>
-                        val isUserAMember = memberList.mapNotNull { it as? Map<String, Any> }
-                            .any { it["id"] == currentUserId }
-                        if (isUserAMember) {
-                            Log.d(TAG, "User is a member of the event: ${event.id}")
-                            eventsList.add(event)
-                        }
-                    }
-                    callback(eventsList, null)
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "Query failed with exception: $exception")
-                callback(null, exception)
-            }
-    }
-    }
 
-    fun fetchPastEventsDataForCurrentUser(
-        callback: (List<IEvent>?, Exception?) -> Unit
-    ) {
+    /**
+     * @param active The active status of the event you want to fetch. 'null' to fetch all.
+     * @param category The category of the event you want to fetch. 'null' or 'All' to fetch all.
+     * @param callback The callback function that will be called using the List<IEvent> fetched as argument
+     */
+    fun fetchEventsDataForCurrentUser(active: Boolean?, category: String?, callback: (List<IEvent>?, Exception?) -> Unit) {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
             Log.d(TAG, "currentUserId=${currentUserId}")
             Log.d(TAG, "fetchEventsDataForCurrentUser()... with currentUserId=${currentUserId}")
+            val ref = when (category) {
+                null, "All" -> {
+                    db.collection("events").get()
+                }
+                "Dining", "Meeting", "Study", "Travel" -> {
+                    db.collection("events").whereEqualTo("category", category).get()
+                }
+                else -> {
+                    callback(null, Exception("category=$category is illegal. category must be All (null), Dining, Meeting, Study, or Travel"))
+                    return@fetchEventsDataForCurrentUser
+                }
+            }
+
             val eventsList = mutableListOf<IEvent>()
-            val ref = db.collection("events").whereEqualTo("active", false).get()
-                .addOnSuccessListener { result ->
+            ref.addOnSuccessListener { result ->
                     if (result.isEmpty) {
                         Log.d(TAG, "Query returned no results.")
                     } else {
                         Log.d(TAG, "Processing ${result.size()} documents.")
                         for (document in result) {
                             val event = document.toObject(Event::class.java)
-                            Log.d(TAG, "Processing event: ${event.id}")
+                            Log.d(TAG, "Processing event: ${event.id} ${event.name}")
+                            if(active != null && event.active != active){ // if you fetch active=true or active=false
+                                continue
+                            }
                             val memberList = document.get("members") as List<*>
-                            val isUserAMember = memberList.mapNotNull { it as? Map<String, Any> }
+                            val isUserAMember = memberList.mapNotNull { it as? Map<*, *> }
                                 .any { it["id"] == currentUserId }
                             if (isUserAMember) {
                                 Log.d(TAG, "User is a member of the event: ${event.id}")
@@ -594,6 +578,7 @@ class FirebaseManager {
                     Log.d(TAG, "Query failed with exception: $exception")
                     callback(null, exception)
                 }
+
         }
     }
 
@@ -609,7 +594,7 @@ class FirebaseManager {
                 .addOnSuccessListener { result ->
                     if (result.isEmpty) {
                         Log.d(TAG, "Query returned no results.")
-                        callback(0.0, null) // 返回空列表，无错误
+                        callback(0.0, null)
                     } else {
                         Log.d(TAG, "Processing ${result.size()} documents.")
                         val allArriveTimes = mutableListOf<Long>()
@@ -628,7 +613,7 @@ class FirebaseManager {
                         val averageArriveTime = if (allArriveTimes.isNotEmpty()) {
                             allArriveTimes.average()
                         } else {
-                            null // 如果没有 arriveTimes，设置平均值为 null
+                            null
                         }
                         Log.d(TAG, "Average arrive time for user $currentUserId is: $averageArriveTime")
                         callback(averageArriveTime, null)

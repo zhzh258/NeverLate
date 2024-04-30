@@ -37,7 +37,7 @@
             android:focusable="true"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_notification"
+            android:src="@drawable/ic_menu_notification"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
