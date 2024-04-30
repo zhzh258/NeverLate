@@ -50,4 +50,9 @@ class EventAttendeesAdapter(
         attendees.removeAt(position)
         notifyItemRemoved(position)
     }
+
+    fun addAttendee(attendee: IUser) {
+        attendees.add(attendee)
+        notifyItemInserted(attendees.size - 1)
+    }
 }

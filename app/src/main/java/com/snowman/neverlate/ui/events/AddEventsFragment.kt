@@ -2,13 +2,15 @@ package com.snowman.neverlate.ui.events
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.Spinner
+import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,8 +28,10 @@ class AddEventsFragment : Fragment() {
 
     private lateinit var attendeeRV: RecyclerView
     private lateinit var addAttendeeCV: MaterialCardView
+    private lateinit var attendeesAdapter: EventAttendeesAdapter
     private var attendees = mutableListOf<IUser>()
     private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
+    private val hashedIdToUserMap = mutableMapOf<Int, IUser>() // Assuming IUser is your user interface/model
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IEvent>()
     private lateinit var addEventsAdapter: AddEventsAdapter
@@ -81,14 +85,37 @@ class AddEventsFragment : Fragment() {
         addAttendeeCV = view.findViewById(R.id.addAttendeeCV)
         attendeeRV = view.findViewById(R.id.attendeeRV)
         attendeeRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        val attendeesAdapter = EventAttendeesAdapter(attendees)
+        attendeesAdapter = EventAttendeesAdapter(attendees)
         attendeeRV.adapter = attendeesAdapter
         addAttendeesClickListener()
     }
 
     private fun addAttendeesClickListener() {
         addAttendeeCV.setOnClickListener{
-            Log.i("add attendees", friendsViewModel.friends.value.toString())
+            val friendsList = friendsViewModel.friends.value ?: emptyList()
+
+            if (friendsList.isNotEmpty()) {
+                val popupMenu = PopupMenu(requireContext(), it)
+                for (friend in friendsList) {
+                    if (!attendees.contains(friend)) {
+                        val hashedId = friend.userId.hashCode()
+                        hashedIdToUserMap[hashedId] = friend
+                        popupMenu.menu.add(Menu.NONE, hashedId, Menu.NONE, friend.displayName)
+                    }
+                }
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    val selectedFriendId = menuItem.itemId
+                    val selectedFriend = hashedIdToUserMap[selectedFriendId]
+                    if (selectedFriend != null) {
+                        attendeesAdapter.addAttendee(selectedFriend)
+                        return@setOnMenuItemClickListener true
+                    }
+                    return@setOnMenuItemClickListener false
+                }
+                popupMenu.show()
+            } else {
+                Toast.makeText(requireContext(), "No friends to display, please add some friends first", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
