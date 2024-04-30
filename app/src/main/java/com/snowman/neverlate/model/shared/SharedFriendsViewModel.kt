@@ -17,12 +17,12 @@ class SharedFriendsViewModel : ViewModel() {
 
     fun fetchFriendsData() {
         firebaseManager.fetchFriendsDataForCurrentUser { friendsList, exception ->
-            if (exception != null) {
+            if (exception != null || friendsList == null) {
                 Log.i(TAG, "unable to fetch friends $exception")
             } else {
-                _friends.value = friendsList.orEmpty()
+                val sortedList = friendsList.sortedBy { friend -> friend.displayName }
+                _friends.value = sortedList
             }
         }
-
     }
 }

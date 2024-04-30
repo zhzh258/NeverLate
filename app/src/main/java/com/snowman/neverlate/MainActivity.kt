@@ -16,11 +16,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.databinding.ActivityMainBinding
 import com.snowman.neverlate.model.FirebaseManager
+import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.ui.login.LoginActivity
 
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private val firebaseManager = FirebaseManager.getInstance()
     private val sharedUserViewModel: SharedUserViewModel by viewModels()
-
+    private val friendsViewModel: SharedFriendsViewModel by viewModels()
 
     private val TAG = "Main Activity"
 
@@ -122,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                 Log.e("FirebaseManager", "Failed to retrieve user data")
             }
         }
+        friendsViewModel.fetchFriendsData()
     }
 
     private fun observeUserData() {

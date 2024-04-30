@@ -2,27 +2,36 @@ package com.snowman.neverlate.ui.events
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
+import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.ui.events.AddEventsAdapter
+import com.snowman.neverlate.model.types.IUser
 import java.util.Calendar
 
 class AddEventsFragment : Fragment() {
     private val TAG = "addeventsfragment"
 
+    private lateinit var attendeeRV: RecyclerView
+    private lateinit var addAttendeeCV: MaterialCardView
+    private lateinit var attendeesAdapter: EventAttendeesAdapter
+    private var attendees = mutableListOf<IUser>()
+    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
+    private val hashedIdToUserMap = mutableMapOf<Int, IUser>()
     private val firebaseManager = FirebaseManager.getInstance()
     private val searchList = mutableListOf<IEvent>()
     private lateinit var addEventsAdapter: AddEventsAdapter
@@ -54,6 +63,8 @@ class AddEventsFragment : Fragment() {
         calendarIcon.setOnClickListener {
             showCalendar()
         }
+
+        setUpAddAttendees(view)
     }
 
     private fun showCalendar() {
@@ -68,6 +79,44 @@ class AddEventsFragment : Fragment() {
             calendar.get(Calendar.DAY_OF_MONTH)
         )
         datePickerDialog.show()
+    }
+
+    private fun setUpAddAttendees(view: View) {
+        addAttendeeCV = view.findViewById(R.id.addAttendeeCV)
+        attendeeRV = view.findViewById(R.id.attendeeRV)
+        attendeeRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        attendeesAdapter = EventAttendeesAdapter(attendees)
+        attendeeRV.adapter = attendeesAdapter
+        addAttendeesClickListener()
+    }
+
+    private fun addAttendeesClickListener() {
+        addAttendeeCV.setOnClickListener{
+            val friendsList = friendsViewModel.friends.value ?: emptyList()
+
+            if (friendsList.isNotEmpty()) {
+                val popupMenu = PopupMenu(requireContext(), it)
+                for (friend in friendsList) {
+                    if (!attendees.contains(friend)) {
+                        val hashedId = friend.userId.hashCode()
+                        hashedIdToUserMap[hashedId] = friend
+                        popupMenu.menu.add(Menu.NONE, hashedId, Menu.NONE, friend.displayName)
+                    }
+                }
+                popupMenu.setOnMenuItemClickListener { menuItem ->
+                    val selectedFriendId = menuItem.itemId
+                    val selectedFriend = hashedIdToUserMap[selectedFriendId]
+                    if (selectedFriend != null) {
+                        attendeesAdapter.addAttendee(selectedFriend)
+                        return@setOnMenuItemClickListener true
+                    }
+                    return@setOnMenuItemClickListener false
+                }
+                popupMenu.show()
+            } else {
+                Toast.makeText(requireContext(), "No friends to display, please add some friends first", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 }

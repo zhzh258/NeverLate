@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +18,7 @@ class FriendsFragment : Fragment() {
 
     private lateinit var friendsListRv: RecyclerView
     private lateinit var addFriendsBtn: Button
-    private val friendsViewModel: SharedFriendsViewModel by viewModels()
+    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
     private lateinit var adapter: FriendsListAdapter
 
     override fun onCreateView(
@@ -52,7 +52,6 @@ class FriendsFragment : Fragment() {
         friendsViewModel.friends.observe(viewLifecycleOwner) { friends ->
             updateFriendsList(friends, adapter)
         }
-        friendsViewModel.fetchFriendsData()
     }
 
     private fun updateFriendsList(friends: List<IUser>, adapter: FriendsListAdapter) {
