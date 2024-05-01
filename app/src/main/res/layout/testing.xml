@@ -1,37 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:weightSum="100">
+    <!-- Top Color Banner -->
+    <View
+        android:id="@+id/topColorBanner"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:translationZ="1dp"
+        android:background="#2196F3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
-        <LinearLayout
-            android:layout_gravity="center"
-            android:layout_width="288dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="70"
-            android:orientation="vertical">
+    <!-- Profile Picture -->
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:translationZ="2dp"
+        android:src="@drawable/app_icon"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="@id/topColorBanner"
+        app:layout_constraintBottom_toBottomOf="@id/bottomColorBanner"
+        app:layout_constraintVertical_bias="0.5"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent" />
 
-            <Button
-                android:id="@+id/origin_mb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your location"
-                android:textSize="12sp" />
+    <!-- Bottom Color Banner (Optional) -->
+    <View
+        android:id="@+id/bottomColorBanner"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:translationZ="1dp"
+        android:background="#4CAF50"
+    app:layout_constraintTop_toBottomOf="@id/topColorBanner"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent" />
 
-            <Button
-                android:id="@+id/destination_mb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DESTINATION"
-                android:textSize="12sp" />
+    <!-- Other profile info here -->
 
-            <Button
-                android:id="@+id/close_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Close" />
-        </LinearLayout>
-    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
