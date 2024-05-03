@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.gms.maps.model.LatLng
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
@@ -31,12 +32,18 @@ import java.time.format.DateTimeFormatter
 import java.time.Duration
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import com.snowman.neverlate.model.*
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
+import com.snowman.neverlate.model.types.MemberStatus
+import com.snowman.neverlate.util.TimeUtil
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class OneEventFragment : Fragment() {
@@ -47,6 +54,9 @@ class OneEventFragment : Fragment() {
     private lateinit var friendsRV: RecyclerView
     private lateinit var friendsAdapter: EventFriendsAdapter
     private lateinit var theEvent: IEvent
+    val auth = com.google.firebase.ktx.Firebase.auth
+    private val currentUser = auth.currentUser
+
 
     private var _binding: FragmentOneEventBinding? = null
     private val binding get() = _binding!!
@@ -99,10 +109,16 @@ class OneEventFragment : Fragment() {
                 theEvent = event
                 view.findViewById<TextView>(R.id.text_title).text = theEvent.name
                 view.findViewById<TextView>(R.id.textview_description).text = theEvent.description
-                view.findViewById<TextView>(R.id.text_event_time).text = event.date.toString()
+                view.findViewById<TextView>(R.id.text_event_time).text = theEvent.date.toDate().toString()
                 view.findViewById<TextView>(R.id.text_event_location).text = event.location.toString()
                 view.findViewById<TextView>(R.id.text_people_count).text = event.members.size.toString() + " people"
                 setUpFriends(view)
+
+                Glide.with(this)
+                    .load(theEvent.photoURL)
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_util_clear_24)
+                    .into(binding.imageBackground)
             }
         }
         setUpETA()
@@ -126,10 +142,19 @@ class OneEventFragment : Fragment() {
 
     private fun setUpFriends(view: View) {
         var friendsNames = ""
+        var memberStatusList1 = theEvent.members.toMutableList()
+        for(member in memberStatusList1) {
+            if(currentUser != null) {
+                if (member.id.equals(currentUser.uid)) {
+                    memberStatusList1.remove(member)
+                    break
+                }
+            }
+        }
         friendsRV = view.findViewById(R.id.friendsRV)
         friendsRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         friendsAdapter = EventFriendsAdapter(mutableListOf(), requireContext())
-        val memberStatusList = theEvent.members
+        val memberStatusList = memberStatusList1.toList()
         val userIdList = memberStatusList.map { memberStatus ->
             memberStatus.id
         }

@@ -29,14 +29,10 @@
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:id="@+id/chooseImageButton"
             android:src="@drawable/ic_colorful_add_img"
             android:scaleType="fitCenter"/>
 
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_colorful_edit"
-            android:scaleType="fitCenter"/>
 
         <ImageButton
             android:layout_width="50dp"
@@ -87,6 +83,7 @@
                 android:layout_width="300dp"
                 android:layout_height="25dp"
                 android:layout_marginTop="0dp"
+                android:id="@+id/event_title"
                 android:background="@drawable/rounded_edittext"
                 android:hint="       Your Event Name       "
                 android:textAlignment="center"
@@ -97,6 +94,7 @@
                 android:layout_width="300dp"
                 android:layout_height="25dp"
                 android:layout_marginTop="10dp"
+                android:id="@+id/event_description"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Write A Short Description For The Event"
                 android:textAlignment="center"
@@ -119,47 +117,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="TIME" />
+            android:text="START TIME" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <EditText
-                android:layout_width="0dp"
-                android:layout_height="20dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_edittext"
-                android:hint="Start Time"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12dp" />
+                android:id="@+id/editTextHour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:digits="0123456789"
+                android:hint="HH"
+                android:maxLength="2"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":"/>
 
             <EditText
-                android:layout_width="0dp"
-                android:layout_height="20dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_edittext"
-                android:hint="End Time"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12dp" />
+                android:id="@+id/editTextMinute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:digits="0123456789"
+                android:hint="MM"
+                android:maxLength="2"
+                android:layout_marginEnd="8dp"/>
 
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="20dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_edittext"
-                android:hint="Duration"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12dp" />
-
+            <Spinner
+                android:id="@+id/spinnerAMPM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
+
 
     </LinearLayout>
 
@@ -235,6 +230,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add New Event"
+        android:id="@+id/addEventButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
