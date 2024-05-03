@@ -20,8 +20,8 @@ import android.app.Activity
 import androidx.appcompat.app.AlertDialog
 import android.provider.Settings
 import android.net.Uri
-
-
+import androidx.navigation.fragment.findNavController
+import com.snowman.neverlate.R
 
 
 class EditProfileFragment : Fragment() {
@@ -91,6 +91,7 @@ class EditProfileFragment : Fragment() {
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
                 Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.nav_profile)
                 it.updateUserViewModel(sharedUserViewModel)
             },
             onFailure = { exception ->

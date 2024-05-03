@@ -41,6 +41,10 @@ class EventAttendeesAdapter(
         return attendees.size
     }
 
+    fun getAttendees(): MutableList<IUser> {
+        return attendees
+    }
+
     override fun onBindViewHolder(holder: EventAttendeeViewHolder, position: Int) {
         val attendee = attendees[position]
         holder.bind(attendee)
