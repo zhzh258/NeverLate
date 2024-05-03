@@ -1,6 +1,5 @@
 package com.snowman.neverlate.ui.settings
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,10 +27,10 @@ import com.snowman.neverlate.R
 class EditProfileFragment : Fragment() {
 
     private var _binding: FragmentEditProfileBinding? = null
-
     private val binding get() = _binding!!
     private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
     private val firebaseManager = FirebaseManager.getInstance()
+    private var profileUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +63,6 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -95,13 +93,33 @@ class EditProfileFragment : Fragment() {
         val address = binding.addressET.text.toString().trim()
         val phoneNumber = binding.phoneNumberET.text.toString().trim()
         val aboutMe = binding.AboutMeET.text.toString().trim()
-        val updatedUserData = mapOf(
-            "displayName" to username,
-            "address" to address,
-            "phoneNumber" to phoneNumber,
-            "status" to aboutMe,
-        )
 
+        val uri = profileUri
+        if (uri != null) {
+            firebaseManager.saveImageToStorage(uri, "pfp") { url ->
+                if (url != null) {
+                    val updatedUserData = mapOf(
+                        "displayName" to username,
+                        "address" to address,
+                        "phoneNumber" to phoneNumber,
+                        "status" to aboutMe,
+                        "photoURL" to url
+                    )
+                    save(updatedUserData)
+                }
+            }
+        } else {
+            val updatedUserData = mapOf(
+                "displayName" to username,
+                "address" to address,
+                "phoneNumber" to phoneNumber,
+                "status" to aboutMe,
+            )
+            save(updatedUserData)
+        }
+    }
+
+    private fun save(updatedUserData: Map<String, Any>) {
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
                 Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT)
@@ -133,62 +151,12 @@ class EditProfileFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            val imageUri = data.data
+            profileUri = data.data
 
-            if (imageUri != null) {
-                firebaseManager.saveImageToStorage(imageUri, "pfp") { url ->
-                    if (url != null) {
-                        binding.profilePicture.setImageURI(imageUri)
-                        Glide.with(binding.profilePicture)
-                            .load(url)
-                            .circleCrop()
-                            .error(R.mipmap.ic_launcher_round)
-                            .into(binding.profilePicture)
-
-                        val updatedUserData = mapOf(
-                            "photoURL" to url,
-                        )
-                        firebaseManager.editUserProfile(updatedUserData,
-                            onSuccess = {
-                                Toast.makeText(
-                                    context,
-                                    "User details updated successfully.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                it.updateUserViewModel(sharedUserViewModel)
-                            },
-                            onFailure = { exception ->
-                                Toast.makeText(
-                                    context,
-                                    "Failed to update user details: ${exception.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        )
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Could not upload image to database",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-
-
-//            val updatedUserData = mapOf(
-//                "photoURL" to imageUri.toString(),
-//            )
-
-//            firebaseManager.editUserProfile(updatedUserData,
-//                onSuccess = {
-//                    Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
-//                    it.updateUserViewModel(sharedUserViewModel)
-//                },
-//                onFailure = { exception ->
-//                    Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
-//                }
-//            )
+            Glide.with(this)
+                .load(profileUri)
+                .circleCrop()
+                .into(binding.profilePicture)
         }
     }
 
@@ -215,7 +183,6 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-
     fun showPermissionSettingsDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Permission Required")
@@ -233,6 +200,4 @@ class EditProfileFragment : Fragment() {
         intent.data = uri
         startActivity(intent)
     }
-
-
 }
