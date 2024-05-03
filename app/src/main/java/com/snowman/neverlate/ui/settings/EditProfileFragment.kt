@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import android.provider.Settings
 import android.net.Uri
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 
 
@@ -30,6 +31,7 @@ class EditProfileFragment : Fragment() {
 
     private val binding get() = _binding!!
     private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
+    private val firebaseManager = FirebaseManager.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,10 +49,17 @@ class EditProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.changePicture.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_MEDIA_IMAGES
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
                 openGalleryForImage()
             } else {
-                requestPermissions(arrayOf(Manifest.permission.READ_MEDIA_IMAGES), STORAGE_PERMISSION_CODE)
+                requestPermissions(
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                    STORAGE_PERMISSION_CODE
+                )
             }
         }
     }
@@ -74,6 +83,11 @@ class EditProfileFragment : Fragment() {
         binding.addressET.setText(me.address)
         binding.phoneNumberET.setText(me.phoneNumber)
         binding.AboutMeET.setText(me.status)
+        Glide.with(binding.profilePicture)
+            .load(me.photoURL)
+            .circleCrop()
+            .error(R.mipmap.ic_launcher_round)
+            .into(binding.profilePicture)
     }
 
     private fun updateUserDetails() {
@@ -90,12 +104,17 @@ class EditProfileFragment : Fragment() {
 
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
-                Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT)
+                    .show()
                 findNavController().navigate(R.id.nav_profile)
                 it.updateUserViewModel(sharedUserViewModel)
             },
             onFailure = { exception ->
-                Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    "Failed to update user details: ${exception.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
@@ -115,24 +134,69 @@ class EditProfileFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK && data != null) {
             val imageUri = data.data
-            binding.profilePicture.setImageURI(imageUri)
-            val updatedUserData = mapOf(
-                "photoURL" to imageUri.toString(),
-            )
 
-            FirebaseManager.getInstance().editUserProfile(updatedUserData,
-                onSuccess = {
-                    Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
-                    it.updateUserViewModel(sharedUserViewModel)
-                },
-                onFailure = { exception ->
-                    Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
+            if (imageUri != null) {
+                firebaseManager.saveImageToStorage(imageUri, "pfp") { url ->
+                    if (url != null) {
+                        binding.profilePicture.setImageURI(imageUri)
+                        Glide.with(binding.profilePicture)
+                            .load(url)
+                            .circleCrop()
+                            .error(R.mipmap.ic_launcher_round)
+                            .into(binding.profilePicture)
+
+                        val updatedUserData = mapOf(
+                            "photoURL" to url,
+                        )
+                        firebaseManager.editUserProfile(updatedUserData,
+                            onSuccess = {
+                                Toast.makeText(
+                                    context,
+                                    "User details updated successfully.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                it.updateUserViewModel(sharedUserViewModel)
+                            },
+                            onFailure = { exception ->
+                                Toast.makeText(
+                                    context,
+                                    "Failed to update user details: ${exception.message}",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        )
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Could not upload image to database",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            )
+            }
+
+
+//            val updatedUserData = mapOf(
+//                "photoURL" to imageUri.toString(),
+//            )
+
+//            firebaseManager.editUserProfile(updatedUserData,
+//                onSuccess = {
+//                    Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
+//                    it.updateUserViewModel(sharedUserViewModel)
+//                },
+//                onFailure = { exception ->
+//                    Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
+//                }
+//            )
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -141,7 +205,11 @@ class EditProfileFragment : Fragment() {
                 if (!shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES)) {
                     showPermissionSettingsDialog()
                 } else {
-                    Toast.makeText(context, "Permission denied. Unable to change picture without permission.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "Permission denied. Unable to change picture without permission.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -165,7 +233,6 @@ class EditProfileFragment : Fragment() {
         intent.data = uri
         startActivity(intent)
     }
-
 
 
 }
