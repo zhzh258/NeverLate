@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.Duration
+import java.util.Locale
+import java.util.TimeZone
+import java.time.ZoneId;
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
@@ -64,7 +68,7 @@ class OneEventFragment : Fragment() {
     private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
 
     private val mockDataEventTime = "2024-04-22 23:30:00" // Replace it with specific event time
-
+    private lateinit var DataEventTime: String
     private val handler = Handler(Looper.getMainLooper())
     // ------ Get Current Time Every 1000 ms ------ //
     private val updateRunnable = object : Runnable {
@@ -73,7 +77,7 @@ class OneEventFragment : Fragment() {
             val currentDateTime = LocalDateTime.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val formattedDateTime = currentDateTime.format(formatter)
-            calculateRemainingTime(mockDataEventTime)
+            calculateRemainingTime(DataEventTime)
             binding.currentTimeTV.text = formattedDateTime
             handler.postDelayed(this, 1000) // schedule the next run
         }
@@ -84,8 +88,8 @@ class OneEventFragment : Fragment() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
             setUpETA()
-            calculatePunctualStatus(mockDataEventTime)
-            handler.postDelayed(this, 10000) // schedule the next run
+            calculatePunctualStatus(DataEventTime)
+            handler.postDelayed(this, 100000) // schedule the next run
         }
     }
     // ------ Dummy origin laglng data and destination laglng data for testing ------ //
@@ -113,7 +117,8 @@ class OneEventFragment : Fragment() {
                 view.findViewById<TextView>(R.id.text_event_location).text = event.location.toString()
                 view.findViewById<TextView>(R.id.text_people_count).text = event.members.size.toString() + " people"
                 setUpFriends(view)
-
+                DataEventTime = convertEventTimeToStandardFormat(theEvent.date)
+                Log.d("DataEventTime", DataEventTime)
                 Glide.with(this)
                     .load(theEvent.photoURL)
                     .placeholder(R.drawable.ic_launcher_background)
@@ -272,5 +277,17 @@ class OneEventFragment : Fragment() {
         )
         return if (seconds < 0) "-$positive" else positive
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun convertEventTimeToStandardFormat(timestamp: com.google.firebase.Timestamp): String {
+        val instant = java.time.Instant.ofEpochSecond(timestamp.seconds, timestamp.nanoseconds.toLong())
+        val zonedDateTime = instant.atZone(ZoneId.systemDefault())
+        var localDateTime = zonedDateTime.toLocalDateTime()
+        localDateTime = localDateTime.minusYears(1900)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return formatter.format(localDateTime)
+    }
+
+
 
 }
