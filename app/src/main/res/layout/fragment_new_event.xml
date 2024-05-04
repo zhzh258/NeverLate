@@ -1,301 +1,248 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:isScrollContainer="true">
 
-    <ImageView
-        android:id="@+id/event_image"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/event_img_test"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@id/event_image"
-        app:layout_constraintTop_toTopOf="@id/event_image">
+        <ImageView
+            android:id="@+id/event_image"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/event_img_test"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/chooseImageButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:backgroundTint="@android:color/transparent"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_colorful_add_img" />
-
-
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_colorful_delete" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/event_image">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="DATE" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/calendar_row"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/date">
-
+            android:src="@drawable/ic_colorful_add_img"
+            app:layout_constraintBottom_toBottomOf="@id/event_image"
+            app:layout_constraintStart_toStartOf="@id/event_image" />
 
         <ImageButton
             android:id="@+id/ic_calendar"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_colorful_calendar" />
+            android:src="@drawable/ic_colorful_calendar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/event_image" />
 
+        <EditText
+            android:id="@+id/event_title"
+            style="@style/AddEventTextStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Your Event Name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_calendar"
+            app:layout_constraintTop_toTopOf="@id/ic_calendar" />
+
+        <EditText
+            android:id="@+id/event_description"
+            style="@style/AddEventTextStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/general_small_margin"
+            android:hint="Write A Short Description For The Event"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_calendar"
+            app:layout_constraintTop_toBottomOf="@id/event_title" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/time_row"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/event_title"
-                android:layout_width="300dp"
-                android:layout_height="25dp"
-                android:layout_marginTop="0dp"
-                android:background="@drawable/rounded_edittext"
-                android:hint="Your Event Name"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/event_description"
-                android:layout_width="300dp"
-                android:layout_height="25dp"
-                android:layout_marginTop="@dimen/general_xsmall_margin"
-                android:background="@drawable/rounded_edittext"
-                android:hint="Write A Short Description For The Event"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12dp" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/time_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/calendar_row">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="START TIME" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/editTextHour"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:digits="0123456789"
-                android:hint="HH"
-                android:inputType="number"
-                android:maxLength="2" />
+            android:layout_marginTop="@dimen/general_small_margin"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/event_description">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=":" />
+                android:layout_marginTop="10dp"
+                android:text="START TIME" />
 
-            <EditText
-                android:id="@+id/editTextMinute"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:digits="0123456789"
-                android:hint="MM"
-                android:inputType="number"
-                android:maxLength="2" />
+                android:orientation="horizontal">
 
-            <Spinner
-                android:id="@+id/spinnerAMPM"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/editTextHour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:digits="0123456789"
+                    android:hint="HH"
+                    android:inputType="number"
+                    android:maxLength="2" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":" />
+
+                <EditText
+                    android:id="@+id/editTextMinute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:digits="0123456789"
+                    android:hint="MM"
+                    android:inputType="number"
+                    android:maxLength="2" />
+
+                <Spinner
+                    android:id="@+id/spinnerAMPM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
         </LinearLayout>
-
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/address_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/time_row">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ADDRESS" />
 
         <LinearLayout
+            android:id="@+id/address_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/time_row">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:background="@drawable/rounded_edittext"
-                android:hint="Address Line 1"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ADDRESS" />
 
-            <EditText
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_marginTop="@dimen/general_xsmall_margin"
-                android:background="@drawable/rounded_edittext"
-                android:hint="Address Line 2"
-                android:textAlignment="center"
-                android:textColor="#b4b2b2"
-                android:textSize="12sp" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <EditText
+                    style="@style/AddEventTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/general_small_margin"
+                    android:hint="Address Line 1" />
+
+                <EditText
+                    style="@style/AddEventTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/general_small_margin"
+                    android:hint="Address Line 2" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/event_type_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/address_row">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="18dp"
-            android:text="EVENT TYPE" />
-
-        <Spinner
-            android:id="@+id/spinner1"
+        <LinearLayout
+            android:id="@+id/event_type_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edittext"
-            android:textAlignment="center"
-            android:textSize="12sp" />
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/address_row">
 
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/addEventButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add New Event"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attendeeRV" />
-
-    <TextView
-        android:id="@+id/attendeeText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="start"
-        android:text="@string/attendees"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/event_type_row" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/addAttendeeCV"
-        android:layout_width="@dimen/add_event_attendee_item_width"
-        android:layout_height="@dimen/add_event_attendee_item_height"
-        android:layout_marginVertical="1dp"
-        android:layout_marginEnd="@dimen/general_small_margin"
-        android:backgroundTint="@color/addEventRed"
-        app:cardCornerRadius="@dimen/card_corner_radius"
-        app:layout_constraintEnd_toStartOf="@id/attendeeRV"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/attendeeText">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ImageView
-                android:id="@+id/friendIV"
-                android:layout_width="@dimen/add_event_attendee_image_size"
-                android:layout_height="@dimen/add_event_attendee_image_size"
-                android:layout_marginStart="@dimen/general_small_margin"
-                android:layout_marginEnd="20dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/baseline_person_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/addBtn"
+            <TextView
                 android:layout_width="wrap_content"
+                android:layout_height="18dp"
+                android:text="EVENT TYPE" />
+
+            <Spinner
+                android:id="@+id/spinner1"
+                style="@style/AddEventTextStyle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/general_small_margin"
-                android:backgroundTint="@android:color/transparent"
-                android:src="@drawable/baseline_add_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/friendIV"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginTop="@dimen/general_small_margin" />
+        </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/addEventButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add New Event"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/addAttendeeCV" />
 
-    </com.google.android.material.card.MaterialCardView>
+        <TextView
+            android:id="@+id/attendeeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:gravity="start"
+            android:text="@string/attendees"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/event_type_row" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/attendeeRV"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addAttendeeCV"
-        app:layout_constraintTop_toBottomOf="@id/attendeeText" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/addAttendeeCV"
+            android:layout_width="@dimen/add_event_attendee_item_width"
+            android:layout_height="@dimen/add_event_attendee_item_height"
+            android:layout_marginVertical="1dp"
+            android:layout_marginTop="@dimen/general_small_margin"
+            android:layout_marginEnd="@dimen/general_small_margin"
+            android:backgroundTint="@color/addEventRed"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:layout_constraintEnd_toStartOf="@id/attendeeRV"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/attendeeText">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/friendIV"
+                    android:layout_width="@dimen/add_event_attendee_image_size"
+                    android:layout_height="@dimen/add_event_attendee_image_size"
+                    android:layout_marginStart="@dimen/general_small_margin"
+                    android:layout_marginEnd="20dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/baseline_person_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/addBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/general_small_margin"
+                    android:backgroundTint="@android:color/transparent"
+                    android:src="@drawable/baseline_add_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/friendIV"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/attendeeRV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/addAttendeeCV"
+            app:layout_constraintTop_toBottomOf="@id/attendeeText" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
