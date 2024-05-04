@@ -27,18 +27,18 @@
         app:layout_constraintTop_toTopOf="@id/event_image">
 
         <ImageButton
+            android:id="@+id/chooseImageButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/chooseImageButton"
-            android:src="@drawable/ic_colorful_add_img"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_colorful_add_img" />
 
 
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_colorful_delete"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_colorful_delete" />
 
     </LinearLayout>
 
@@ -70,7 +70,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_colorful_calendar"/>
+            android:src="@drawable/ic_colorful_calendar" />
 
 
         <LinearLayout
@@ -80,21 +80,21 @@
             android:orientation="vertical">
 
             <EditText
+                android:id="@+id/event_title"
                 android:layout_width="300dp"
                 android:layout_height="25dp"
                 android:layout_marginTop="0dp"
-                android:id="@+id/event_title"
                 android:background="@drawable/rounded_edittext"
-                android:hint="       Your Event Name       "
+                android:hint="Your Event Name"
                 android:textAlignment="center"
                 android:textColor="#b4b2b2"
-                android:textSize="12dp" />
+                android:textSize="12sp" />
 
             <EditText
+                android:id="@+id/event_description"
                 android:layout_width="300dp"
                 android:layout_height="25dp"
-                android:layout_marginTop="10dp"
-                android:id="@+id/event_description"
+                android:layout_marginTop="@dimen/general_xsmall_margin"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Write A Short Description For The Event"
                 android:textAlignment="center"
@@ -128,31 +128,31 @@
                 android:id="@+id/editTextHour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"
+                android:layout_marginEnd="8dp"
                 android:digits="0123456789"
                 android:hint="HH"
-                android:maxLength="2"
-                android:layout_marginEnd="8dp"/>
+                android:inputType="number"
+                android:maxLength="2" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=":"/>
+                android:text=":" />
 
             <EditText
                 android:id="@+id/editTextMinute"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"
+                android:layout_marginEnd="8dp"
                 android:digits="0123456789"
                 android:hint="MM"
-                android:maxLength="2"
-                android:layout_marginEnd="8dp"/>
+                android:inputType="number"
+                android:maxLength="2" />
 
             <Spinner
                 android:id="@+id/spinnerAMPM"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
 
@@ -180,7 +180,6 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_marginTop="5dp"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Address Line 1"
                 android:textAlignment="center"
@@ -190,12 +189,12 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="@dimen/general_xsmall_margin"
                 android:background="@drawable/rounded_edittext"
                 android:hint="Address Line 2"
                 android:textAlignment="center"
                 android:textColor="#b4b2b2"
-                android:textSize="12dp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -211,14 +210,13 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="18dp"
             android:text="EVENT TYPE" />
 
         <Spinner
             android:id="@+id/spinner1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:background="@drawable/rounded_edittext"
             android:textAlignment="center"
             android:textSize="12sp" />
@@ -227,13 +225,14 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/addEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add New Event"
-        android:id="@+id/addEventButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/attendeeRV" />
 
     <TextView
         android:id="@+id/attendeeText"
