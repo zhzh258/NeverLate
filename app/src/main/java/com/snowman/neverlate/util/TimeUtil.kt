@@ -7,12 +7,14 @@ import java.util.TimeZone
 
 class TimeUtil {
 
+    companion object {
+        val dateFormat = SimpleDateFormat("E MMM dd h:mm a", Locale.getDefault())
+    }
+
     fun convertMillisToDateTime(millis: Long): String {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a", Locale.getDefault())
         dateFormat.timeZone = TimeZone.getDefault()
 
         val dateTime = Date(millis)
         return dateFormat.format(dateTime)
     }
-
 }
