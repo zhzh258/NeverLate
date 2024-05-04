@@ -15,6 +15,9 @@ import com.snowman.neverlate.model.types.User
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.types.Event
 import com.snowman.neverlate.model.types.Message
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 
 class FirebaseManager {
     private val TAG = "Firebase Manager"
@@ -181,7 +184,8 @@ class FirebaseManager {
     }
 
     fun sendMessage(message: Message, onSuccess: () -> Unit) {
-        val receiverMessagesRef = db.collection("users").document(message.receiverUid).collection("messages")
+        val receiverMessagesRef =
+            db.collection("users").document(message.receiverUid).collection("messages")
 
         val messageDocRef = receiverMessagesRef.document(message.messageId)
         messageDocRef.set(message)
@@ -532,7 +536,11 @@ class FirebaseManager {
      * @param category The category of the event you want to fetch. 'null' or 'All' to fetch all.
      * @param callback The callback function that will be called using the List<IEvent> fetched as argument
      */
-    fun fetchEventsDataForCurrentUser(active: Boolean?, category: String?, callback: (List<IEvent>?, Exception?) -> Unit) {
+    fun fetchEventsDataForCurrentUser(
+        active: Boolean?,
+        category: String?,
+        callback: (List<IEvent>?, Exception?) -> Unit
+    ) {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val currentUserId = currentUser.uid
@@ -542,38 +550,43 @@ class FirebaseManager {
                 null, "All" -> {
                     db.collection("events").get()
                 }
+
                 "Dining", "Meeting", "Study", "Travel" -> {
                     db.collection("events").whereEqualTo("category", category).get()
                 }
+
                 else -> {
-                    callback(null, Exception("category=$category is illegal. category must be All (null), Dining, Meeting, Study, or Travel"))
+                    callback(
+                        null,
+                        Exception("category=$category is illegal. category must be All (null), Dining, Meeting, Study, or Travel")
+                    )
                     return@fetchEventsDataForCurrentUser
                 }
             }
 
             val eventsList = mutableListOf<IEvent>()
             ref.addOnSuccessListener { result ->
-                    if (result.isEmpty) {
-                        Log.d(TAG, "Query returned no results.")
-                    } else {
-                        Log.d(TAG, "Processing ${result.size()} documents.")
-                        for (document in result) {
-                            val event = document.toObject(Event::class.java)
-                            Log.d(TAG, "Processing event: ${event.id} ${event.name}")
-                            if(active != null && event.active != active){ // if you fetch active=true or active=false
-                                continue
-                            }
-                            val memberList = document.get("members") as List<*>
-                            val isUserAMember = memberList.mapNotNull { it as? Map<*, *> }
-                                .any { it["id"] == currentUserId }
-                            if (isUserAMember) {
-                                Log.d(TAG, "User is a member of the event: ${event.id}")
-                                eventsList.add(event)
-                            }
+                if (result.isEmpty) {
+                    Log.d(TAG, "Query returned no results.")
+                } else {
+                    Log.d(TAG, "Processing ${result.size()} documents.")
+                    for (document in result) {
+                        val event = document.toObject(Event::class.java)
+                        Log.d(TAG, "Processing event: ${event.id} ${event.name}")
+                        if (active != null && event.active != active) { // if you fetch active=true or active=false
+                            continue
                         }
-                        callback(eventsList, null)
+                        val memberList = document.get("members") as List<*>
+                        val isUserAMember = memberList.mapNotNull { it as? Map<*, *> }
+                            .any { it["id"] == currentUserId }
+                        if (isUserAMember) {
+                            Log.d(TAG, "User is a member of the event: ${event.id}")
+                            eventsList.add(event)
+                        }
                     }
+                    callback(eventsList, null)
                 }
+            }
                 .addOnFailureListener { exception ->
                     Log.d(TAG, "Query failed with exception: $exception")
                     callback(null, exception)
@@ -615,7 +628,10 @@ class FirebaseManager {
                         } else {
                             null
                         }
-                        Log.d(TAG, "Average arrive time for user $currentUserId is: $averageArriveTime")
+                        Log.d(
+                            TAG,
+                            "Average arrive time for user $currentUserId is: $averageArriveTime"
+                        )
                         callback(averageArriveTime, null)
                     }
                 }
@@ -626,6 +642,30 @@ class FirebaseManager {
         } else {
             Log.d(TAG, "Current user not found")
             callback(null, Exception("Current user not found"))
+        }
+    }
+
+    fun saveImageToStorage(
+        imageUri: Uri,
+        filename: String,
+        callback: (String?) -> Unit
+    ) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val currentUserId = currentUser.uid
+            val uploadName = "images/${currentUserId}_${filename}.jpg"
+            val storageRef = FirebaseStorage.getInstance().reference.child(uploadName)
+            val uploadTask: UploadTask = storageRef.putFile(imageUri)
+
+            uploadTask.addOnSuccessListener { taskSnapshot ->
+                storageRef.downloadUrl.addOnSuccessListener { uri ->
+                    val imageUrl = uri.toString()
+                    callback(imageUrl)
+                }
+            }.addOnFailureListener { e ->
+                Log.i(TAG, "could not upload image $e")
+                callback(null)
+            }
         }
     }
 

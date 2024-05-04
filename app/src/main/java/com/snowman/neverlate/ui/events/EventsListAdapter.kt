@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.ListItemEventBinding
 import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.util.TimeUtil
 
 class EventsViewHolder(private val binding: ListItemEventBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -18,7 +19,7 @@ class EventsViewHolder(private val binding: ListItemEventBinding) :
         // Bind other data to the views
         binding.textEventTitle.text = event.name
         binding.textEventLocation.text = event.address
-        binding.textEventTime.text = event.date.toString()
+        binding.textEventTime.text = TimeUtil.dateFormat.format(event.date.toDate())
         binding.textPeopleCount.text = event.members.count().toString()
         Glide.with(binding.imageEvent)
             .load(event.photoURL)
