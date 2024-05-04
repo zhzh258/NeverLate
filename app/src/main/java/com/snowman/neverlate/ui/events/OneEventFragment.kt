@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -89,7 +90,7 @@ class OneEventFragment : Fragment() {
         override fun run() {
             setUpETA()
             calculatePunctualStatus(DataEventTime)
-            handler.postDelayed(this, 100000) // schedule the next run
+            handler.postDelayed(this, 1000000) // schedule the next run
         }
     }
     // ------ Dummy origin laglng data and destination laglng data for testing ------ //
@@ -119,6 +120,7 @@ class OneEventFragment : Fragment() {
                 setUpFriends(view)
                 DataEventTime = convertEventTimeToStandardFormat(theEvent.date)
                 Log.d("DataEventTime", DataEventTime)
+                updateRunnableETA.run()
                 Glide.with(this)
                     .load(theEvent.photoURL)
                     .placeholder(R.drawable.ic_launcher_background)
@@ -126,9 +128,17 @@ class OneEventFragment : Fragment() {
                     .into(binding.imageBackground)
             }
         }
-        setUpETA()
         handler.post(updateRunnable)
-        handler.post(updateRunnableETA)
+        handler.postDelayed({
+            updateRunnableETA.run()
+            handler.postDelayed(updateRunnableETA, 1000000) // Schedule subsequent updates after initial run
+        }, 10000) // Delay the first execution by 10 seconds
+
+        //handler.post(updateRunnableETA)
+        val btnArrived = view.findViewById<Button>(R.id.btn_arrived)
+        btnArrived.setOnClickListener {
+            markAsArrived()
+        }
 
 //        val args: EventDetailsFragmentArgs by navArgs()
 //        val eventId = args.eventId
@@ -235,6 +245,75 @@ class OneEventFragment : Fragment() {
         }
     }
 
+    private fun markAsArrived() {
+
+        val currentUserID = auth.currentUser?.uid
+        val remainingTimeText = binding.remainingTimeTV.text.toString()
+        val minutes = extractMinutes(remainingTimeText)
+        val status  = when {
+            minutes.toLong() > 20 -> getString(R.string.preStatus_1)
+            minutes.toLong() > 5 -> getString(R.string.preStatus_2)
+            minutes.toLong() > -5 -> getString(R.string.preStatus_3)
+            minutes.toLong() > -15 -> getString(R.string.preStatus_4)
+            minutes.toLong() > -25 -> getString(R.string.preStatus_5)
+            else -> getString(R.string.preStatus_6)
+        }
+
+        theEvent.members.find { it.id == currentUserID }?.let { memberStatus ->
+            val updatedMember = memberStatus.copy(isArrived = true, arriveTime = minutes.toLong(), status = status)
+            updateMemberStatusInDatabase(updatedMember, {
+                // Success callback
+                /////checkEventStatusAndDeactivateIfRequired()
+                //---markEventAsInactive()
+                Toast.makeText(context, "Arrival time updated successfully.", Toast.LENGTH_SHORT).show()
+            }, {
+                // Failure callback
+                    e -> Toast.makeText(context, "Failed to update arrival time: ${e.message}", Toast.LENGTH_SHORT).show()
+            })
+        }
+    }
+
+    private fun updateMemberStatusInDatabase(memberStatus: MemberStatus, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        firebaseManager.updateMemberStatus(theEvent.id, memberStatus, onSuccess, onFailure)
+    }
+
+    private fun extractMinutes(remainingTimeText: String): Int {
+        val parts = remainingTimeText.split(":")
+        if (parts.size == 3) {
+            val hours = parts[0].toInt()
+            val minutes = parts[1].toInt()
+            val isNegative = hours < 0
+            val totalMinutes = if (isNegative) hours * 60 - minutes else hours * 60 + minutes
+            return totalMinutes
+        }
+        return 0
+    }
+
+    private fun checkEventStatusAndDeactivateIfRequired() {
+        firebaseManager.checkAndDeactivateEventIfAllArrived(theEvent.id) { allArrived ->
+            if (allArrived) {
+                Toast.makeText(context, "All members have arrived, event marked as inactive.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Not all members have arrived yet.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun markEventAsInactive() {
+        val eventId = theEvent.id // Assuming theEvent is an instance of IEvent and has an id field
+
+        firebaseManager.updateEventActiveStatus(eventId, false,
+            onSuccess = {
+                Toast.makeText(context, "Event marked as inactive successfully.", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = { e ->
+                Toast.makeText(context, "Failed to mark event as inactive: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+
     // ------ Remaining Time = Event Time - Current Time ------ //
     @RequiresApi(Build.VERSION_CODES.O)
     private fun calculateRemainingTime(eventTime: String) {
@@ -253,7 +332,9 @@ class OneEventFragment : Fragment() {
         val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
         val etaTime = LocalDateTime.parse(binding.etaTV.text, givenTimeFormatter)
         val duration = Duration.between(etaTime, givenTime)
-
+        Log.d("givenTime", givenTime.toString())
+        Log.d("etaTime", etaTime.toString())
+        Log.d("duration", duration.toString())
         val durationMinutes = duration.toMinutes()
         binding.punctualityTV.text = when {
             durationMinutes > 30 -> getString(R.string.status_1)
@@ -284,10 +365,9 @@ class OneEventFragment : Fragment() {
         val zonedDateTime = instant.atZone(ZoneId.systemDefault())
         var localDateTime = zonedDateTime.toLocalDateTime()
         localDateTime = localDateTime.minusYears(1900)
+        localDateTime = localDateTime.minusHours(1)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         return formatter.format(localDateTime)
     }
-
-
 
 }

@@ -18,6 +18,7 @@ import com.snowman.neverlate.model.types.Message
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import com.snowman.neverlate.model.types.MemberStatus
 
 class FirebaseManager {
     private val TAG = "Firebase Manager"
@@ -669,7 +670,99 @@ class FirebaseManager {
         }
     }
 
+    fun updateMemberStatus(eventId: String, memberStatus: MemberStatus, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val eventsRef = db.collection("events").whereEqualTo("id", eventId)
+        eventsRef.get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // Assuming 'id' is unique, we'll take the first document found.
+                    val document = querySnapshot.documents.first()
+                    val membersList = document.get("members") as List<Map<String, Any>>?
+                    membersList?.let {
+                        val updatedMembersList = membersList.map { member ->
+                            if (member["id"] == memberStatus.id) {
+                                mapOf(
+                                    "id" to memberStatus.id,
+                                    "isArrived" to memberStatus.isArrived,
+                                    "status" to memberStatus.status,
+                                    "arriveTime" to memberStatus.arriveTime
+                                )
+                            } else {
+                                member
+                            }
+                        }
+                        document.reference.update("members", updatedMembersList)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Member status updated successfully for eventId: $eventId")
+                                onSuccess()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error updating member status in event: $eventId", e)
+                                onFailure(e)
+                            }
+                    } ?: onFailure(Exception("No members found in the event"))
+                } else {
+                    Log.e(TAG, "Event not found with ID: $eventId")
+                    onFailure(Exception("Event not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error fetching events for ID: $eventId", e)
+                onFailure(e)
+            }
+    }
+
+    fun updateEventActiveStatus(eventId: String, isActive: Boolean, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val eventsRef = db.collection("events").whereEqualTo("id", eventId)
+        eventsRef.get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents.first()
+                    document.reference.update("active", isActive)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Event active status updated successfully for eventId: $eventId")
+                            onSuccess()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e(TAG, "Error updating active status for eventId: $eventId", e)
+                            onFailure(e)
+                        }
+                } else {
+                    Log.e(TAG, "Event not found with ID: $eventId")
+                    onFailure(Exception("Event not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error fetching event for ID: $eventId", e)
+                onFailure(e)
+            }
+    }
+
+    fun checkAndDeactivateEventIfAllArrived(eventId: String, onComplete: (Boolean) -> Unit) {
+        val eventsRef = db.collection("events").whereEqualTo("id", eventId)
+        eventsRef.get().addOnSuccessListener { querySnapshot ->
+            if (!querySnapshot.isEmpty) {
+                val documentSnapshot = querySnapshot.documents.first() // Assuming 'id' is unique
+                val event = documentSnapshot.toObject(Event::class.java)
+                val allArrived = event?.members?.all { it.isArrived } ?: false
+                if (allArrived) {
+                    documentSnapshot.reference.update("active", false).addOnCompleteListener { task ->
+                        onComplete(task.isSuccessful)
+                    }
+                } else {
+                    onComplete(false)
+                }
+            } else {
+                onComplete(false) // No event found
+            }
+        }.addOnFailureListener {
+            onComplete(false)
+        }
+    }
+
 
 }
+
+
 
 

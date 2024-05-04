@@ -217,11 +217,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btn_right_bottom"
+        android:id="@+id/btn_arrived"
         style="@style/CustomButtonStyle"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="-50dp"
         android:text="I've arrived"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent" />
