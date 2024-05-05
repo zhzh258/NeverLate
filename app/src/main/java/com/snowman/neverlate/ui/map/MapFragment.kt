@@ -66,6 +66,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("MY_DEBUG", "MapFragment: onViewCreated")
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         _mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
         _sharedOneEventViewModel = ViewModelProvider(this)[SharedOneEventViewModel::class.java]
@@ -84,6 +85,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onDestroyView() {
+        Log.d("MY_DEBUG", "OneEventFragment: onDestroyView")
         super.onDestroyView()
 //        Log.d("MY_DEBUG", "MapFragment is destroyed!")
         _binding = null
@@ -157,7 +159,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val origin: LatLng? = getUserGPS()
             // event card
             binding.eventCard.setOnClickListener {
-                // TODO: navigate to EventDetailFragment
                 Toast.makeText(requireContext(), "navigates to event.id = ${event.id}", Toast.LENGTH_SHORT).show()
                 sharedOneEventViewModel.setSelectedEvent(event)
                 findNavController().navigate(R.id.nav_eventDetails)

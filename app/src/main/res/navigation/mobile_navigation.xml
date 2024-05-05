@@ -39,19 +39,11 @@
         android:id="@+id/action_friendsFragment_to_addFriendsFragment"
         app:destination="@id/nav_addFriends" />
 
-<!--    <action-->
-<!--        android:id="@+id/action_eventFragment_to_eventFragment"-->
-<!--        app:destination="@id/nav_eventDetails">-->
-<!--        <argument-->
-<!--            android:name="eventId"-->
-<!--            app:argType="string" />-->
-<!--    </action>-->
-  
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.snowman.neverlate.ui.profile.ProfileFragment"
         android:label="@string/menu_profile"
-        tools:layout="@layout/fragment_profile_v2"/>
+        tools:layout="@layout/fragment_profile"/>
 
     <fragment
         android:id="@+id/nav_addEvent"
@@ -63,8 +55,12 @@
         android:id="@+id/nav_eventDetails"
         android:name="com.snowman.neverlate.ui.events.OneEventFragment"
         android:label="Event Details"
-        tools:layout="@layout/fragment_one_event" />
-  
+        tools:layout="@layout/fragment_one_event" >
+    </fragment>
+    <action
+        android:id="@+id/action_oneEventFragment_to_mapFragment"
+        app:destination="@id/nav_map" />
+
     <fragment
         android:id="@+id/nav_map"
         android:name="com.snowman.neverlate.ui.map.MapFragment"
@@ -84,7 +80,7 @@
         tools:layout="@layout/fragment_edit_profile" />
 
     <action
-        android:id="@+id/settingsFragment_to_editProfileFragment"
+        android:id="@+id/action_settingsFragment_to_editProfileFragment"
         app:destination="@id/nav_editProfile" />
 
     <fragment
@@ -94,7 +90,7 @@
         tools:layout="@layout/fragment_rateus" />
 
     <action
-        android:id="@+id/settingsFragment_to_rateUsFragment"
+        android:id="@+id/action_settingsFragment_to_rateUsFragment"
         app:destination="@id/nav_rateUs" />
   
 </navigation>
