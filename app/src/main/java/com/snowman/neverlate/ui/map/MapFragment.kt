@@ -274,6 +274,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    /***
+     * @param origin The LatLng of the origin point
+     * @param mode Must be one of "drive", "walk", "bike", "transit". Or other mode supported by Google (idk).
+     * @param destination The LatLng of the origin point
+     * @return DirectionsResponse?
+     */
     private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, destination: LatLng): DirectionsResponse? {
         Log.d(TAG, "Now fetching data with origin = ${origin}")
         origin ?: return null
@@ -335,8 +341,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
-
-
 }
 
 

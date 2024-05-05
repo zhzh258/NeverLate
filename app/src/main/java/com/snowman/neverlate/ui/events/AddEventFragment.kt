@@ -29,8 +29,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.card.MaterialCardView
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.R
 import com.google.firebase.Timestamp
@@ -41,14 +41,15 @@ import com.snowman.neverlate.model.types.Event
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.MemberStatus
-import com.snowman.neverlate.ui.settings.EditProfileFragment
+import com.snowman.neverlate.ui.addressSelection.AddressSelectionActivity
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
-class AddEventsFragment : Fragment() {
-    private val TAG = "addeventsfragment"
+class AddEventFragment : Fragment() {
+    private val TAG = "AddEventFragment"
 
+    private lateinit var addressSelectorButton: Button
     private lateinit var attendeeRV: RecyclerView
     private lateinit var addAttendeeCV: MaterialCardView
     private lateinit var attendeesAdapter: EventAttendeesAdapter
@@ -67,13 +68,14 @@ class AddEventsFragment : Fragment() {
     private val currentUser = auth.currentUser
     private var profileUri: Uri? = null
     private lateinit var event_image: ImageView
+    private lateinit var latLng: LatLng
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_new_event, container, false)
+        return inflater.inflate(R.layout.fragment_add_event, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -99,6 +101,7 @@ class AddEventsFragment : Fragment() {
 
         setUpImageUpload(view)
         setUpAddAttendees(view)
+        setUpAddressSelector(view)
 
         val addEventButton: Button = view.findViewById<Button>(R.id.addEventButton)
         addEventButton.setOnClickListener {
@@ -221,6 +224,7 @@ class AddEventsFragment : Fragment() {
     companion object {
         private const val IMAGE_PICK_CODE = 1000
         private const val STORAGE_PERMISSION_CODE = 1001
+        private const val ADDRESS_SELECTION_CODE = 2000
     }
 
     private fun openGalleryForImage() {
@@ -231,12 +235,17 @@ class AddEventsFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK && data != null) { // pick image returns
             profileUri = data.data
 
             Glide.with(this)
                 .load(profileUri)
                 .into(event_image)
+        } else if (requestCode == ADDRESS_SELECTION_CODE && resultCode == Activity.RESULT_OK && data != null){ // address selection returns
+            val addressString: String? = data?.getStringExtra("addressString")
+            val latitude: Double? = data?.getDoubleExtra("latitude", 70.0)
+            val longitude: Double? = data?.getDoubleExtra("longitude", 70.0)
+            addressSelectorButton.text=  addressString + " " + latitude.toString() + " " + longitude.toString()
         }
     }
 
@@ -316,6 +325,15 @@ class AddEventsFragment : Fragment() {
             } else {
                 Toast.makeText(requireContext(), "No friends to display, please add some friends first", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun setUpAddressSelector(view: View){
+        addressSelectorButton = view.findViewById(R.id.address_selector_button)
+        addressSelectorButton.setOnClickListener {
+            // open AddressSelectionActivity
+            val intent = Intent(requireContext(), AddressSelectionActivity::class.java)
+            startActivityForResult(intent, ADDRESS_SELECTION_CODE)
         }
     }
 

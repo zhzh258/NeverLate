@@ -55,9 +55,9 @@
 
     <fragment
         android:id="@+id/nav_addEvent"
-        android:name="com.snowman.neverlate.ui.events.AddEventsFragment"
+        android:name="com.snowman.neverlate.ui.events.AddEventFragment"
         android:label="Add Event"
-        tools:layout="@layout/fragment_new_event" />
+        tools:layout="@layout/fragment_add_event" />
 
     <fragment
         android:id="@+id/nav_eventDetails"
