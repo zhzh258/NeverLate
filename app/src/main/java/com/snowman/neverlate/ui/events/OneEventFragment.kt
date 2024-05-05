@@ -75,12 +75,14 @@ class OneEventFragment : Fragment() {
     private val updateRunnable = object : Runnable {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
-            val currentDateTime = LocalDateTime.now()
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val formattedDateTime = currentDateTime.format(formatter)
-            calculateRemainingTime(DataEventTime)
-            binding.currentTimeTV.text = formattedDateTime
-            handler.postDelayed(this, 1000) // schedule the next run
+            if (isAdded && isVisible && binding != null) {
+                val currentDateTime = LocalDateTime.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                val formattedDateTime = currentDateTime.format(formatter)
+                calculateRemainingTime(DataEventTime)
+                binding.currentTimeTV.text = formattedDateTime
+                handler.postDelayed(this, 1000) // schedule the next run
+            }
         }
     }
 
@@ -88,9 +90,11 @@ class OneEventFragment : Fragment() {
     private val updateRunnableETA = object : Runnable {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
-            setUpETA()
-            calculatePunctualStatus(DataEventTime)
-            handler.postDelayed(this, 1000000) // schedule the next run
+            if (isAdded && isVisible && binding != null) {
+                setUpETA()
+                calculatePunctualStatus(DataEventTime)
+                handler.postDelayed(this, 500000) // schedule the next run
+            }
         }
     }
     // ------ Dummy origin laglng data and destination laglng data for testing ------ //
@@ -328,22 +332,27 @@ class OneEventFragment : Fragment() {
     // ------ Punctual Status based on => Event Time - Expected Time of Arrival ------ //
     @RequiresApi(Build.VERSION_CODES.O)
     private fun calculatePunctualStatus(eventTime: String) {
-        val givenTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
-        val etaTime = LocalDateTime.parse(binding.etaTV.text, givenTimeFormatter)
-        val duration = Duration.between(etaTime, givenTime)
-        Log.d("givenTime", givenTime.toString())
-        Log.d("etaTime", etaTime.toString())
-        Log.d("duration", duration.toString())
-        val durationMinutes = duration.toMinutes()
-        binding.punctualityTV.text = when {
-            durationMinutes > 30 -> getString(R.string.status_1)
-            durationMinutes > 10 -> getString(R.string.status_2)
-            durationMinutes > 5 -> getString(R.string.status_3)
-            durationMinutes > 0 -> getString(R.string.status_4)
-            durationMinutes > -10 -> getString(R.string.status_5)
-            durationMinutes > -30 -> getString(R.string.status_6)
-            else -> getString(R.string.status_7)
+        val binding = binding
+        if (binding != null) {
+            val givenTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
+            val etaTime = LocalDateTime.parse(binding.etaTV.text, givenTimeFormatter)
+            val duration = Duration.between(etaTime, givenTime)
+            Log.d("givenTime", givenTime.toString())
+            Log.d("etaTime", etaTime.toString())
+            Log.d("duration", duration.toString())
+            val durationMinutes = duration.toMinutes()
+            binding.punctualityTV.text = when {
+                durationMinutes > 30 -> getString(R.string.status_1)
+                durationMinutes > 10 -> getString(R.string.status_2)
+                durationMinutes > 5 -> getString(R.string.status_3)
+                durationMinutes > 0 -> getString(R.string.status_4)
+                durationMinutes > -10 -> getString(R.string.status_5)
+                durationMinutes > -30 -> getString(R.string.status_6)
+                else -> getString(R.string.status_7)
+            }
+        }else {
+            Log.d(TAG, "Binding is null, skipping update")
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
