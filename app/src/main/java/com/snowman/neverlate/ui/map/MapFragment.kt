@@ -34,6 +34,7 @@ import com.snowman.neverlate.model.retrofit.DirectionsResponse
 import com.snowman.neverlate.model.retrofit.GoogleMapsDirectionsService
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.util.getMetaData
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -227,12 +228,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val distance = transitResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
                 this.text = "Transit: " + duration
             }
+
         }
             true
         }
 
         map.setOnMapClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
         }
     }
 
@@ -282,7 +286,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val service = retrofit.create(GoogleMapsDirectionsService::class.java)
 
         try {
-            val apiKey = getMetaData("com.google.android.geo.API_KEY")
+            val apiKey = getMetaData("com.google.android.geo.API_KEY", context)
             val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
 //            Log.d(TAG, response.body().toString())
             if (response.isSuccessful) {
@@ -332,16 +336,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getMetaData(name: String): String? {
-        val context = context ?: return null
-        return try {
-            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            applicationInfo.metaData.getString(name)
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            null
-        }
-    }
+
 }
 
 

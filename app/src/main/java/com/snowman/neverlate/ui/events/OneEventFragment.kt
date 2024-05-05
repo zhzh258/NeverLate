@@ -47,6 +47,7 @@ import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 import com.snowman.neverlate.model.types.MemberStatus
 import com.snowman.neverlate.util.TimeUtil
+import com.snowman.neverlate.util.getMetaData
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -215,7 +216,7 @@ class OneEventFragment : Fragment() {
             .build()
         val service = retrofit.create(GoogleMapsDirectionsService::class.java)
         try {
-            val apiKey = getMetaData("com.google.android.geo.API_KEY")
+            val apiKey = getMetaData("com.google.android.geo.API_KEY", context)
             val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
             if (response.isSuccessful) {
                 if(response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0){
@@ -231,17 +232,6 @@ class OneEventFragment : Fragment() {
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Other Exceptions", Toast.LENGTH_SHORT).show()
             return null
-        }
-    }
-
-    private fun getMetaData(name: String): String? {
-        val context = context ?: return null
-        return try {
-            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            applicationInfo.metaData.getString(name)
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            null
         }
     }
 
