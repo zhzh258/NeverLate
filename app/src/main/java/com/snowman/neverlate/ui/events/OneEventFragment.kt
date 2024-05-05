@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -47,6 +48,7 @@ import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 import com.snowman.neverlate.model.types.MemberStatus
 import com.snowman.neverlate.util.TimeUtil
+import com.snowman.neverlate.util.getMetaData
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -106,12 +108,14 @@ class OneEventFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("MY_DEBUG", "OneEventFragment: onCreateView")
         _binding = FragmentOneEventBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("MY_DEBUG", "OneEventFragment: onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         sharedOneEventViewModel.selectedEvent.observe(viewLifecycleOwner) { event ->
             event?.let {
@@ -122,6 +126,7 @@ class OneEventFragment : Fragment() {
                 view.findViewById<TextView>(R.id.text_event_location).text = event.location.toString()
                 view.findViewById<TextView>(R.id.text_people_count).text = event.members.size.toString() + " people"
                 setUpFriends(view)
+                setUpMapNavigation(view)
                 DataEventTime = convertEventTimeToStandardFormat(theEvent.date)
                 Log.d("DataEventTime", DataEventTime)
                 updateRunnableETA.run()
@@ -150,14 +155,12 @@ class OneEventFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d("MY_DEBUG", "OneEventFragment: onDestroyView")
         handler.removeCallbacks(updateRunnable)
         handler.removeCallbacks(updateRunnableETA)
         _binding = null
     }
 
-    // TODO: REPLACE THIS WITH EVENTS MEMBERS LIST
-    private val MOCK_DATA_REMOVE_LATER = listOf("7G8aYM2nCQYee2Ty2gOF6WfJfZi2", "kqrDkWba3dVMLEUnGFjX4gjqmmF3",
-    "rPzbvBIau8OLR9yenHZDyhVNcVX2", "uoFb8MuJOAeAaL2wZqE8PTmrS8M2")
 
     private fun setUpFriends(view: View) {
         var friendsNames = ""
@@ -185,6 +188,12 @@ class OneEventFragment : Fragment() {
         PagerSnapHelper().attachToRecyclerView(friendsRV)
     }
 
+    private fun setUpMapNavigation(view: View) {
+        val toMapButton: Button = view.findViewById(R.id.to_map_button)
+        toMapButton.setOnClickListener {
+            findNavController().navigate(R.id.action_oneEventFragment_to_mapFragment)
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpETA() {
@@ -219,7 +228,7 @@ class OneEventFragment : Fragment() {
             .build()
         val service = retrofit.create(GoogleMapsDirectionsService::class.java)
         try {
-            val apiKey = getMetaData("com.google.android.geo.API_KEY")
+            val apiKey = getMetaData("com.google.android.geo.API_KEY", context)
             val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
             if (response.isSuccessful) {
                 if(response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0){
@@ -235,17 +244,6 @@ class OneEventFragment : Fragment() {
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Other Exceptions", Toast.LENGTH_SHORT).show()
             return null
-        }
-    }
-
-    private fun getMetaData(name: String): String? {
-        val context = context ?: return null
-        return try {
-            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            applicationInfo.metaData.getString(name)
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            null
         }
     }
 

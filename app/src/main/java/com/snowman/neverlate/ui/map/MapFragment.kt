@@ -34,6 +34,7 @@ import com.snowman.neverlate.model.retrofit.DirectionsResponse
 import com.snowman.neverlate.model.retrofit.GoogleMapsDirectionsService
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.util.getMetaData
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -65,6 +66,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("MY_DEBUG", "MapFragment: onViewCreated")
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         _mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
         _sharedOneEventViewModel = ViewModelProvider(this)[SharedOneEventViewModel::class.java]
@@ -83,6 +85,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onDestroyView() {
+        Log.d("MY_DEBUG", "OneEventFragment: onDestroyView")
         super.onDestroyView()
 //        Log.d("MY_DEBUG", "MapFragment is destroyed!")
         _binding = null
@@ -156,7 +159,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val origin: LatLng? = getUserGPS()
             // event card
             binding.eventCard.setOnClickListener {
-                // TODO: navigate to EventDetailFragment
                 Toast.makeText(requireContext(), "navigates to event.id = ${event.id}", Toast.LENGTH_SHORT).show()
                 sharedOneEventViewModel.setSelectedEvent(event)
                 findNavController().navigate(R.id.nav_eventDetails)
@@ -227,12 +229,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val distance = transitResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
                 this.text = "Transit: " + duration
             }
+
         }
             true
         }
 
         map.setOnMapClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
         }
     }
 
@@ -270,6 +275,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    /***
+     * @param origin The LatLng of the origin point
+     * @param mode Must be one of "drive", "walk", "bike", "transit". Or other mode supported by Google (idk).
+     * @param destination The LatLng of the origin point
+     * @return DirectionsResponse?
+     */
     private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, destination: LatLng): DirectionsResponse? {
         Log.d(TAG, "Now fetching data with origin = ${origin}")
         origin ?: return null
@@ -282,7 +293,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val service = retrofit.create(GoogleMapsDirectionsService::class.java)
 
         try {
-            val apiKey = getMetaData("com.google.android.geo.API_KEY")
+            val apiKey = getMetaData("com.google.android.geo.API_KEY", context)
             val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
 //            Log.d(TAG, response.body().toString())
             if (response.isSuccessful) {
@@ -329,17 +340,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Log.d(TAG, "No location available at this time.")
                 return null
             }
-        }
-    }
-
-    private fun getMetaData(name: String): String? {
-        val context = context ?: return null
-        return try {
-            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            applicationInfo.metaData.getString(name)
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            null
         }
     }
 }

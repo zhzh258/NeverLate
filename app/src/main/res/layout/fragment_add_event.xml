@@ -127,26 +127,12 @@
                 android:layout_height="wrap_content"
                 android:text="ADDRESS" />
 
-            <LinearLayout
+            <Button
+                android:id="@+id/address_selector_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <EditText
-                    style="@style/AddEventTextStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/general_small_margin"
-                    android:hint="Address Line 1" />
-
-                <EditText
-                    style="@style/AddEventTextStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/general_small_margin"
-                    android:hint="Address Line 2" />
-
-            </LinearLayout>
+                android:layout_marginTop="@dimen/general_small_margin"
+                android:text="Click me to select an address"/>
 
         </LinearLayout>
 

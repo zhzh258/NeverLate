@@ -30,10 +30,10 @@ class SettingsFragment : Fragment() {
     ): View {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
         binding.btnEditProfile.setOnClickListener(){
-            findNavController().navigate(R.id.settingsFragment_to_editProfileFragment)
+            findNavController().navigate(R.id.action_settingsFragment_to_editProfileFragment)
         }
         binding.btnRateUs.setOnClickListener(){
-            findNavController().navigate(R.id.settingsFragment_to_rateUsFragment)
+            findNavController().navigate(R.id.action_settingsFragment_to_rateUsFragment)
         }
         binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
