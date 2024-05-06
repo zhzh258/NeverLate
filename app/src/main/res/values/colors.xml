@@ -9,6 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray_100">#E0E0E0</color>
     <color name="gray_300">#CCCCCC</color>
+    <color name="red">#FF0000</color>
+
 
     <!-- Primary Color Settings -->
     <color name="colorPrimary">#A3CAFA</color>

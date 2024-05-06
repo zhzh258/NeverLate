@@ -22,7 +22,7 @@ class NotificationViewHolder(
             if (user != null) {
                 binding.senderTV.text = user.displayName
                 binding.msgTV.text = message.messageText
-                binding.timeTV.text = TimeUtil().convertMillisToDateTime(message.timestamp)
+                binding.timeTV.text = TimeUtil.convertMillisToDateTime(message.timestamp)
                 Glide.with(binding.senderIV)
                     .load(user.photoURL)
                     .circleCrop()
