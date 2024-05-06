@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/activity_padding"
+    android:padding="@dimen/general_small_margin"
     tools:context=".ui.friends.FriendsFragment">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchFriendsSV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/general_small_margin"
+        android:background="@drawable/rounded_btn"
+        android:backgroundTint="@color/colorPrimaryDark"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search Friend's Username" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/friendsListRv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/addFriendsBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_friends"
+        android:layout_gravity="end"
         android:layout_margin="@dimen/general_small_margin"
-        android:layout_gravity="end"/>
+        android:text="@string/add_friends" />
 
 </LinearLayout>
