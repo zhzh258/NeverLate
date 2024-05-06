@@ -38,6 +38,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
@@ -114,7 +116,7 @@ class AddEventFragment : Fragment() {
         setUpEventTypeSelector(view)
         setUpAddAttendees(view)
 
-        val addEventButton: Button = view.findViewById<Button>(R.id.addEventButton)
+        val addEventButton = view.findViewById<ExtendedFloatingActionButton>(R.id.addEventButton)
         addEventButton.setOnClickListener {
             addNewEventToFirebase(view)
         }
