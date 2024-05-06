@@ -1,6 +1,7 @@
 package com.snowman.neverlate.ui.events
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ class EventsFragment : Fragment()  {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("MY_DEBUG", "EventFragment: onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
@@ -85,6 +87,10 @@ class EventsFragment : Fragment()  {
         }
     }
 
+    override fun onDestroyView() {
+        Log.d("MY_DEBUG", "EventsFragment: onDestroyView")
+        super.onDestroyView()
+    }
     private fun searchEvents(query: String?) {
         // Filter the list of events based on the query
         val filteredEvents = events.value?.filter { event ->

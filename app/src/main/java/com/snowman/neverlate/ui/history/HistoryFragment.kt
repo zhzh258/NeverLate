@@ -38,6 +38,7 @@ class HistoryFragment : Fragment()  {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("MY_DEBUG", "HistoryFragment: onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
         initViews(view)
@@ -87,6 +88,10 @@ class HistoryFragment : Fragment()  {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("MY_DEBUG", "HistoryFragment: onDestroyView")
+    }
     private fun searchEvents(query: String?) {
         // Filter the list of events based on the query
         val filteredEvents = events.value?.filter { event ->

@@ -191,7 +191,7 @@ class OneEventFragment : Fragment() {
     private fun setUpMapNavigation(view: View) {
         val toMapButton: Button = view.findViewById(R.id.to_map_button)
         toMapButton.setOnClickListener {
-            findNavController().navigate(R.id.action_oneEventFragment_to_mapFragment)
+            findNavController().navigate(R.id.nav_map)
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)

@@ -85,10 +85,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onDestroyView() {
-        Log.d("MY_DEBUG", "OneEventFragment: onDestroyView")
+        Log.d("MY_DEBUG", "MapFragment: onDestroyView")
         super.onDestroyView()
-//        Log.d("MY_DEBUG", "MapFragment is destroyed!")
-        _binding = null
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

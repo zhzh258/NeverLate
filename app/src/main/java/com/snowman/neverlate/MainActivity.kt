@@ -1,5 +1,6 @@
 package com.snowman.neverlate
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -16,8 +17,11 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.customview.widget.Openable
 import androidx.fragment.app.viewModels
+import androidx.navigation.ui.NavigationUI
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.databinding.ActivityMainBinding
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private fun setUpSideActionBar() {
         setSupportActionBar(binding.appBarMain.toolbar)
 
@@ -98,7 +103,31 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+//            Log.d("MY_DEBUG", "Navigated to ${destination.label} with id ${destination.id}")
+        }
+        // I override the default setNavigationItemSelectedListener in setupActionBarWithNavController()
+        navView.setNavigationItemSelectedListener { item ->
+//            Log.d("MY_DEBUG", "item ${item.itemId} ${item.title} is selected in navView")
+            val handled = NavigationUI.onNavDestinationSelected(item, navController)
 
+            // This will simply clear the popBackStack. It will solve our issue.
+            // However, the price is that our app loses the stack of the back button. (We don't actually need it tho)
+            findNavController(R.id.nav_host_fragment_content_main).popBackStack(item.itemId, inclusive = false)
+
+            if (handled) {
+                val parent = binding.navView.parent
+                if (parent is Openable) {
+                    parent.close()
+                } else {
+                    val bottomSheetBehavior = NavigationUI.findBottomSheetBehavior(navView)
+                    if (bottomSheetBehavior != null) {
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    }
+                }
+            }
+            handled
+        }
         navView.menu.findItem(R.id.nav_sign_out).setOnMenuItemClickListener {
             signOut()
             true
