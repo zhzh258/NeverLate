@@ -18,15 +18,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.google.android.gms.location.CurrentLocationRequest
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.api.Billing.BillingDestination
 import com.google.maps.android.PolyUtil
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentMapBinding
@@ -94,12 +91,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             map = googleMap
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
             setMapConfig()
-            bindLiveData()
+            observeCamera()
             val origin = getUserGPS() // suspend function
-            origin?.let { map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f)) }
+            origin?.let {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f))
+            }
             if(origin != null){
                 Log.d(TAG, "Moving camera to ${origin.toString()}")
-
+                observeMarkers()
             }
             setUpBottomSheet()
         }
@@ -109,17 +108,29 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map.isTrafficEnabled = false
     }
 
-    private fun bindLiveData() {
+    private fun observeCamera() {
         mapViewModel.cameraPos.observe(viewLifecycleOwner) {
             map.moveCamera(CameraUpdateFactory.newCameraPosition(it))
         }
+    }
 
+    private fun observeMarkers() {
         mapViewModel.markerData.observe(viewLifecycleOwner) {
-            this.map.clear()
-            this.marker2event.clear()
-            it.forEach { markerData ->
-                val marker = this.map.addMarker(markerData.markerOptions)
-                marker?.let { this.marker2event[marker] = markerData.event }
+            if (it.isNotEmpty()) {
+                this.map.clear()
+                this.marker2event.clear()
+                val builder = LatLngBounds.Builder()
+
+                it.forEach { markerData ->
+                    val marker = this.map.addMarker(markerData.markerOptions)
+                    marker?.let { this.marker2event[marker] = markerData.event }
+                    builder.include(markerData.markerOptions.position)
+                }
+
+                val bounds = builder.build()
+                val padding = resources.getDimensionPixelSize(R.dimen.map_padding)
+                val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+                map.animateCamera(cameraUpdate)
             }
         }
     }
