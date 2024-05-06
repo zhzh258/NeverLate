@@ -1,46 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_events"
-            android:icon="@drawable/ic_menu_events"
-            android:title="@string/menu_events" />
-        <item
-            android:id="@+id/nav_history"
-            android:icon="@drawable/ic_menu_history"
-            android:title="@string/menu_history" />
-        <item
-            android:id="@+id/nav_notification"
-            android:icon="@drawable/ic_menu_notification"
-            android:title="@string/menu_notification" />
-        <item
-            android:id="@+id/nav_friends"
-            android:icon="@drawable/ic_menu_friends"
-            android:title="@string/menu_friends" />
-        <item
-            android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_menu_profile"
-            android:title="@string/menu_profile" />
-        <item
-            android:id="@+id/nav_map"
-            android:icon="@drawable/ic_menu_map"
-            android:title="Map" />
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_menu_settings"
-            android:title="Settings" />
-    </group>
+    <item
+        android:title="@string/nav_menu_title_home"
+        >
 
-    <group
-        android:id="@+id/menu_bottom"
-        android:checkableBehavior="none">
+        <menu android:checkableBehavior="single">
+            <item
+                android:id="@+id/nav_events"
 
-        <item
-            android:id="@+id/nav_sign_out"
-            android:icon="@drawable/ic_menu_sign_out"
-            android:title="@string/sign_out" />
-    </group>
+                android:icon="@drawable/ic_menu_events"
+                android:title="@string/menu_events"
+                />
+            <item
+                android:id="@+id/nav_history"
+                app:itemVerticalPadding="0dp"
+                android:icon="@drawable/ic_menu_history"
+                android:title="@string/menu_history" />
+            <item
+                android:id="@+id/nav_notification"
+                android:icon="@drawable/ic_menu_notification"
+                android:title="@string/menu_notification" />
+            <item
+                android:id="@+id/nav_friends"
+                android:icon="@drawable/ic_menu_friends"
+                android:title="@string/menu_friends" />
+            <item
+                android:id="@+id/nav_map"
+                android:icon="@drawable/ic_menu_map"
+                android:title="@string/menu_map" />
+        </menu>
+    </item>
+
+    <item
+        android:title="@string/nav_menu_title_app">
+        <menu
+            android:id="@+id/menu_bottom"
+            android:checkableBehavior="none">
+            <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_menu_profile"
+                android:title="@string/menu_profile" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_menu_settings"
+                android:title="@string/menu_settings" />
+            <item
+                android:id="@+id/nav_sign_out"
+                android:icon="@drawable/ic_menu_sign_out"
+                android:title="@string/sign_out" />
+        </menu>
+    </item>
+
 </menu>

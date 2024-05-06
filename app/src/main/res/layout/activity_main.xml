@@ -5,7 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:openDrawer="start">
 
     <include
@@ -19,9 +19,11 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:itemShapeFillColor="@color/colorPrimaryDark"
+        app:itemShapeFillColor="@color/white"
+        app:itemVerticalPadding="0dp"
         app:itemTextColor="@color/black"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
+        app:menu="@menu/activity_main_drawer"
+        app:drawerLayoutCornerSize="10dp"/>
 </androidx.drawerlayout.widget.DrawerLayout>
