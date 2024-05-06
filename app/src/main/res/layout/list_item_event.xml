@@ -11,49 +11,54 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="16dp"
-
+        android:src="@drawable/event_img_test"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.3"
-        android:src="@drawable/event_img_test" />
+        app:layout_constraintWidth_percent="0.3" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        app:layout_constraintStart_toEndOf="@id/image_event"
+        android:paddingHorizontal="@dimen/general_small_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toEndOf="@id/image_event"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/text_event_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="House Party at Mary's place"
+            android:ellipsize="end"
+            android:lines="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="House Party at Mary's place" />
 
         <TextView
             android:id="@+id/text_event_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:text="Time / 18:30 March 05, 2024"
+            android:ellipsize="end"
+            android:lines="1"
             android:textColor="@color/colorPrimary"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_event_title" />
+            app:layout_constraintTop_toBottomOf="@id/text_event_title"
+            tools:text="Time / 18:30 March 05, 2024" />
 
         <TextView
             android:id="@+id/text_event_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
-            android:text="Location / 808 Commonwealth Ave"
+            android:ellipsize="end"
+            android:lines="1"
             android:textColor="@color/colorPrimary"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_event_time" />
+            app:layout_constraintTop_toBottomOf="@id/text_event_time"
+            tools:text="Location / 808 Commonwealth Ave, Boston, MA, 02215" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -66,19 +71,20 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_menu_friends"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/text_people_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
-                android:text="6 people"
+                android:lines="1"
+                app:layout_constraintBottom_toBottomOf="@id/image_people"
                 app:layout_constraintStart_toEndOf="@id/image_people"
                 app:layout_constraintTop_toTopOf="@id/image_people"
-                app:layout_constraintBottom_toBottomOf="@id/image_people" />
+                tools:text="6 people" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
