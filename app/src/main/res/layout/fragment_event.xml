@@ -6,79 +6,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/event_header"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal">
 
-        <TextView
-            style="@style/CustomTextViewStyle"
-            android:id="@+id/event_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
-            android:text="Event"
-            android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/my_icon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_menu_notification"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/search_row"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchEventsSV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/event_header">
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchEventsSV"
-            android:queryBackground="@color/colorPrimaryDark"
-            android:hint="Search events by name"
-            android:textColorHint="@color/black"
-            android:background="@drawable/rounded_btn"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="95dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <Button
-            style="@style/CustomButtonStyle"
-            android:layout_width="70dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="15dp"
-            android:drawableLeft="@drawable/ic_widget_filter"
-            android:drawableStart="@drawable/ic_widget_filter"
-            android:scaleType="fitCenter"
-            app:layout_constraintEnd_toEndOf="parent"/>
+        android:background="@drawable/rounded_btn"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:queryBackground="@color/colorPrimaryDark"
+        android:textColorHint="@color/black"
+        app:iconifiedByDefault="false"
+        android:layout_margin="@dimen/general_small_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Search events by name" />
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <HorizontalScrollView
         android:id="@+id/category_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
         android:layout_marginTop="15dp"
-        app:layout_constraintTop_toBottomOf="@id/search_row"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/searchEventsSV"
         tools:layout_editor_absoluteX="-86dp">
 
         <LinearLayout
@@ -87,55 +38,55 @@
             android:orientation="horizontal">
 
             <ToggleButton
-                style="@style/CustomButtonStyle"
                 android:id="@+id/filterAllBtn"
+                style="@style/CustomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/general_small_margin"
+                android:layout_marginEnd="@dimen/general_small_margin"
                 android:text="All"
-                android:textOn="All"
                 android:textOff="All"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="13dp"/>
+                android:textOn="All" />
 
             <ToggleButton
-                style="@style/CustomButtonStyle"
                 android:id="@+id/filterDiningBtn"
+                style="@style/CustomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/general_small_margin"
                 android:text="Dining"
-                android:textOn="Dining"
                 android:textOff="Dining"
-                android:layout_marginEnd="8dp"/>
+                android:textOn="Dining" />
 
             <ToggleButton
-                style="@style/CustomButtonStyle"
                 android:id="@+id/filterStudyBtn"
+                style="@style/CustomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/general_small_margin"
                 android:text="Study"
-                android:textOn="Study"
                 android:textOff="Study"
-                android:layout_marginEnd="8dp"/>
+                android:textOn="Study" />
 
             <ToggleButton
-                style="@style/CustomButtonStyle"
                 android:id="@+id/filterMeetingBtn"
+                style="@style/CustomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/general_small_margin"
                 android:text="Meeting"
-                android:textOn="Meeting"
                 android:textOff="Meeting"
-                android:layout_marginEnd="8dp"/>
+                android:textOn="Meeting" />
 
             <ToggleButton
-                style="@style/CustomButtonStyle"
                 android:id="@+id/filterTravelBtn"
+                style="@style/CustomButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/general_small_margin"
                 android:text="Travel"
-                android:textOn="Travel"
                 android:textOff="Travel"
-                android:layout_marginEnd="8dp"/>
+                android:textOn="Travel" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -147,8 +98,8 @@
         app:layout_constraintTop_toBottomOf="@id/category_scroll">
 
         <TextView
-            style="@style/CustomTextViewStyle"
             android:id="@+id/upcoming_event"
+            style="@style/CustomTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -159,18 +110,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            style="@style/CustomTextViewStyle"
             android:id="@+id/see_all"
+            style="@style/CustomTextViewStyle"
             android:layout_width="70dp"
             android:layout_height="50dp"
             android:layout_marginEnd="16dp"
             android:padding="10dp"
-            android:text="see all"
-
             android:scaleType="fitCenter"
+
+            android:text="see all"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -179,18 +129,18 @@
         android:id="@+id/eventsListRv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/upcoming_seeall"
-        app:layout_constraintHeight_max="900dp"/>
+        app:layout_constraintHeight_max="900dp"
+        app:layout_constraintTop_toBottomOf="@id/upcoming_seeall" />
 
     <Button
-        style="@style/CustomButtonStyle"
         android:id="@+id/addEventBtn"
+        style="@style/CustomButtonStyle"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:text="Add Event"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:text="Add Event"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

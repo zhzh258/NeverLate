@@ -19,6 +19,7 @@
 
     <!-- Button Color Settings -->
     <color name="buttonBackground">	#97CBFF</color>
+    <color name="buttonSelectedBackground">#5BABFB</color>
     <color name="buttonText">#FFFFFF</color>
 
     <color name="addEventRed">#f2dede</color>

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ToggleButton
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -26,6 +27,7 @@ class EventsFragment : Fragment()  {
     private lateinit var searchEventsSV: SearchView
     private lateinit var events: MutableLiveData<List<IEvent>>
     private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
+    private lateinit var selectedBtn: ToggleButton
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,18 +74,23 @@ class EventsFragment : Fragment()  {
 
         view.findViewById<Button>(R.id.filterAllBtn).setOnClickListener {
             filterEvents(null) // Passing null to show all events
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterDiningBtn).setOnClickListener {
             filterEvents("Dining")
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterStudyBtn).setOnClickListener {
             filterEvents("Study")
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterMeetingBtn).setOnClickListener {
             filterEvents("Meeting")
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterTravelBtn).setOnClickListener {
             filterEvents("Travel")
+            selectBtn(it as ToggleButton)
         }
     }
 
@@ -128,6 +135,21 @@ class EventsFragment : Fragment()  {
         eventsListRv.adapter = adapter
         searchEventsSV = view.findViewById(R.id.searchEventsSV)
         events = eventsViewModel.events
+
+        // the all btn will always be selected first
+        selectedBtn = view.findViewById(R.id.filterAllBtn)
+        selectedBtn.setBackgroundDrawable(resources.getDrawable(R.drawable.rounded_selected_btn, null))
+        selectedBtn.isChecked = true
+    }
+
+    private fun selectBtn(btn: ToggleButton) {
+        // deselect btn color
+        selectedBtn.setBackgroundDrawable(resources.getDrawable(R.drawable.rounded_btn, null))
+        selectedBtn.isChecked = false
+        // select new button
+        selectedBtn = btn
+        selectedBtn.isChecked = true
+        selectedBtn.setBackgroundDrawable(resources.getDrawable(R.drawable.rounded_selected_btn, null))
     }
 
 
