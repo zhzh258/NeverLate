@@ -38,6 +38,7 @@ import java.util.TimeZone
 import java.time.ZoneId;
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.async
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 import com.snowman.neverlate.model.*
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
+import com.snowman.neverlate.model.types.Event
 import com.snowman.neverlate.model.types.MemberStatus
 import com.snowman.neverlate.util.TimeUtil
 import com.snowman.neverlate.util.getMetaData
@@ -60,7 +62,6 @@ class OneEventFragment : Fragment() {
     private lateinit var addEventsAdapter: AddEventsAdapter
     private lateinit var friendsRV: RecyclerView
     private lateinit var friendsAdapter: EventFriendsAdapter
-    private lateinit var theEvent: IEvent
     val auth = com.google.firebase.ktx.Firebase.auth
     private val currentUser = auth.currentUser
 
@@ -69,20 +70,19 @@ class OneEventFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
+    private lateinit var event: Event // The current event
+    private var rt: Duration = Duration.ofSeconds(0)
+    private var ett: Duration = Duration.ofSeconds(0) // estimated travel time
+    private var eta: LocalDateTime = LocalDateTime.now() // estimated time (to) arrive
 
-    private val mockDataEventTime = "2024-04-22 23:30:00" // Replace it with specific event time
-    private lateinit var DataEventTime: String
     private val handler = Handler(Looper.getMainLooper())
     // ------ Get Current Time Every 1000 ms ------ //
     private val updateRunnable = object : Runnable {
-        @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
             if (isAdded && isVisible && binding != null) {
                 val currentDateTime = LocalDateTime.now()
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                val formattedDateTime = currentDateTime.format(formatter)
-                calculateRemainingTime(DataEventTime)
-                binding.currentTimeTV.text = formattedDateTime
+                binding.currentTimeTV.text = TimeUtil.localDateTime2FormattedString(currentDateTime)
+                calculateRemainingTime()
                 handler.postDelayed(this, 1000) // schedule the next run
             }
         }
@@ -92,9 +92,9 @@ class OneEventFragment : Fragment() {
     private val updateRunnableETA = object : Runnable {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun run() {
-            if (isAdded && isVisible && binding != null) {
+            if (isAdded && isVisible) {
                 setUpETA()
-                calculatePunctualStatus(DataEventTime)
+                calculatePunctualStatus()
                 handler.postDelayed(this, 500000) // schedule the next run
             }
         }
@@ -117,21 +117,24 @@ class OneEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d("MY_DEBUG", "OneEventFragment: onViewCreated")
         super.onViewCreated(view, savedInstanceState)
-        sharedOneEventViewModel.selectedEvent.observe(viewLifecycleOwner) { event ->
-            event?.let {
-                theEvent = event
-                view.findViewById<TextView>(R.id.text_title).text = theEvent.name
-                view.findViewById<TextView>(R.id.textview_description).text = theEvent.description
-                view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(theEvent.date.toDate())
-                view.findViewById<TextView>(R.id.text_event_location).text = event.location.toString()
-                view.findViewById<TextView>(R.id.text_people_count).text = event.members.size.toString() + " people"
+        sharedOneEventViewModel.selectedEvent.observe(viewLifecycleOwner) { it ->
+            if (it == null) {
+                throw NullPointerException("zz - sharedOneEventViewModel.selectedEvent.value is null. Have you updated it before navigating to this fragment?")
+            }
+
+            it.let {
+                Toast.makeText(requireContext(), "Hey! The event is ${it.name}", Toast.LENGTH_SHORT).show()
+                event = it
+                view.findViewById<TextView>(R.id.text_title).text = it.name
+                view.findViewById<TextView>(R.id.textview_description).text = it.description
+                view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
+                view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
+                view.findViewById<TextView>(R.id.text_people_count).text = it.members.size.toString() + " people"
                 setUpFriends(view)
                 setUpMapNavigation(view)
-                DataEventTime = convertEventTimeToStandardFormat(theEvent.date)
-                Log.d("DataEventTime", DataEventTime)
                 updateRunnableETA.run()
                 Glide.with(this)
-                    .load(theEvent.photoURL)
+                    .load(it.photoURL)
                     .placeholder(R.drawable.ic_launcher_background)
                     .error(R.drawable.ic_util_clear_24)
                     .into(binding.imageBackground)
@@ -164,7 +167,7 @@ class OneEventFragment : Fragment() {
 
     private fun setUpFriends(view: View) {
         var friendsNames = ""
-        var memberStatusList1 = theEvent.members.toMutableList()
+        var memberStatusList1 = event.members.toMutableList()
         for(member in memberStatusList1) {
             if(currentUser != null) {
                 if (member.id.equals(currentUser.uid)) {
@@ -194,7 +197,6 @@ class OneEventFragment : Fragment() {
             findNavController().navigate(R.id.nav_map)
         }
     }
-    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpETA() {
         lifecycleScope.launch {
@@ -206,16 +208,16 @@ class OneEventFragment : Fragment() {
             val responses = awaitAll(driving, walking, bicycling, transit)
             val (drivingResponse, walkingResponse, bicyclingResponse, transitResponse) = responses
             // ------ Setting Expected Travel Time ------ //
-            val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
-            val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-            binding.ettTV.text = "Drive: " + duration + " ( " + distance + " )"
+            val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration
+            val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance
+            ett = Duration.ofSeconds(duration?.value?.toLong() ?: 0)
+            binding.ettTV.text = "Drive: " + duration?.text + " ( " + distance.toString() + " )"
+
             // ------ Setting Expected Time of Arrival ------ //
             val durationValue = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.value?: 0
             val currentDateTime = LocalDateTime.now()
-            val eta = currentDateTime.plusSeconds(durationValue.toLong())
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val formattedETA = eta.format(formatter)
-            binding.etaTV.text = "$formattedETA"
+            eta = currentDateTime.plusSeconds(durationValue.toLong())
+            binding.etaTV.text = TimeUtil.localDateTime2FormattedString(eta)
         }
     }
 
@@ -250,8 +252,7 @@ class OneEventFragment : Fragment() {
     private fun markAsArrived() {
 
         val currentUserID = auth.currentUser?.uid
-        val remainingTimeText = binding.remainingTimeTV.text.toString()
-        val minutes = extractMinutes(remainingTimeText)
+        val minutes = rt.toMinutes()
         val status  = when {
             minutes.toLong() > 20 -> getString(R.string.preStatus_1)
             minutes.toLong() > 5 -> getString(R.string.preStatus_2)
@@ -261,7 +262,7 @@ class OneEventFragment : Fragment() {
             else -> getString(R.string.preStatus_6)
         }
 
-        theEvent.members.find { it.id == currentUserID }?.let { memberStatus ->
+        event.members.find { it.id == currentUserID }?.let { memberStatus ->
             val updatedMember = memberStatus.copy(arrived = true, arriveTime = minutes.toLong(), status = status)
             updateMemberStatusInDatabase(updatedMember, {
                 // Success callback
@@ -276,23 +277,12 @@ class OneEventFragment : Fragment() {
     }
 
     private fun updateMemberStatusInDatabase(memberStatus: MemberStatus, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        firebaseManager.updateMemberStatus(theEvent.id, memberStatus, onSuccess, onFailure)
+        firebaseManager.updateMemberStatus(event.id, memberStatus, onSuccess, onFailure)
     }
 
-    private fun extractMinutes(remainingTimeText: String): Int {
-        val parts = remainingTimeText.split(":")
-        if (parts.size == 3) {
-            val hours = parts[0].toInt()
-            val minutes = parts[1].toInt()
-            val isNegative = hours < 0
-            val totalMinutes = if (isNegative) hours * 60 - minutes else hours * 60 + minutes
-            return totalMinutes
-        }
-        return 0
-    }
 
     private fun checkEventStatusAndDeactivateIfRequired() {
-        firebaseManager.checkAndDeactivateEventIfAllArrived(theEvent.id) { allArrived ->
+        firebaseManager.checkAndDeactivateEventIfAllArrived(event.id) { allArrived ->
             if (allArrived) {
                 Toast.makeText(context, "All members have arrived, event marked as inactive.", Toast.LENGTH_SHORT).show()
             } else {
@@ -303,7 +293,7 @@ class OneEventFragment : Fragment() {
 
 
     private fun markEventAsInactive() {
-        val eventId = theEvent.id // Assuming theEvent is an instance of IEvent and has an id field
+        val eventId = event.id // Assuming event is an instance of IEvent and has an id field
 
         firebaseManager.updateEventActiveStatus(eventId, false,
             onSuccess = {
@@ -317,64 +307,55 @@ class OneEventFragment : Fragment() {
 
 
     // ------ Remaining Time = Event Time - Current Time ------ //
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculateRemainingTime(eventTime: String) {
-        val givenTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
+    private fun calculateRemainingTime() {
+        val givenTime = TimeUtil.timeStamp2LocalDateTime(event.date)
         val currentTime = LocalDateTime.now()
-        val duration = Duration.between(currentTime, givenTime)
-        val formattedDuration = formatDuration(duration)
-        binding.remainingTimeTV.text = formattedDuration
+        rt = Duration.between(currentTime, givenTime)
+        binding.remainingTimeTV.text = TimeUtil.duration2FormattedString(rt)
     }
 
     // ------ Punctual Status based on => Event Time - Expected Time of Arrival ------ //
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun calculatePunctualStatus(eventTime: String) {
-        val binding = binding
-        if (binding != null) {
-            val givenTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val givenTime = LocalDateTime.parse(eventTime, givenTimeFormatter)
-            val etaTime = LocalDateTime.parse(binding.etaTV.text, givenTimeFormatter)
-            val duration = Duration.between(etaTime, givenTime)
-            Log.d("givenTime", givenTime.toString())
-            Log.d("etaTime", etaTime.toString())
-            Log.d("duration", duration.toString())
-            val durationMinutes = duration.toMinutes()
-            binding.punctualityTV.text = when {
-                durationMinutes > 30 -> getString(R.string.status_1)
-                durationMinutes > 10 -> getString(R.string.status_2)
-                durationMinutes > 5 -> getString(R.string.status_3)
-                durationMinutes > 0 -> getString(R.string.status_4)
-                durationMinutes > -10 -> getString(R.string.status_5)
-                durationMinutes > -30 -> getString(R.string.status_6)
-                else -> getString(R.string.status_7)
-            }
-        }else {
-            Log.d(TAG, "Binding is null, skipping update")
+    private fun calculatePunctualStatus() {
+        val givenTime = TimeUtil.timeStamp2LocalDateTime(event.date)
+        val etaTime = eta
+        val duration = Duration.between(eta, givenTime)
+
+        Log.d("givenTime", givenTime.toString())
+        Log.d("etaTime", etaTime.toString())
+        Log.d("duration", duration.toString())
+        val durationMinutes = duration.toMinutes()
+        binding.punctualityTV.text = when {
+            durationMinutes > 30 -> getString(R.string.status_1)
+            durationMinutes > 10 -> getString(R.string.status_2)
+            durationMinutes > 5 -> getString(R.string.status_3)
+            durationMinutes > 0 -> getString(R.string.status_4)
+            durationMinutes > -10 -> getString(R.string.status_5)
+            durationMinutes > -30 -> getString(R.string.status_6)
+            else -> getString(R.string.status_7)
         }
     }
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun formatDuration(duration: Duration): String {
-        val seconds = duration.seconds
-        val absSeconds = Math.abs(seconds)
-        val positive = String.format(
-            "%d:%02d:%02d",
-            absSeconds / 3600,
-            (absSeconds % 3600) / 60,
-            absSeconds % 60
-        )
-        return if (seconds < 0) "-$positive" else positive
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun formatDuration(duration: Duration): String {
+//        val seconds = duration.seconds
+//        val absSeconds = Math.abs(seconds)
+//        val positive = String.format(
+//            "%d:%02d:%02d",
+//            absSeconds / 3600,
+//            (absSeconds % 3600) / 60,
+//            absSeconds % 60
+//        )
+//        return if (seconds < 0) "-$positive" else positive
+//    }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun convertEventTimeToStandardFormat(timestamp: com.google.firebase.Timestamp): String {
-        val instant = java.time.Instant.ofEpochSecond(timestamp.seconds, timestamp.nanoseconds.toLong())
-        val zonedDateTime = instant.atZone(ZoneId.systemDefault())
-        var localDateTime = zonedDateTime.toLocalDateTime()
-        localDateTime = localDateTime.minusYears(1900)
-        localDateTime = localDateTime.minusHours(1)
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        return formatter.format(localDateTime)
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun convertEventTimeToStandardFormat(timestamp: com.google.firebase.Timestamp): String {
+//        val instant = java.time.Instant.ofEpochSecond(timestamp.seconds, timestamp.nanoseconds.toLong())
+//        val zonedDateTime = instant.atZone(ZoneId.systemDefault())
+//        var localDateTime = zonedDateTime.toLocalDateTime()
+//        localDateTime = localDateTime.minusYears(1900)
+//        localDateTime = localDateTime.minusHours(1)
+//        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+//        return formatter.format(localDateTime)
+//    }
 
 }

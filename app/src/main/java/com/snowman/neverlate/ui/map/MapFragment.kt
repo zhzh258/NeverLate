@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -51,8 +52,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private var _mapViewModel: MapViewModel? = null
     private val mapViewModel get() = _mapViewModel!!
-    private var _sharedOneEventViewModel: SharedOneEventViewModel? = null
-    private val sharedOneEventViewModel get() = _sharedOneEventViewModel!!
+    private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
 
     private var _bottomSheetBehavior:  BottomSheetBehavior<FrameLayout>? = null
     private val bottomSheetBehavior get() = _bottomSheetBehavior!!
@@ -69,7 +69,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Log.d("MY_DEBUG", "MapFragment: onViewCreated")
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         _mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
-        _sharedOneEventViewModel = ViewModelProvider(this)[SharedOneEventViewModel::class.java]
         _bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
 
         bottomSheetBehavior.isHideable = true
@@ -157,7 +156,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val origin: LatLng? = getUserGPS()
             // event card
             binding.eventCard.setOnClickListener {
-                Toast.makeText(requireContext(), "navigates to event.id = ${event.id}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Now navigating to event ${event.name}", Toast.LENGTH_SHORT).show()
                 sharedOneEventViewModel.setSelectedEvent(event)
                 findNavController().navigate(R.id.nav_eventDetails)
             }
