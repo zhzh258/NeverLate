@@ -1,25 +1,21 @@
 package com.snowman.neverlate.ui.history
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.ListItemEventBinding
 import com.snowman.neverlate.model.types.IEvent
+import com.snowman.neverlate.util.TimeUtil
 
 class HistoryViewHolder(private val binding: ListItemEventBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(event: IEvent, onClickListener: () -> Unit) {
-        binding.root.setOnClickListener {
-            onClickListener.invoke()
-        }
+    fun bind(event: IEvent) {
         binding.textEventTitle.text = event.name
         binding.textEventLocation.text = event.address
-        binding.textEventTime.text = event.date.toString()
+        binding.textEventTime.text = TimeUtil.dateFormat.format(event.date.toDate())
         binding.textPeopleCount.text = event.members.count().toString()
         Glide.with(binding.imageEvent)
             .load(event.photoURL)
@@ -30,8 +26,7 @@ class HistoryViewHolder(private val binding: ListItemEventBinding) :
 }
 
 class HistoryListAdapter(
-    private var events: MutableList<IEvent>,
-    private val onItemClick: () -> Unit
+    private var events: MutableList<IEvent>
 ) : RecyclerView.Adapter<HistoryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -45,9 +40,7 @@ class HistoryListAdapter(
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val event = events[position]
-        holder.bind(event) {
-            onItemClick.invoke()
-        }
+        holder.bind(event)
     }
 
     fun updateData(newFriends: List<IEvent>) {

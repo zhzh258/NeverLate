@@ -6,21 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.res.ResourcesCompat
-
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.ui.events.EventsListAdapter
-import com.snowman.neverlate.ui.events.EventsViewModel
 
 class HistoryFragment : Fragment()  {
     private lateinit var eventsListRv: RecyclerView
@@ -45,19 +40,6 @@ class HistoryFragment : Fragment()  {
 
         initViews(view)
         observeEvents()
-
-//        addEventBtn.setOnClickListener {
-//            findNavController().navigate(R.id.nav_addEvent)
-//        }
-
-        eventsViewModel.navigateToAnotherPage.observe(viewLifecycleOwner) { navigate ->
-            if (navigate) {
-                navigateToAnotherPage()
-                // Reset the value to false to avoid triggering navigation multiple times
-                eventsViewModel.onButtonClicked()
-            }
-        }
-
         performSearchAndFilter(view)
     }
 
@@ -122,16 +104,10 @@ class HistoryFragment : Fragment()  {
         }
     }
 
-    private fun navigateToAnotherPage() {
-        findNavController().navigate(R.id.nav_eventDetails)
-    }
-
     private fun initViews(view: View) {
         eventsListRv = view.findViewById(R.id.eventsListRv)
         eventsListRv.layoutManager = LinearLayoutManager(context)
-        adapter = HistoryListAdapter(mutableListOf()) {
-            navigateToAnotherPage()
-        }
+        adapter = HistoryListAdapter(mutableListOf())
         eventsListRv.adapter = adapter
         searchEventsSV = view.findViewById(R.id.searchEventsSV)
         events = eventsViewModel.events
