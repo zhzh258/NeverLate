@@ -11,7 +11,6 @@
         android:layout_height="@dimen/nav_header_image_size"
         android:layout_margin="@dimen/general_small_margin"
         android:contentDescription="@string/nav_header_desc"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/displayNameTV"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,24 +19,38 @@
 
     <TextView
         android:id="@+id/displayNameTV"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/general_small_margin"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_marginHorizontal="@dimen/general_xsmall_margin"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         app:layout_constraintBottom_toTopOf="@id/memoTv"
+        app:layout_constraintEnd_toStartOf="@+id/badge_img"
         app:layout_constraintStart_toEndOf="@id/profileIV"
         app:layout_constraintTop_toTopOf="@id/profileIV"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="@string/nav_header_title" />
 
     <TextView
         android:id="@+id/memoTv"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/general_small_margin"
+        android:layout_marginEnd="@dimen/general_xsmall_margin"
+        android:layout_marginBottom="@dimen/general_xsmall_margin"
         app:layout_constraintBottom_toBottomOf="@id/profileIV"
-        app:layout_constraintStart_toEndOf="@+id/profileIV"
+        app:layout_constraintEnd_toStartOf="@+id/badge_img"
+        app:layout_constraintStart_toStartOf="@+id/displayNameTV"
         app:layout_constraintTop_toBottomOf="@id/displayNameTV"
         tools:text="@string/nav_header_subtitle" />
+
+    <ImageView
+        android:id="@+id/badge_img"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_margin="@dimen/general_small_margin"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/ic_colorful_badge_1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

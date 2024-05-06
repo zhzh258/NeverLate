@@ -1,14 +1,11 @@
 package com.snowman.neverlate.model
 
 import android.util.Log
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.User
@@ -644,6 +641,50 @@ class FirebaseManager {
             Log.d(TAG, "Current user not found")
             callback(null, Exception("Current user not found"))
         }
+    }
+
+    fun fetchAverageArrivalTimeForUser(user: IUser, callback: (Double?, Exception?) -> Unit) {
+        val currentUserId = user.userId
+        Log.d(TAG, "currentUserId=$currentUserId")
+        val eventsList = mutableListOf<IEvent>()
+        db.collection("events")
+            .whereEqualTo("active", false)
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    Log.d(TAG, "Query returned no results.")
+                    callback(0.0, null)
+                } else {
+                    Log.d(TAG, "Processing ${result.size()} documents.")
+                    val allArriveTimes = mutableListOf<Long>()
+                    for (document in result) {
+                        val event = document.toObject(Event::class.java)
+                        Log.d(TAG, "Processing event: ${event.id}")
+                        val memberList = document.get("members") as List<*>
+                        memberList.mapNotNull { it as? Map<String, Any> }
+                            .filter { it["id"] == currentUserId }
+                            .forEach {
+                                allArriveTimes.add(it["arriveTime"] as Long)
+                                eventsList.add(event)
+                            }
+                    }
+
+                    val averageArriveTime = if (allArriveTimes.isNotEmpty()) {
+                        allArriveTimes.average()
+                    } else {
+                        null
+                    }
+                    Log.d(
+                        TAG,
+                        "Average arrive time for user $currentUserId is: $averageArriveTime"
+                    )
+                    callback(averageArriveTime, null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "Query failed with exception: $exception")
+                callback(null, exception)
+            }
     }
 
     fun saveImageToStorage(
