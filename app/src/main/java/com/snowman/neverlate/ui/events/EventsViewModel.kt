@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.model.types.Event
 
 class EventsViewModel : ViewModel() {
     private val TAG = "Event Fragment"
@@ -20,7 +19,6 @@ class EventsViewModel : ViewModel() {
     fun onButtonClicked() {
         _navigateToAnotherPage.value = true
     }
-
 
     fun fetchEventsData() {
         firebaseManager.fetchEventsDataForCurrentUser(true, "All") { eventsList, exception ->
