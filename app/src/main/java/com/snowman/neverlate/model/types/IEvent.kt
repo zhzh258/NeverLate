@@ -6,7 +6,7 @@ import com.snowman.neverlate.model.types.Event
 
 data class MemberStatus(
     val id: String = "",
-    val isArrived: Boolean = false,
+    val arrived: Boolean = false,
     val status: String = "",
     val arriveTime: Long = 0L
 )

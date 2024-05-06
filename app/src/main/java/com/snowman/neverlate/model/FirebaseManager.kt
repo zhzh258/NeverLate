@@ -683,7 +683,7 @@ class FirebaseManager {
                             if (member["id"] == memberStatus.id) {
                                 mapOf(
                                     "id" to memberStatus.id,
-                                    "isArrived" to memberStatus.isArrived,
+                                    "arrived" to memberStatus.arrived,
                                     "status" to memberStatus.status,
                                     "arriveTime" to memberStatus.arriveTime
                                 )
@@ -744,7 +744,7 @@ class FirebaseManager {
             if (!querySnapshot.isEmpty) {
                 val documentSnapshot = querySnapshot.documents.first() // Assuming 'id' is unique
                 val event = documentSnapshot.toObject(Event::class.java)
-                val allArrived = event?.members?.all { it.isArrived } ?: false
+                val allArrived = event?.members?.all { it.arrived } ?: false
                 if (allArrived) {
                     documentSnapshot.reference.update("active", false).addOnCompleteListener { task ->
                         onComplete(task.isSuccessful)

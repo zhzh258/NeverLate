@@ -262,7 +262,7 @@ class OneEventFragment : Fragment() {
         }
 
         theEvent.members.find { it.id == currentUserID }?.let { memberStatus ->
-            val updatedMember = memberStatus.copy(isArrived = true, arriveTime = minutes.toLong(), status = status)
+            val updatedMember = memberStatus.copy(arrived = true, arriveTime = minutes.toLong(), status = status)
             updateMemberStatusInDatabase(updatedMember, {
                 // Success callback
                 /////checkEventStatusAndDeactivateIfRequired()
