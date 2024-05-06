@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -17,6 +19,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.customview.widget.Openable
 import androidx.fragment.app.viewModels
 import androidx.navigation.ui.NavigationUI
@@ -103,9 +106,9 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+//        navController.addOnDestinationChangedListener { controller, destination, arguments ->
 //            Log.d("MY_DEBUG", "Navigated to ${destination.label} with id ${destination.id}")
-        }
+//        }
         // I override the default setNavigationItemSelectedListener in setupActionBarWithNavController()
         navView.setNavigationItemSelectedListener { item ->
 //            Log.d("MY_DEBUG", "item ${item.itemId} ${item.title} is selected in navView")
@@ -126,17 +129,25 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
             handled
         }
-        navView.menu.findItem(R.id.nav_sign_out).setOnMenuItemClickListener {
-            signOut()
-            true
-        }
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
+        navView.menu.findItem(R.id.nav_sign_out).setOnMenuItemClickListener {
+            signOut()
+            true
+        }
+        navView.getHeaderView(0).setOnClickListener {
+            Toast.makeText(this, "header clicked", Toast.LENGTH_SHORT).show()
+            findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.nav_profile)
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+        }
         return true
     }
 
