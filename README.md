@@ -1,4 +1,20 @@
-# NeverLate Planning
+# Quick Start
+1. `git clone`
+2. Create a file named `secrets.properties` in project root directory.
+3. In the `secrets.properties`, add
+   
+   ```text
+   MAPS_API_KEY=REPLACE_WITH_YOUR_API_KEY
+   ```
+   Replace `REPLACE_WITH_YOUR_API_KEY` with your Google Cloud Platform API Key
+   - The following APIs should be enabled:
+     - Google Directions
+     - Google Places
+     - Google Map
+4. Build with Gradle and run with emulator
+
+
+# Planning
 **Non Core Feature** (we should NOT work on this until we’re done with everything else)
 
 ## MVP (Minimum Viable Product)
@@ -73,33 +89,87 @@
 ### Locality?
 - [ ] For extra credit, we incorporate another language
 
-## Database Schema
+# Database Schema
 ### User
-- id: String // UUID
-- phoneNumber: Number
-- firstName: String
-- lastName: String
-- profilePicture: any // TODO: find a way to store the picture
-- email: String
-- passwordHash: String // encrypted password
-- friends: Array<String> // Array<UUID of a user>
-- totalLateTime: Number // for analysis
-- totalEarlyTime: Number // for analysis
-- **About Me**
-- **Setting Config** // store the user's 'setting'
-- **Profile** // any other information related to personal profile page
+```
+interface IUser {
+    val userId: String // UUID
+    val phoneNumber: String
+    val firstName: String
+    val lastName: String
+    val displayName: String
+    val photoURL: String // For storing profile picture, you might need a custom type or a String URL
+    val email: String
+    val passwordHash: String // Encrypted password
+    val friends: List<String> // List of UUIDs of other users
+    val totalLateTime: Long // For analysis
+    val totalEarlyTime: Long // For analysis
+    val status: String //status is aboutMe
+    val address: String
+    val personalSignature: String
+    val rate: Int
+    val friendRequests: List<String>
+}
+
+data class User(
+    override val userId: String = "",
+    override val phoneNumber: String = "",
+    override val firstName: String = "",
+    override val lastName: String = "",
+    override val displayName: String = "",
+    override val photoURL: String = "",
+    override val email: String = "",
+    override val passwordHash: String = "",
+    override val friends: List<String> = emptyList(),
+    override val totalLateTime: Long = 0L,
+    override val totalEarlyTime: Long = 0L,
+    override val status: String = "I'm sleepy",
+    override val address: String = "in the middle of Charles River",
+    override val personalSignature: String = "It's all about the Mindset",
+    override val rate: Int = 5,
+    override val friendRequests: List<String> = emptyList()
+) : IUser
+```
 
 ### Event
-- id: String // uuid
-- name: String
-- date: String // '3/26/2023'
-- time: String // '14:00'
-- active: Boolean // history event or ongoing event?
-- address: String
-- members: Array<String> // Array<UUID of a user>
-- description: String
-- duration: Number // 789243724 milliseconds
-- category: String // category that is one of Dining, Study, Meeting. It’ll be useful for filtering
+```Kotlin
+data class MemberStatus(
+    val id: String = "",
+    val arrived: Boolean = false,
+    val status: String = "",
+    val arriveTime: Long = 0L
+)
+
+interface IEvent {
+    val active: Boolean // History event or ongoing event?
+    val address: String // Think about the format/how to check if it is accurate
+    val category: String // Category that is one of Dining, Study, Meeting. Useful for filtering
+    val date: Timestamp // '3/26/2023'; consider using a more suitable date type
+    val description: String
+    val duration: Long // Duration in milliseconds
+    val id: String // UUID
+    val members: List<MemberStatus> // List of members userid
+    val name: String
+    val location: GeoPoint
+    val photoURL: String // For storing profile picture, you might need a custom type or a String URL
+}
+
+data class Event(
+    override var active: Boolean = true,
+    override var address: String = "",
+    override var category: String = "",
+    override var date: Timestamp = Timestamp(Date()),
+    override var description: String = "",
+    override var duration: Long = 0L,
+    override var id: String = "",
+    override var members: List<MemberStatus> = emptyList(),
+    override var name: String = "",
+    // Chicago. If you see Chicago on map it means something is wrong
+    override var location: GeoPoint = GeoPoint(41.8781, 87.6298),
+    override var photoURL: String = "",
+) : IEvent
+```
+
 
 ### **Message**
 - senderId: String // UUID of a user
@@ -108,40 +178,12 @@
 - timestamp: Number
 
 ```Kotlin
-interface IUserDB {
-    val id: String // UUID
-    val phoneNumber: Long
-    val firstName: String
-    val lastName: String
-    val profilePicture: Any // For storing profile picture, you might need a custom type or a String URL
-    val email: String
-    val passwordHash: String // Encrypted password
-    val friends: List<String> // List of UUIDs of other users
-    val totalLateTime: Long // For analysis
-    val totalEarlyTime: Long // For analysis
-    // Assuming "About Me" and "Setting Config" are strings for simplicity; adjust as necessary
-    // ** val aboutMe: String
-    // ** val settingConfig: String
-    // ** val profile: String // Other information related to personal profile page; adjust type as necessary
-}
-
-interface IEventDB {
-    val id: String // UUID
-    val name: String
-    val date: String // '3/26/2023'; consider using a more suitable date type
-    val time: String // '14:00'; consider using a more suitable time type
-    val active: Boolean // History event or ongoing event?
-    val address: String
-    val members: List<String> // List of UUIDs of users
-    val description: String
-    val duration: Long // Duration in milliseconds
-    val category: String // Category that is one of Dining, Study, Meeting. Useful for filtering
-}
-
-interface IMessageDB {
-    val senderId: String // UUID of a user
-    val receiverId: String // UUID of a user
-    val content: String // Content of the message
-    val timestamp: Long // Consider using a date-time type for more precision
-}
+data class Message(
+    val messageId: String = "",
+    val senderUid: String = "",
+    val receiverUid: String = "",
+    val messageText: String = "",
+    val timestamp: Long = System.currentTimeMillis() // timestamp for when the message was sent mayb
+)
 ```
+
