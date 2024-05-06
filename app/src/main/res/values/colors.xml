@@ -17,7 +17,7 @@
     <color name="colorPrimaryDark">#E7E9E9</color>
     <color name="colorPrimaryVariant">#4DB6AC</color>
     <color name="colorTime">#FF623B</color>
-
+    <color name="colorLate">#f4cfdf</color>
     <!-- Button Color Settings -->
     <color name="buttonBackground">	#97CBFF</color>
     <color name="buttonSelectedBackground">#5BABFB</color>

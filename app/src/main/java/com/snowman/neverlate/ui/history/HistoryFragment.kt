@@ -14,6 +14,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.types.IEvent
 
@@ -24,6 +26,8 @@ class HistoryFragment : Fragment()  {
     private lateinit var searchEventsSV: SearchView
     private lateinit var events: MutableLiveData<List<IEvent>>
     private lateinit var selectedBtn: ToggleButton
+    val auth = com.google.firebase.ktx.Firebase.auth
+    private val currentUserId = auth.currentUser?.uid ?: ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -107,7 +111,7 @@ class HistoryFragment : Fragment()  {
     private fun initViews(view: View) {
         eventsListRv = view.findViewById(R.id.eventsListRv)
         eventsListRv.layoutManager = LinearLayoutManager(context)
-        adapter = HistoryListAdapter(mutableListOf())
+        adapter = HistoryListAdapter(mutableListOf(), currentUserId)
         eventsListRv.adapter = adapter
         searchEventsSV = view.findViewById(R.id.searchEventsSV)
         events = eventsViewModel.events
