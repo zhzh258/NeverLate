@@ -1,7 +1,9 @@
 package com.snowman.neverlate.ui.events
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
@@ -23,13 +25,12 @@ class EventAttendeeViewHolder(
         binding.deleteBtn.setOnClickListener {
             val position = adapterPosition
             adapter.removeAttendee(position)
-
         }
     }
 }
 
 class EventAttendeesAdapter(
-    private val attendees: MutableList<IUser>
+    private val vm: AddEventViewModel
 ) : RecyclerView.Adapter<EventAttendeeViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventAttendeeViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -38,25 +39,31 @@ class EventAttendeesAdapter(
     }
 
     override fun getItemCount(): Int {
-        return attendees.size
+        return vm.attendees.value!!.size
     }
 
     fun getAttendees(): MutableList<IUser> {
-        return attendees
+        return vm.attendees.value!!
     }
 
     override fun onBindViewHolder(holder: EventAttendeeViewHolder, position: Int) {
-        val attendee = attendees[position]
+        val attendee = vm.attendees.value!![position]
         holder.bind(attendee)
     }
 
     fun removeAttendee(position: Int) {
-        attendees.removeAt(position)
+        val updatedList = vm.attendees.value ?: mutableListOf()
+        updatedList.removeAt(position)
+        vm.attendees.value = updatedList  // Trigger LiveData update
         notifyItemRemoved(position)
+//        Log.d("AddEventFragment","remove ${vm.attendees.value!!.toString()}")
     }
 
     fun addAttendee(attendee: IUser) {
-        attendees.add(attendee)
-        notifyItemInserted(attendees.size - 1)
+        val updatedList = vm.attendees.value ?: mutableListOf()
+        updatedList.add(attendee)
+        vm.attendees.value = updatedList  // Trigger LiveData update
+        notifyItemInserted(vm.attendees.value!!.size - 1)
+//        Log.d("AddEventFragment","add ${vm.attendees.value!!.toString()}")
     }
 }

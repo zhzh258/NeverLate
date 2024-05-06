@@ -18,23 +18,36 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import com.google.android.material.slider.Slider
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.snowman.neverlate.R
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.GeoPoint
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.Event
@@ -42,66 +55,63 @@ import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.types.IUser
 import com.snowman.neverlate.model.types.MemberStatus
 import com.snowman.neverlate.ui.addressSelection.AddressSelectionActivity
+import com.snowman.neverlate.util.TimeUtil
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
 class AddEventFragment : Fragment() {
     private val TAG = "AddEventFragment"
+    companion object {
+        private const val IMAGE_PICK_CODE = 1000
+        private const val STORAGE_PERMISSION_CODE = 1001
+        private const val ADDRESS_SELECTION_CODE = 2000
+    }
 
+    // UI
     private lateinit var addressSelectorButton: Button
     private lateinit var attendeeRV: RecyclerView
     private lateinit var addAttendeeCV: MaterialCardView
     private lateinit var attendeesAdapter: EventAttendeesAdapter
-    private val event = Event()
-    private var eventYear = 0
-    private var eventMonth = 0
-    private var eventDay = 0
-    private var attendees = mutableListOf<IUser>()
-    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
-    private val hashedIdToUserMap = mutableMapOf<Int, IUser>()
-    private val firebaseManager = FirebaseManager.getInstance()
-    private val searchList = mutableListOf<IEvent>()
     private lateinit var addEventsAdapter: AddEventsAdapter
-    private val db = FirebaseFirestore.getInstance()
-    val auth = com.google.firebase.ktx.Firebase.auth
-    private val currentUser = auth.currentUser
-    private var profileUri: Uri? = null
     private lateinit var event_image: ImageView
-    private lateinit var latLng: LatLng
 
+
+
+    // Firebase
+    private val firebaseManager = FirebaseManager.getInstance()
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = com.google.firebase.ktx.Firebase.auth
+    private val currentUser = auth.currentUser
+
+    private val sharedFriendsViewModel: SharedFriendsViewModel by activityViewModels()
+//
+    private val hashedIdToUserMap = mutableMapOf<Int, IUser>()
+//    private val searchList = mutableListOf<IEvent>()
+//    private var profileUri: Uri? = null
+//    private lateinit var latLng: LatLng
+
+    private val vm: AddEventViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_add_event, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val spinner: Spinner = view.findViewById(R.id.spinner1)
-        val eventTypes = resources.getStringArray(R.array.EventType)
-
-        val spinnerAMPM: Spinner = view.findViewById(R.id.spinnerAMPM)
-        val ampmOptions = arrayOf("AM", "PM")
-        val adapter1 = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, ampmOptions)
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerAMPM.adapter = adapter1
-
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, eventTypes)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-
-        val calendarIcon: ImageButton = view.findViewById(R.id.ic_calendar)
-        calendarIcon.setOnClickListener {
-            showCalendar()
-        }
-
         setUpImageUpload(view)
-        setUpAddAttendees(view)
+        setUpTitleAndDescription(view)
+        setUpDateSelector(view)
+        setUpTimeSelector(view)
+        setUpDurationSelector(view)
         setUpAddressSelector(view)
+        setUpEventTypeSelector(view)
+        setUpAddAttendees(view)
 
         val addEventButton: Button = view.findViewById<Button>(R.id.addEventButton)
         addEventButton.setOnClickListener {
@@ -110,60 +120,33 @@ class AddEventFragment : Fragment() {
     }
 
     private fun addNewEventToFirebase(view: View) {
-        // Read input fields from the UI and create an Event object
-        val eventName: String = view.findViewById<EditText>(R.id.event_title).text.toString()
-        val eventDescription: String = view.findViewById<EditText>(R.id.event_description).text.toString()
-        var eventHour: String = view.findViewById<EditText>(R.id.editTextHour).text.toString().toString()
-        val eventMinute: String = view.findViewById<EditText>(R.id.editTextMinute).text.toString().toString()
-        val eventType: String = view.findViewById<Spinner>(R.id.spinner1).selectedItem.toString()
-        var eventMembers = mutableListOf<MemberStatus>()
-
-        for(attendee in attendeesAdapter.getAttendees()) {
-            eventMembers.add(MemberStatus(attendee.userId, false, "", 0L))
-        }
-
-        if (eventMembers.size == 0 || eventYear == 0 || eventName.isEmpty() || eventDescription.isEmpty() || eventHour.isEmpty() || eventMinute.isEmpty()) {
+        if (vm.event.name.isEmpty() || vm.event.description.isEmpty()) {
             Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
-        }
-
-        var hour: Int = eventHour.toInt()
-        val minute: Int = eventMinute.toInt()
-        if (hour !in 0..12 || minute !in 0..59) {
-            // Show a toast message if hour or minute is invalid
-            Toast.makeText(requireContext(), "Invalid hour or minute", Toast.LENGTH_SHORT).show()
+        } else if (vm.event.members.isEmpty()) {
+            Toast.makeText(requireContext(), "Please select at least 1 friend", Toast.LENGTH_SHORT).show()
+            return
+        } else if (vm.event.category == "") {
+            Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
             return
         }
-        if(view.findViewById<Spinner>(R.id.spinnerAMPM).selectedItem.toString().equals("PM")) {
-            hour += 12
-        }
 
-        if(currentUser != null) {
-            eventMembers.add(MemberStatus(currentUser.uid, false, "", 0L))
-        }
-
-        event.active = true
-        event.id = UUID.randomUUID().toString();
-        event.name = eventName
-        event.description = eventDescription
-        event.category = eventType
-        event.date = Timestamp(Date(eventYear, eventMonth, eventDay, hour, minute))
-        event.members = eventMembers.toList()
-        val uri = profileUri
+        val uri = vm.profileUri.value
         if (uri != null) {
-            firebaseManager.saveImageToStorage(uri, event.id) { url ->
+            firebaseManager.saveImageToStorage(uri, vm.event.id) { url ->
                 if (url != null) {
-                    event.photoURL = url
-                    saveEvent(event)
+                    vm.event.photoURL = url
+                    saveEvent(vm.event)
                 }
             }
         } else {
-            event.photoURL = "https://funny-business.com/wp-content/uploads/2021/08/Choose-the-Right-Event-Host.jpg"
-            saveEvent(event)
+            vm.event.photoURL = "https://funny-business.com/wp-content/uploads/2021/08/Choose-the-Right-Event-Host.jpg"
+            saveEvent(vm.event)
         }
     }
 
     private fun saveEvent(event: Event) {
+        Log.d(TAG, vm.event.toString())
         db.collection("events")
             .add(event)
             .addOnSuccessListener { documentReference ->
@@ -184,47 +167,24 @@ class AddEventFragment : Fragment() {
             }
     }
 
-    private fun showCalendar() {
-        val calendar = Calendar.getInstance()
-        val datePickerDialog = DatePickerDialog(
-            requireContext(),
-            { _, year, month, dayOfMonth ->
-                eventYear = year
-                eventMonth = month
-                eventDay = dayOfMonth
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        datePickerDialog.show()
-    }
 
     private fun setUpImageUpload(view: View) {
         val chooseImageButton = view.findViewById<ImageButton>(R.id.chooseImageButton)
         event_image = view.findViewById(R.id.event_image)
-        chooseImageButton.setOnClickListener { imageUpload() }
-    }
-
-    private fun imageUpload() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.READ_MEDIA_IMAGES
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            openGalleryForImage()
-        } else {
-            requestPermissions(
-                arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
-                STORAGE_PERMISSION_CODE
-            )
+        chooseImageButton.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_MEDIA_IMAGES
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                openGalleryForImage()
+            } else {
+                requestPermissions(
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                    STORAGE_PERMISSION_CODE
+                )
+            }
         }
-    }
-
-    companion object {
-        private const val IMAGE_PICK_CODE = 1000
-        private const val STORAGE_PERMISSION_CODE = 1001
-        private const val ADDRESS_SELECTION_CODE = 2000
     }
 
     private fun openGalleryForImage() {
@@ -236,16 +196,19 @@ class AddEventFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK && data != null) { // pick image returns
-            profileUri = data.data
+            vm.profileUri.value = data.data
 
             Glide.with(this)
-                .load(profileUri)
+                .load(vm.profileUri.value)
                 .into(event_image)
         } else if (requestCode == ADDRESS_SELECTION_CODE && resultCode == Activity.RESULT_OK && data != null){ // address selection returns
-            val addressString: String? = data?.getStringExtra("addressString")
-            val latitude: Double? = data?.getDoubleExtra("latitude", 70.0)
-            val longitude: Double? = data?.getDoubleExtra("longitude", 70.0)
-            addressSelectorButton.text=  addressString + " " + latitude.toString() + " " + longitude.toString()
+            val addressString: String = data.getStringExtra("addressString") ?: "No address found"
+            val latitude: Double = data.getDoubleExtra("latitude", 70.0)
+            val longitude: Double = data.getDoubleExtra("longitude", 70.0)
+            addressSelectorButton.text=  addressString
+            // update vm.event
+            vm.event.address = addressString
+            vm.event.location = GeoPoint(latitude, longitude)
         }
     }
 
@@ -290,23 +253,158 @@ class AddEventFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun setUpTitleAndDescription(view: View) {
+        val title = view.findViewById<EditText>(R.id.event_title)
+        val description = view.findViewById<EditText>(R.id.event_description)
+
+        title.addTextChangedListener { it ->
+            vm.event.name = it.toString()
+        }
+
+        description.addTextChangedListener {
+            vm.event.description = it.toString()
+        }
+    }
+    private fun setUpDateSelector(view: View) {
+        val year = view.findViewById<TextView>(R.id.textViewYear)
+        val month = view.findViewById<TextView>(R.id.textViewMonth)
+        val day = view.findViewById<TextView>(R.id.textViewDay)
+
+        vm.selectedDate.observe(viewLifecycleOwner) { localDate ->
+            year.text = localDate.year.toString()
+            month.text = localDate.month.toString()
+            day.text = localDate.dayOfMonth.toString()
+            // update vm.event
+            vm.event.date = TimeUtil.convertTimeAndDateToTimestamp(localDate, vm.selectedTime.value!!)
+        }
+        val dateSelector = view.findViewById<MaterialCardView>(R.id.date_selector)
+        dateSelector.setOnClickListener {
+            // show calendar
+            val calendar = Calendar.getInstance()
+            // this one requires 0-11 lol, while LocalDate requires 1-12
+            calendar.set(vm.selectedDate.value!!.year, vm.selectedDate.value!!.monthValue-1, vm.selectedDate.value!!.dayOfMonth)
+            val datePickerDialog = DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    // update vm.selectedDate
+                    vm.selectedDate.value = LocalDate.of(year, month+1, dayOfMonth)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            datePickerDialog.show()
+        }
+
+    }
+    private fun setUpTimeSelector(view: View) {
+        val hour = view.findViewById<TextView>(R.id.textViewHour)
+        val minute = view.findViewById<TextView>(R.id.textViewMinute)
+        vm.selectedTime.observe(viewLifecycleOwner) { localTime ->
+            hour.setText(localTime.hour.toString())
+            minute.setText(localTime.minute.toString())
+            // update vm.event
+            vm.event.date = TimeUtil.convertTimeAndDateToTimestamp(vm.selectedDate.value!!, localTime)
+        }
+
+        val timeSelector = view.findViewById<MaterialCardView>(R.id.time_selector)
+        timeSelector.setOnClickListener {
+            val timePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setHour(vm.selectedTime.value?.hour ?: 12)
+                .setMinute(vm.selectedTime.value?.minute ?: 0)
+                .setTitleText("Select Time")
+                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build()
+            timePicker.show(childFragmentManager, "timePicker")
+            timePicker.addOnPositiveButtonClickListener {
+                vm.selectedTime.value = LocalTime.of(timePicker.hour, timePicker.minute)
+            }
+        }
+    }
+
+    private fun setUpDurationSelector(view: View) {
+        val slider = view.findViewById<Slider>(R.id.duration_slider)
+        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+                // Responds to when slider's touch event is being started
+            }
+
+            override fun onStopTrackingTouch(slider: Slider) {
+                // Responds to when slider's touch event is being stopped
+            }
+        })
+
+        slider.addOnChangeListener { slider, value, fromUser ->
+            // Responds to when slider's value is changed
+            vm.event.duration = value.toLong()
+        }
+    }
+    private fun setUpAddressSelector(view: View){
+        // please see onActivityResult()
+        addressSelectorButton = view.findViewById(R.id.address_selector_button)
+        addressSelectorButton.setOnClickListener {
+            // open AddressSelectionActivity
+            val intent = Intent(requireContext(), AddressSelectionActivity::class.java)
+            startActivityForResult(intent, ADDRESS_SELECTION_CODE)
+        }
+    }
+    private fun setUpEventTypeSelector(view: View) {
+
+        val chipGroup = view.findViewById<ChipGroup>(R.id.chipGroup)
+        val eventTypes = resources.getStringArray(R.array.EventType)
+
+        eventTypes.forEach { text ->
+            val chip = Chip(requireContext()).apply {
+                this.text = text
+                isClickable = true
+                isCheckable = true
+            }
+            chipGroup.addView(chip)
+        }
+
+        chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+            val chip = view.findViewById<Chip>(checkedIds[0])
+            if (chip != null) {
+                // Toast.makeText(requireContext(), "Selected chip: ${chip.text}", Toast.LENGTH_SHORT).show()
+                vm.event.category = chip.text.toString()
+            }
+        }
+    }
     private fun setUpAddAttendees(view: View) {
         addAttendeeCV = view.findViewById(R.id.addAttendeeCV)
         attendeeRV = view.findViewById(R.id.attendeeRV)
         attendeeRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        attendeesAdapter = EventAttendeesAdapter(attendees)
+
+        vm.attendees.observe(viewLifecycleOwner) {
+            Log.d("AddEventFragment", "observe ${vm.attendees.value!!.size}")
+            var eventMembers = mutableListOf<MemberStatus>()
+            for(attendee in vm.attendees.value!!) {
+                eventMembers.add(MemberStatus(attendee.userId, false, "", 0L))
+            }
+            // remember to add yourself
+            if(currentUser != null) {
+                eventMembers.add(MemberStatus(currentUser.uid, false, "", 0L))
+            }
+            // update vm.event
+            vm.event.members = eventMembers
+        }
+        attendeesAdapter = EventAttendeesAdapter(
+            vm
+        )
         attendeeRV.adapter = attendeesAdapter
         addAttendeesClickListener()
     }
 
     private fun addAttendeesClickListener() {
         addAttendeeCV.setOnClickListener{
-            val friendsList = friendsViewModel.friends.value ?: emptyList()
+            val friendsList = sharedFriendsViewModel.friends.value ?: emptyList()
+            Toast.makeText(requireContext(), "${friendsList.size}", Toast.LENGTH_SHORT).show()
 
             if (friendsList.isNotEmpty()) {
                 val popupMenu = PopupMenu(requireContext(), it)
                 for (friend in friendsList) {
-                    if (!attendees.contains(friend)) {
+                    if (vm.attendees.value?.contains(friend) == false) { // only show the friends that you haven't add
                         val hashedId = friend.userId.hashCode()
                         hashedIdToUserMap[hashedId] = friend
                         popupMenu.menu.add(Menu.NONE, hashedId, Menu.NONE, friend.displayName)
@@ -328,13 +426,6 @@ class AddEventFragment : Fragment() {
         }
     }
 
-    private fun setUpAddressSelector(view: View){
-        addressSelectorButton = view.findViewById(R.id.address_selector_button)
-        addressSelectorButton.setOnClickListener {
-            // open AddressSelectionActivity
-            val intent = Intent(requireContext(), AddressSelectionActivity::class.java)
-            startActivityForResult(intent, ADDRESS_SELECTION_CODE)
-        }
-    }
+
 
 }
