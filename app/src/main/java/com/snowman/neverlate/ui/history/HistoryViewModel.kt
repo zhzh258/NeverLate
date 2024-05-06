@@ -1,12 +1,10 @@
 package com.snowman.neverlate.ui.history
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IEvent
-import com.snowman.neverlate.model.types.Event
 
 class HistoryViewModel : ViewModel() {
     private val TAG = "History Fragment"
@@ -14,12 +12,6 @@ class HistoryViewModel : ViewModel() {
 
     private var _events = MutableLiveData<List<IEvent>>()
     var events: MutableLiveData<List<IEvent>> = _events
-    private val _navigateToAnotherPage = MutableLiveData<Boolean>()
-    val navigateToAnotherPage: LiveData<Boolean> = _navigateToAnotherPage
-
-    fun onButtonClicked() {
-        _navigateToAnotherPage.value = true
-    }
 
     fun fetchEventsData() {
         firebaseManager.fetchEventsDataForCurrentUser(false, null) { eventsList, exception ->

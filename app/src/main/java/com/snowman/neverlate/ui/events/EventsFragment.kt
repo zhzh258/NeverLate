@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ToggleButton
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -26,6 +28,7 @@ class EventsFragment : Fragment()  {
     private lateinit var searchEventsSV: SearchView
     private lateinit var events: MutableLiveData<List<IEvent>>
     private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
+    private lateinit var selectedBtn: ToggleButton
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,35 +58,42 @@ class EventsFragment : Fragment()  {
             }
         }
 
+        performSearchAndFilter(view)
+    }
+
+    private fun performSearchAndFilter(view:View) {
         val searchView: SearchView = view.findViewById(R.id.searchEventsSV)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                // Perform search when user submits query (e.g., by pressing Enter)
-                searchEvents(query)
+                searchAndFilterEvents(query, getSelectedEventType(view))
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Perform search as user types
-                searchEvents(newText)
+                searchAndFilterEvents(newText, getSelectedEventType(view))
                 return true
             }
         })
 
         view.findViewById<Button>(R.id.filterAllBtn).setOnClickListener {
-            filterEvents(null) // Passing null to show all events
+            searchAndFilterEvents(searchView.query.toString(), null) // Passing null to show all events
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterDiningBtn).setOnClickListener {
-            filterEvents("Dining")
+            searchAndFilterEvents(searchView.query.toString(),"Dining")
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterStudyBtn).setOnClickListener {
-            filterEvents("Study")
+            searchAndFilterEvents(searchView.query.toString(),"Study")
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterMeetingBtn).setOnClickListener {
-            filterEvents("Meeting")
+            searchAndFilterEvents(searchView.query.toString(),"Meeting")
+            selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterTravelBtn).setOnClickListener {
-            filterEvents("Travel")
+            searchAndFilterEvents(searchView.query.toString(),"Travel")
+            selectBtn(it as ToggleButton)
         }
     }
 
@@ -91,29 +101,27 @@ class EventsFragment : Fragment()  {
         Log.d("MY_DEBUG", "EventsFragment: onDestroyView")
         super.onDestroyView()
     }
-    private fun searchEvents(query: String?) {
-        // Filter the list of events based on the query
+    private fun searchAndFilterEvents(query: String?, eventType: String?) {
         val filteredEvents = events.value?.filter { event ->
-            event.name.contains(query ?: "", ignoreCase = true)
+            val matchesSearch = event.name.contains(query ?: "", ignoreCase = true) //search part
+            val matchesFilter = eventType.isNullOrEmpty() || event.category == eventType //filtering pt
+            matchesSearch && matchesFilter
         }
-        // Update the RecyclerView with filtered events
         filteredEvents?.let { updateEventsList(it, adapter) }
     }
 
-    private fun filterEvents(eventType: String?) {
-        val filteredEvents = if (eventType.isNullOrEmpty()) {
-            eventsViewModel.events.value // Show all events if eventType is null or empty
-        } else {
-            eventsViewModel.events.value?.filter { it.category == eventType }
-        }
-        filteredEvents?.let {
-            updateEventsList(it, adapter)
+    private fun getSelectedEventType(view: View): String? {
+        return when (selectedBtn) {
+            view.findViewById<ToggleButton>(R.id.filterAllBtn) -> null
+            view.findViewById<ToggleButton>(R.id.filterDiningBtn) -> "Dining"
+            view.findViewById<ToggleButton>(R.id.filterStudyBtn) -> "Study"
+            view.findViewById<ToggleButton>(R.id.filterMeetingBtn) -> "Meeting"
+            view.findViewById<ToggleButton>(R.id.filterTravelBtn) -> "Travel"
+            else -> null
         }
     }
 
     private fun navigateToAnotherPage() {
-//        val action = EventsFragmentDirections.actionEventFragmentToEventFragment(eventId)
-//        findNavController().navigate(action)
         findNavController().navigate(R.id.nav_eventDetails)
     }
 
@@ -128,6 +136,21 @@ class EventsFragment : Fragment()  {
         eventsListRv.adapter = adapter
         searchEventsSV = view.findViewById(R.id.searchEventsSV)
         events = eventsViewModel.events
+
+        // the all btn will always be selected first
+        selectedBtn = view.findViewById(R.id.filterAllBtn)
+        selectedBtn.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.rounded_selected_btn, null))
+        selectedBtn.isChecked = true
+    }
+
+    private fun selectBtn(btn: ToggleButton) {
+        // deselect btn color
+        selectedBtn.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.rounded_btn, null))
+        selectedBtn.isChecked = false
+        // select new button
+        selectedBtn = btn
+        selectedBtn.isChecked = true
+        selectedBtn.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.rounded_selected_btn, null))
     }
 
 

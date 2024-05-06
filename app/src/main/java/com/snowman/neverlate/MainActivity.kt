@@ -132,8 +132,6 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             handled
         }
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
