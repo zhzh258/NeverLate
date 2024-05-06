@@ -16,13 +16,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 
 class EventsFragment : Fragment()  {
     private lateinit var eventsListRv: RecyclerView
-    private lateinit var addEventBtn: Button
+    private lateinit var addEventFab: FloatingActionButton
     private val eventsViewModel: EventsViewModel by viewModels()
     private lateinit var adapter: EventsListAdapter
     private lateinit var searchEventsSV: SearchView
@@ -46,7 +47,7 @@ class EventsFragment : Fragment()  {
         initViews(view)
         observeEvents()
 
-        addEventBtn.setOnClickListener {
+        addEventFab.setOnClickListener {
             findNavController().navigate(R.id.nav_addEvent)
         }
 
@@ -126,7 +127,7 @@ class EventsFragment : Fragment()  {
     }
 
     private fun initViews(view: View) {
-        addEventBtn = view.findViewById(R.id.addEventBtn)
+        addEventFab = view.findViewById(R.id.addEventFab)
         eventsListRv = view.findViewById(R.id.eventsListRv)
         eventsListRv.layoutManager = LinearLayoutManager(context)
         adapter = EventsListAdapter(mutableListOf()) { event ->

@@ -11,6 +11,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IUser
@@ -18,7 +20,7 @@ import com.snowman.neverlate.model.types.IUser
 class FriendsFragment : Fragment() {
 
     private lateinit var friendsListRv: RecyclerView
-    private lateinit var addFriendsBtn: Button
+    private lateinit var addFriendsBtn: ExtendedFloatingActionButton
     private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
     private lateinit var adapter: FriendsListAdapter
     private lateinit var searchFriendsSV: SearchView

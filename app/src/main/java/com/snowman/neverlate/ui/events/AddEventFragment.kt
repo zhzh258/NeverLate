@@ -38,6 +38,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
@@ -57,6 +59,7 @@ import com.snowman.neverlate.model.types.MemberStatus
 import com.snowman.neverlate.ui.addressSelection.AddressSelectionActivity
 import com.snowman.neverlate.util.TimeUtil
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.Calendar
 import java.util.Date
@@ -113,7 +116,7 @@ class AddEventFragment : Fragment() {
         setUpEventTypeSelector(view)
         setUpAddAttendees(view)
 
-        val addEventButton: Button = view.findViewById<Button>(R.id.addEventButton)
+        val addEventButton = view.findViewById<ExtendedFloatingActionButton>(R.id.addEventButton)
         addEventButton.setOnClickListener {
             addNewEventToFirebase(view)
         }
@@ -275,7 +278,8 @@ class AddEventFragment : Fragment() {
             month.text = localDate.month.toString()
             day.text = localDate.dayOfMonth.toString()
             // update vm.event
-            vm.event.date = TimeUtil.convertTimeAndDateToTimestamp(localDate, vm.selectedTime.value!!)
+            val localDateTime = LocalDateTime.of(localDate, vm.selectedTime.value!!)
+            vm.event.date = TimeUtil.localDateTime2Timestamp(localDateTime)
         }
         val dateSelector = view.findViewById<MaterialCardView>(R.id.date_selector)
         dateSelector.setOnClickListener {
@@ -304,7 +308,8 @@ class AddEventFragment : Fragment() {
             hour.setText(localTime.hour.toString())
             minute.setText(localTime.minute.toString())
             // update vm.event
-            vm.event.date = TimeUtil.convertTimeAndDateToTimestamp(vm.selectedDate.value!!, localTime)
+            val localDateTime = LocalDateTime.of(vm.selectedDate.value!!, localTime)
+            vm.event.date = TimeUtil.localDateTime2Timestamp(localDateTime)
         }
 
         val timeSelector = view.findViewById<MaterialCardView>(R.id.time_selector)

@@ -42,10 +42,14 @@ data class Distance(
     val value: Int
 )
 
+/***
+ * @sample value it's in seconds
+ */
 data class Duration(
     val text: String,
     val value: Int
 )
+
 
 data class Polyline(
     val points: String
