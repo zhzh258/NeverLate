@@ -25,4 +25,10 @@ class SharedFriendsViewModel : ViewModel() {
             }
         }
     }
+
+    fun setUpFriendListener() {
+        firebaseManager.friendListener {
+            fetchFriendsData()
+        }
+    }
 }

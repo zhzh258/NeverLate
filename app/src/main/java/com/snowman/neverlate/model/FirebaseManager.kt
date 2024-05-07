@@ -196,6 +196,29 @@ class FirebaseManager {
             }
     }
 
+    fun friendListener(listener: (List<String>) -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            val userFriendsRef = db.collection("users").document(userId)
+
+            userFriendsRef.addSnapshotListener { snapshot, exception ->
+                if (exception != null) {
+                    Log.e(TAG, "Error listening for friends: $exception")
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val user = snapshot.toObject(User::class.java)
+                    val friends = user?.friends ?: emptyList()
+                    listener(friends)
+                } else {
+                    Log.e(TAG, "Snapshot doesn't exist or is null")
+                }
+            }
+        }
+    }
+
     fun messageListener(listener: (List<Message>) -> Unit) {
         val currentUser = auth.currentUser
         if (currentUser != null) {

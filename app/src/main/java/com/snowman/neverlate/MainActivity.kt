@@ -166,6 +166,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         friendsViewModel.fetchFriendsData()
+        friendsViewModel.setUpFriendListener()
     }
 
     private fun observeUserData() {

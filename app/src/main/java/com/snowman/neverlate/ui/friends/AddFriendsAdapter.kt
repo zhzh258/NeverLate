@@ -113,8 +113,6 @@ class FriendRequestsViewHolder(
             { removeRequest() },
             { e -> onFailDecline(e) }
         )
-
-        friendsViewModel.fetchFriendsData()
     }
 
     private fun onFailureDecline(e: Exception) {
