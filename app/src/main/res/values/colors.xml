@@ -15,7 +15,7 @@
     <!-- Primary Color Settings -->
     <color name="colorPrimary">#A3CAFA</color>
     <color name="colorPrimaryDark">#E7E9E9</color>
-    <color name="colorPrimaryVariant">#4DB6AC</color>
+    <color name="colorPrimaryVariant">#5BABFB</color>
     <color name="colorTime">#FF623B</color>
     <color name="colorLate">#f4cfdf</color>
     <!-- Button Color Settings -->
@@ -23,5 +23,5 @@
     <color name="buttonSelectedBackground">#5BABFB</color>
     <color name="buttonText">#FFFFFF</color>
 
-    <color name="addEventRed">#f2dede</color>
+    <color name="addEventRed">#A3CAFA</color>
 </resources>

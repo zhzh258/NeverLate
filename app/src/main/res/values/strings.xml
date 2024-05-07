@@ -127,5 +127,8 @@
     <string name="request">REQUEST</string>
     <string name="your_selection">YOUR SELECTION</string>
     <string name="confirm">Confirm</string>
+    <string name="your_event_name">Your Event Name</string>
+    <string name="write_a_short_description_for_the_event">Write A Short Description For The Event</string>
+    <string name="add_new_event">Add New Event</string>
 
 </resources>

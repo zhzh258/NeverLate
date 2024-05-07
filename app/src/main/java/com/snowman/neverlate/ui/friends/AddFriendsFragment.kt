@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
+import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IUser
 
 class AddFriendsFragment : Fragment() {
@@ -30,6 +32,7 @@ class AddFriendsFragment : Fragment() {
     private lateinit var friendReqRV: RecyclerView
     private lateinit var searchFriendsBtn: Button
     private var searchQuery = ""
+    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -114,12 +117,12 @@ class AddFriendsFragment : Fragment() {
 
     private fun setUpRequestsRecyclerView() {
         friendReqRV.layoutManager = LinearLayoutManager(context)
-        friendRequestsAdapter = FriendRequestsAdapter(requestsList)
+        friendRequestsAdapter = FriendRequestsAdapter(requestsList, friendsViewModel)
         friendReqRV.adapter = friendRequestsAdapter
     }
 
     private fun populateRequests() {
-        FirebaseManager.getInstance().getFriendRequests() { usersList, exception ->
+        FirebaseManager.getInstance().getFriendRequests { usersList, exception ->
             if (exception != null) {
                 Log.e(TAG, "Error fetching friend requests: $exception")
             } else {
