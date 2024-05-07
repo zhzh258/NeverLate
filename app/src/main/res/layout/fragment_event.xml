@@ -44,9 +44,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/general_small_margin"
                 android:layout_marginEnd="@dimen/general_small_margin"
-                android:text="All"
-                android:textOff="All"
-                android:textOn="All" />
+                android:text="@string/all"
+                android:textOff="@string/all"
+                android:textOn="@string/all" />
 
             <ToggleButton
                 android:id="@+id/filterDiningBtn"
@@ -54,9 +54,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/general_small_margin"
-                android:text="Dining"
-                android:textOff="Dining"
-                android:textOn="Dining" />
+                android:text="@string/dining"
+                android:textOff="@string/dining"
+                android:textOn="@string/dining" />
 
             <ToggleButton
                 android:id="@+id/filterStudyBtn"
@@ -64,9 +64,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/general_small_margin"
-                android:text="Study"
-                android:textOff="Study"
-                android:textOn="Study" />
+                android:text="@string/study"
+                android:textOff="@string/study"
+                android:textOn="@string/study" />
 
             <ToggleButton
                 android:id="@+id/filterMeetingBtn"
@@ -74,9 +74,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/general_small_margin"
-                android:text="Meeting"
-                android:textOff="Meeting"
-                android:textOn="Meeting" />
+                android:text="@string/meeting"
+                android:textOff="@string/meeting"
+                android:textOn="@string/meeting" />
 
             <ToggleButton
                 android:id="@+id/filterTravelBtn"
@@ -84,9 +84,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/general_small_margin"
-                android:text="Travel"
-                android:textOff="Travel"
-                android:textOn="Travel" />
+                android:text="@string/travel"
+                android:textOff="@string/travel"
+                android:textOn="@string/travel" />
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="15dp"
-            android:text="Upcoming Event"
+            android:text="@string/upcoming_event"
             android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -120,7 +120,7 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addEventFab"
         style="@style/Custom.MDC.Fab.Large"
-        android:contentDescription="Add Event"
+        android:contentDescription="@string/add_event_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_util_add_48"

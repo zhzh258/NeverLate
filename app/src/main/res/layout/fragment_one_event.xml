@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="130dp"
-        android:text="Group Project Meeting"
+        android:text="@string/group_project_meeting"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="20dp"
-            android:text="4 people"
+            android:text="@string/_4_people"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@id/image_people"
             app:layout_constraintStart_toEndOf="@id/image_people"
@@ -76,7 +76,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Description"
+            android:text="@string/description"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -137,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:text="Status: " />
+                android:text="@string/status" />
 
             <TextView
                 android:id="@+id/punctualityTV"
@@ -157,7 +157,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Remaining time : " />
+                android:text="@string/remaining_time" />
             <TextView
                 android:id="@+id/remainingTimeTV"
                 android:layout_width="wrap_content"
@@ -201,7 +201,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Estimated travel time: " />
+                android:text="@string/estimated_travel_time" />
 
             <TextView
                 android:id="@+id/ett_TV"
@@ -246,7 +246,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Estimated time of arrival: " />
+                android:text="@string/estimated_time_of_arrival" />
             <TextView
                 android:id="@+id/eta_TV"
                 android:layout_width="wrap_content"
@@ -319,7 +319,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="-30dp"
-        android:text="I've arrived"
+        android:text="@string/i_ve_arrived"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -330,7 +330,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="-30dp"
-        android:text="see event on map"
+        android:text="@string/see_event_on_map"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
         app:layout_constraintStart_toStartOf="parent"/>
 

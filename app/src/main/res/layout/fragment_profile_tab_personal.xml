@@ -18,7 +18,7 @@
             android:id="@+id/about_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="About me"
+            android:text="@string/about_me"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"/>
@@ -40,7 +40,7 @@
             android:id="@+id/phoneNumber_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phone Number"
+            android:text="@string/phone_number"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"/>
@@ -62,7 +62,7 @@
             android:id="@+id/address_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Address"
+            android:text="@string/address"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"/>
@@ -84,7 +84,7 @@
             android:id="@+id/email_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Email"
+            android:text="@string/email"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"/>
