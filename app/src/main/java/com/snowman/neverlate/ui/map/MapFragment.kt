@@ -135,26 +135,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d(TAG, "onRequestPermissionsResult is called")
-        if (requestCode == 1) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
 
-                Log.d(TAG, "onRequestPermissionsResult - the user granted permission - go to if")
-                lifecycleScope.launch {
-                    getUserGPS()
-                }
-            } else {
-                // Permission was denied. Handle the situation by showing a message to the user or taking appropriate action.
-                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpBottomSheet() {
@@ -347,6 +328,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Log.d(TAG, "updateUserGPS is called and fusedLocationProviderClient failed to get a location")
                 Log.d(TAG, "No location available at this time.")
                 return null
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d(TAG, "onRequestPermissionsResult is called")
+        if (requestCode == 1) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+                Log.d(TAG, "onRequestPermissionsResult - the user granted permission - go to if")
+                lifecycleScope.launch {
+                    getUserGPS()
+                }
+            } else {
+                // Permission was denied. Handle the situation by showing a message to the user or taking appropriate action.
+                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }

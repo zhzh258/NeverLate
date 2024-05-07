@@ -1,5 +1,6 @@
 package com.snowman.neverlate.ui.events
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
@@ -14,6 +15,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +24,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.snowman.neverlate.R
 import com.snowman.neverlate.model.FirebaseManager
@@ -38,6 +42,7 @@ import java.util.TimeZone
 import java.time.ZoneId;
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -51,6 +56,7 @@ import com.snowman.neverlate.model.types.Event
 import com.snowman.neverlate.model.types.MemberStatus
 import com.snowman.neverlate.util.TimeUtil
 import com.snowman.neverlate.util.getMetaData
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -203,6 +209,8 @@ class OneEventFragment : Fragment() {
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpETA() {
         lifecycleScope.launch {
+            val originPos = getUserGPS()
+            val destinationPos = LatLng(event.location.latitude, event.location.longitude)
             val driving = async { fetchDirectionsResponse(originPos, "driving", destinationPos) }
             val walking = async { fetchDirectionsResponse(originPos, "walking", destinationPos) }
             val bicycling = async { fetchDirectionsResponse(originPos, "bicycling", destinationPos) }
@@ -322,28 +330,58 @@ class OneEventFragment : Fragment() {
             else -> getString(R.string.status_7)
         }
     }
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun formatDuration(duration: Duration): String {
-//        val seconds = duration.seconds
-//        val absSeconds = Math.abs(seconds)
-//        val positive = String.format(
-//            "%d:%02d:%02d",
-//            absSeconds / 3600,
-//            (absSeconds % 3600) / 60,
-//            absSeconds % 60
-//        )
-//        return if (seconds < 0) "-$positive" else positive
-//    }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun convertEventTimeToStandardFormat(timestamp: com.google.firebase.Timestamp): String {
-//        val instant = java.time.Instant.ofEpochSecond(timestamp.seconds, timestamp.nanoseconds.toLong())
-//        val zonedDateTime = instant.atZone(ZoneId.systemDefault())
-//        var localDateTime = zonedDateTime.toLocalDateTime()
-//        localDateTime = localDateTime.minusYears(1900)
-//        localDateTime = localDateTime.minusHours(1)
-//        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//        return formatter.format(localDateTime)
-//    }
 
+    private suspend fun getUserGPS(): LatLng? {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) { // permission is NOT granted
+            Toast.makeText(requireContext(), "please enable location permissions in device settings", Toast.LENGTH_SHORT).show()
+            return null;
+        } else { // permission is granted, show the location
+            val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+            val priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
+            val cancellationTokenSource = CancellationTokenSource()
+
+            val location = fusedLocationProviderClient.getCurrentLocation(priority, cancellationTokenSource.token).await()
+            if(location != null){
+                Log.d(TAG, "fusedLocationProviderClient successfully fetches a location ${location.toString()}")
+                Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
+                val latLng = LatLng(location.latitude, location.longitude)
+
+                return latLng
+            } else{
+                Toast.makeText(requireContext(), "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.", Toast.LENGTH_LONG).show()
+                Log.d(TAG, "updateUserGPS is called and fusedLocationProviderClient failed to get a location")
+                Log.d(TAG, "No location available at this time.")
+                return null
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d(TAG, "onRequestPermissionsResult is called")
+        if (requestCode == 1) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+                Log.d(TAG, "onRequestPermissionsResult - the user granted permission - go to if")
+                lifecycleScope.launch {
+                    getUserGPS()
+                }
+            } else {
+                // Permission was denied. Handle the situation by showing a message to the user or taking appropriate action.
+                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 }
