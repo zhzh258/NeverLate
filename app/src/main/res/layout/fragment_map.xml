@@ -119,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="96dp"
-                    android:text="Group Project Meeting"
+                    android:text="@string/group_project_meeting"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textColor="@color/white"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -133,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="8dp"
-                    android:text="EVENT_MEMBERS"
+                    android:text="@string/attendees"
                     android:textColor="@color/white"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -164,7 +164,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginLeft="20dp"
-                        android:text="4 people"
+                        android:text="@string/_4_people"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="@id/image_people"
                         app:layout_constraintStart_toEndOf="@id/image_people"
@@ -177,28 +177,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
-                android:text="Drive"
+                android:text="@string/drive"
                 style="@style/Widget.MaterialComponents.Button"/>
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/walkButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
-                android:text="Walk"
+                android:text="@string/walk"
                 style="@style/Widget.MaterialComponents.Button"/>
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/bikeButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
-                android:text="Bike"
+                android:text="@string/bike"
                 style="@style/Widget.MaterialComponents.Button"/>
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/transitButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimaryDark"
-                android:text="Bus"
+                android:text="@string/bus"
                 style="@style/Widget.MaterialComponents.Button"/>
         </LinearLayout>
     </FrameLayout>

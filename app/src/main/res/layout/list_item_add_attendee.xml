@@ -37,7 +37,7 @@
 
         <Button
             style="@style/CustomButtonStyle"
-            android:text="Select"
+            android:text="@string/select"
             android:layout_marginTop="9dp"
             android:layout_marginLeft="45dp"
             android:layout_width="100dp"

@@ -26,7 +26,13 @@ class EventsViewModel : ViewModel() {
                 Log.i(TAG, "unable to fetch events $exception")
             } else {
                 Log.d(TAG, "successfully fetched events! length: ${eventsList?.size}")
-                _events.value = eventsList.orEmpty()
+                var eventsList1 = mutableListOf<IEvent>()
+                for(event in eventsList.orEmpty()) {
+                    if(event.date.seconds > System.currentTimeMillis()/1000) {
+                        eventsList1.add(event)
+                    }
+                }
+                _events.value = eventsList1
             }
         }
     }
