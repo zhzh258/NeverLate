@@ -12,7 +12,7 @@ import com.snowman.neverlate.databinding.FragmentProfileTabBadgesBinding
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.shared.SharedUserViewModel
 
-class ProfileTabBadgesFragment: Fragment() {
+class ProfileTabBadgesFragment : Fragment() {
     private var _binding: FragmentProfileTabBadgesBinding? = null
     private val binding get() = _binding!!
     private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
@@ -30,11 +30,10 @@ class ProfileTabBadgesFragment: Fragment() {
 
     private fun setUpUI() {
         sharedUserViewModel.userData.value?.userId?.let { userId ->
-            firebaseManager.fetchAverageArrivalTimeForCurrentUser{ averageTime, error ->
+            firebaseManager.fetchAverageArrivalTimeForCurrentUser { averageTime, error ->
                 error?.let { err: Exception ->
                     Log.e("ProfileFragment", "Error fetching average arrive time: $err")
                 } ?: run {
-                    //binding.timeTVV.text = String.format("%.2f", averageTime)
                     averageTime?.let {
                         binding.badgeImg.setImageResource(
                             when {
@@ -78,8 +77,6 @@ class ProfileTabBadgesFragment: Fragment() {
                                 averageTime > -30 -> getString(R.string.badge_2s)
                                 else -> getString(R.string.badge_1s)
                             }
-
-
                     }
                 } ?: run {
                     binding.badgeImg.setImageResource(R.drawable.badge_5)

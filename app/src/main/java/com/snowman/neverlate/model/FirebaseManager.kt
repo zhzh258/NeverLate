@@ -800,8 +800,6 @@ class FirebaseManager {
             onComplete(false)
         }
     }
-
-
 }
 
 

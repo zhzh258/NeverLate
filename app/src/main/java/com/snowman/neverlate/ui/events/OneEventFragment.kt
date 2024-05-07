@@ -82,6 +82,7 @@ class OneEventFragment : Fragment() {
     private var eta: LocalDateTime = LocalDateTime.now() // estimated time (to) arrive
 
     private val handler = Handler(Looper.getMainLooper())
+
     // ------ Get Current Time Every 1000 ms ------ //
     private val updateRunnable = object : Runnable {
         override fun run() {
@@ -105,6 +106,7 @@ class OneEventFragment : Fragment() {
             }
         }
     }
+
     // ------ Dummy origin laglng data and destination laglng data for testing ------ //
     val originPos = LatLng(42.350050, -71.103846)
     val destinationPos = LatLng(42.365824, -71.062756)
@@ -129,13 +131,13 @@ class OneEventFragment : Fragment() {
             }
 
             it.let {
-                Toast.makeText(requireContext(), "Hey! The event is ${it.name}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Hey! The event is ${it.name}", Toast.LENGTH_SHORT)
+                    .show()
                 event = it
                 view.findViewById<TextView>(R.id.text_title).text = it.name
                 view.findViewById<TextView>(R.id.textview_description).text = it.description
-                //view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
-                //view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
-                view.findViewById<TextView>(R.id.text_people_count).text = it.members.size.toString() + " people"
+                view.findViewById<TextView>(R.id.text_people_count).text =
+                    it.members.size.toString() + " people"
                 setUpFriends(view)
                 setUpMapNavigation(view)
                 updateRunnableETA.run()
@@ -149,7 +151,10 @@ class OneEventFragment : Fragment() {
         handler.post(updateRunnable)
         handler.postDelayed({
             updateRunnableETA.run()
-            handler.postDelayed(updateRunnableETA, 1000000) // Schedule subsequent updates after initial run
+            handler.postDelayed(
+                updateRunnableETA,
+                1000000
+            ) // Schedule subsequent updates after initial run
         }, 10000) // Delay the first execution by 10 seconds
 
         //handler.post(updateRunnableETA)
@@ -160,9 +165,6 @@ class OneEventFragment : Fragment() {
                 checkEventStatusAndDeactivateIfRequired()
             }, 5000)
         }
-
-//        val args: EventDetailsFragmentArgs by navArgs()
-//        val eventId = args.eventId
     }
 
     override fun onDestroyView() {
@@ -175,10 +177,9 @@ class OneEventFragment : Fragment() {
 
 
     private fun setUpFriends(view: View) {
-        var friendsNames = ""
         var memberStatusList1 = event.members.toMutableList()
-        for(member in memberStatusList1) {
-            if(currentUser != null) {
+        for (member in memberStatusList1) {
+            if (currentUser != null) {
                 if (member.id.equals(currentUser.uid)) {
                     memberStatusList1.remove(member)
                     break
@@ -186,7 +187,8 @@ class OneEventFragment : Fragment() {
             }
         }
         friendsRV = view.findViewById(R.id.friendsRV)
-        friendsRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        friendsRV.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         friendsAdapter = EventFriendsAdapter(mutableListOf(), requireContext())
         val memberStatusList = memberStatusList1.toList()
         val userIdList = memberStatusList.map { memberStatus ->
@@ -206,6 +208,7 @@ class OneEventFragment : Fragment() {
             findNavController().navigate(R.id.nav_map)
         }
     }
+
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpETA() {
         lifecycleScope.launch {
@@ -213,7 +216,8 @@ class OneEventFragment : Fragment() {
             val destinationPos = LatLng(event.location.latitude, event.location.longitude)
             val driving = async { fetchDirectionsResponse(originPos, "driving", destinationPos) }
             val walking = async { fetchDirectionsResponse(originPos, "walking", destinationPos) }
-            val bicycling = async { fetchDirectionsResponse(originPos, "bicycling", destinationPos) }
+            val bicycling =
+                async { fetchDirectionsResponse(originPos, "bicycling", destinationPos) }
             val transit = async { fetchDirectionsResponse(originPos, "transit", destinationPos) }
             // await all
             val responses = awaitAll(driving, walking, bicycling, transit)
@@ -230,14 +234,17 @@ class OneEventFragment : Fragment() {
                 else -> minutes
             }
             // ------ Setting Expected Time of Arrival ------ //
-            val durationValue = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.value?: 0
+            val durationValue = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.value ?: 0
             val currentDateTime = LocalDateTime.now()
             eta = currentDateTime.plusSeconds(durationValue.toLong())
-            //binding.etaTV.text = TimeUtil.localDateTime2FormattedString(eta)
         }
     }
 
-    private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, destination: LatLng?): DirectionsResponse? { // show a line from current location to
+    private suspend fun fetchDirectionsResponse(
+        origin: LatLng?,
+        mode: String,
+        destination: LatLng?
+    ): DirectionsResponse? { // show a line from current location to
         origin ?: return null
         destination ?: return null
         val retrofit = Retrofit.Builder()
@@ -247,13 +254,18 @@ class OneEventFragment : Fragment() {
         val service = retrofit.create(GoogleMapsDirectionsService::class.java)
         try {
             val apiKey = getMetaData("com.google.android.geo.API_KEY", context)
-            val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
+            val response = service.getDirections(
+                "${origin.latitude},${origin.longitude}",
+                "${destination.latitude},${destination.longitude}",
+                mode,
+                apiKey ?: ""
+            )
             if (response.isSuccessful) {
-                if(response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0){
-                    Toast.makeText(requireContext(), "Is Successful but Null", Toast.LENGTH_SHORT).show()
+                if (response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0) {
+                    Toast.makeText(requireContext(), "Is Successful but Null", Toast.LENGTH_SHORT)
+                        .show()
                     return null
-                }
-                else
+                } else
                     return response.body()
             } else {
                 Toast.makeText(requireContext(), "Not Successful", Toast.LENGTH_SHORT).show()
@@ -268,7 +280,7 @@ class OneEventFragment : Fragment() {
     private fun markAsArrived() {
         val currentUserID = auth.currentUser?.uid
         val minutes = rt.toMinutes()
-        val status  = when {
+        val status = when {
             minutes.toLong() > 20 -> getString(R.string.preStatus_1)
             minutes.toLong() > 5 -> getString(R.string.preStatus_2)
             minutes.toLong() > -5 -> getString(R.string.preStatus_3)
@@ -278,20 +290,31 @@ class OneEventFragment : Fragment() {
         }
 
         event.members.find { it.id == currentUserID }?.let { memberStatus ->
-            val updatedMember = memberStatus.copy(arrived = true, arriveTime = minutes.toLong(), status = status)
+            val updatedMember =
+                memberStatus.copy(arrived = true, arriveTime = minutes.toLong(), status = status)
             updateMemberStatusInDatabase(updatedMember, {
                 // Success callback
                 /////checkEventStatusAndDeactivateIfRequired()
                 //---markEventAsInactive()
-                Toast.makeText(context, "Arrival time updated successfully.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Arrival time updated successfully.", Toast.LENGTH_SHORT)
+                    .show()
             }, {
                 // Failure callback
-                    e -> Toast.makeText(context, "Failed to update arrival time: ${e.message}", Toast.LENGTH_SHORT).show()
+                    e ->
+                Toast.makeText(
+                    context,
+                    "Failed to update arrival time: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             })
         }
     }
 
-    private fun updateMemberStatusInDatabase(memberStatus: MemberStatus, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    private fun updateMemberStatusInDatabase(
+        memberStatus: MemberStatus,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         firebaseManager.updateMemberStatus(event.id, memberStatus, onSuccess, onFailure)
     }
 
@@ -299,10 +322,8 @@ class OneEventFragment : Fragment() {
     private fun checkEventStatusAndDeactivateIfRequired() {
         firebaseManager.checkAndDeactivateEventIfAllArrived(event.id) { allArrived ->
             if (allArrived) {
-                //Toast.makeText(context, "All members have arrived, event marked as inactive.", Toast.LENGTH_SHORT).show()
-                Log.d("checkEventStatus","All members have arrived, event marked as inactive.")
+                Log.d("checkEventStatus", "All members have arrived, event marked as inactive.")
             } else {
-                //Toast.makeText(context, "Not all members have arrived yet.", Toast.LENGTH_SHORT).show()
                 Log.d("checkEventStatus", "Not all members have arrived yet.")
             }
         }
@@ -321,7 +342,7 @@ class OneEventFragment : Fragment() {
             rt_minutes > 100 -> 100f    // Ensure the value is a Float
             else -> rt_minutes
         }
-        val eta_minutes = -1 *  (rt.toMinutes().toFloat() - ett.toMinutes().toFloat())
+        val eta_minutes = -1 * (rt.toMinutes().toFloat() - ett.toMinutes().toFloat())
         binding.ETASlider.value = when {
             eta_minutes < -100 -> -100f  // Ensure the value is a Float
             eta_minutes > 100 -> 100f    // Ensure the value is a Float
@@ -365,23 +386,41 @@ class OneEventFragment : Fragment() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) { // permission is NOT granted
-            Toast.makeText(requireContext(), "please enable location permissions in device settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "please enable location permissions in device settings",
+                Toast.LENGTH_SHORT
+            ).show()
             return null;
         } else { // permission is granted, show the location
-            val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+            val fusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity());
             val priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
             val cancellationTokenSource = CancellationTokenSource()
 
-            val location = fusedLocationProviderClient.getCurrentLocation(priority, cancellationTokenSource.token).await()
-            if(location != null){
-                Log.d(TAG, "fusedLocationProviderClient successfully fetches a location ${location.toString()}")
+            val location = fusedLocationProviderClient.getCurrentLocation(
+                priority,
+                cancellationTokenSource.token
+            ).await()
+            if (location != null) {
+                Log.d(
+                    TAG,
+                    "fusedLocationProviderClient successfully fetches a location ${location.toString()}"
+                )
                 Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
                 val latLng = LatLng(location.latitude, location.longitude)
 
                 return latLng
-            } else{
-                Toast.makeText(requireContext(), "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.", Toast.LENGTH_LONG).show()
-                Log.d(TAG, "updateUserGPS is called and fusedLocationProviderClient failed to get a location")
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d(
+                    TAG,
+                    "updateUserGPS is called and fusedLocationProviderClient failed to get a location"
+                )
                 Log.d(TAG, "No location available at this time.")
                 return null
             }

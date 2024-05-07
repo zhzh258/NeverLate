@@ -17,6 +17,4 @@ data class Event(
     // Chicago. If you see Chicago on map it means something is wrong
     override var location: GeoPoint = GeoPoint(41.8781, 87.6298),
     override var photoURL: String = "",
-) : IEvent {
-
-}
+) : IEvent

@@ -16,7 +16,6 @@ import com.snowman.neverlate.model.types.IUser
 class RateUsFragment : Fragment() {
 
     private var _binding: FragmentRateusBinding? = null
-
     private val binding get() = _binding!!
     private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
 
@@ -61,7 +60,8 @@ class RateUsFragment : Fragment() {
         )
 
         stars.forEachIndexed { index, imageView ->
-            val imageRes = if (index < starCount) R.drawable.ic_widget_star else R.drawable.ic_widget_empty_star
+            val imageRes =
+                if (index < starCount) R.drawable.ic_widget_star else R.drawable.ic_widget_empty_star
             imageView.setImageResource(imageRes)
         }
     }
@@ -87,11 +87,16 @@ class RateUsFragment : Fragment() {
 
         FirebaseManager.getInstance().editUserProfile(updatedUserData,
             onSuccess = {
-                Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "User details updated successfully.", Toast.LENGTH_SHORT)
+                    .show()
                 it.updateUserViewModel(sharedUserViewModel)
             },
             onFailure = { exception ->
-                Toast.makeText(context, "Failed to update user details: ${exception.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    "Failed to update user details: ${exception.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }

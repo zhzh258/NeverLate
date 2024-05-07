@@ -31,7 +31,10 @@ class TimeUtil {
          * @return A String following the given pattern
          */
         @SuppressLint("SimpleDateFormat")
-        fun timestamp2FormattedString(timestamp: Timestamp, pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
+        fun timestamp2FormattedString(
+            timestamp: Timestamp,
+            pattern: String = "yyyy-MM-dd HH:mm:ss"
+        ): String {
             val milliseconds = timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
             val date = java.util.Date(milliseconds)
             val dateFormat = SimpleDateFormat(pattern)
@@ -44,12 +47,18 @@ class TimeUtil {
             return LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         }
 
-        fun localDateTime2FormattedString(localDateTime: LocalDateTime, pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
+        fun localDateTime2FormattedString(
+            localDateTime: LocalDateTime,
+            pattern: String = "yyyy-MM-dd HH:mm:ss"
+        ): String {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             return localDateTime.format(formatter)
         }
 
-        fun duration2FormattedString(duration: Duration, pattern: String = "%+d days %d:%02d:%02d"): String {
+        fun duration2FormattedString(
+            duration: Duration,
+            pattern: String = "%+d days %d:%02d:%02d"
+        ): String {
             val isNegative = duration.isNegative
             val absDuration = duration.abs()
 

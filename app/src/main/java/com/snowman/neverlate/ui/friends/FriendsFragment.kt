@@ -49,7 +49,6 @@ class FriendsFragment : Fragment() {
     }
 
 
-
     private fun initViews(view: View) {
         binding.friendsListRv.layoutManager = LinearLayoutManager(context)
         adapter = FriendsListAdapter(mutableListOf())

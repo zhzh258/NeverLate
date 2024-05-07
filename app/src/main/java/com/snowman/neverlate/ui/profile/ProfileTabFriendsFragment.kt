@@ -1,4 +1,5 @@
 package com.snowman.neverlate.ui.profile
+
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +10,7 @@ import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.FragmentProfileTabFriendsBinding
 import com.snowman.neverlate.ui.friends.FriendsFragment
 
-class ProfileTabFriendsFragment: Fragment() {
+class ProfileTabFriendsFragment : Fragment() {
     private var _binding: FragmentProfileTabFriendsBinding? = null
     private val binding get() = _binding!!
 
@@ -30,9 +31,4 @@ class ProfileTabFriendsFragment: Fragment() {
 
         return binding.root
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
 }

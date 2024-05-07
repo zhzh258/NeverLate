@@ -2,7 +2,6 @@ package com.snowman.neverlate.model.types
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
-import com.snowman.neverlate.model.types.Event
 
 data class MemberStatus(
     val id: String = "",

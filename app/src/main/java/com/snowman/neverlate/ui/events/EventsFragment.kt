@@ -21,7 +21,7 @@ import com.snowman.neverlate.R
 import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.model.shared.SharedOneEventViewModel
 
-class EventsFragment : Fragment()  {
+class EventsFragment : Fragment() {
     private lateinit var eventsListRv: RecyclerView
     private lateinit var addEventFab: FloatingActionButton
     private val eventsViewModel: EventsViewModel by viewModels()
@@ -62,7 +62,7 @@ class EventsFragment : Fragment()  {
         performSearchAndFilter(view)
     }
 
-    private fun performSearchAndFilter(view:View) {
+    private fun performSearchAndFilter(view: View) {
         val searchView: SearchView = view.findViewById(R.id.searchEventsSV)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -77,23 +77,26 @@ class EventsFragment : Fragment()  {
         })
 
         view.findViewById<Button>(R.id.filterAllBtn).setOnClickListener {
-            searchAndFilterEvents(searchView.query.toString(), null) // Passing null to show all events
+            searchAndFilterEvents(
+                searchView.query.toString(),
+                null
+            ) // Passing null to show all events
             selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterDiningBtn).setOnClickListener {
-            searchAndFilterEvents(searchView.query.toString(),"Dining")
+            searchAndFilterEvents(searchView.query.toString(), "Dining")
             selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterStudyBtn).setOnClickListener {
-            searchAndFilterEvents(searchView.query.toString(),"Study")
+            searchAndFilterEvents(searchView.query.toString(), "Study")
             selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterMeetingBtn).setOnClickListener {
-            searchAndFilterEvents(searchView.query.toString(),"Meeting")
+            searchAndFilterEvents(searchView.query.toString(), "Meeting")
             selectBtn(it as ToggleButton)
         }
         view.findViewById<Button>(R.id.filterTravelBtn).setOnClickListener {
-            searchAndFilterEvents(searchView.query.toString(),"Travel")
+            searchAndFilterEvents(searchView.query.toString(), "Travel")
             selectBtn(it as ToggleButton)
         }
     }
@@ -102,10 +105,12 @@ class EventsFragment : Fragment()  {
         Log.d("MY_DEBUG", "EventsFragment: onDestroyView")
         super.onDestroyView()
     }
+
     private fun searchAndFilterEvents(query: String?, eventType: String?) {
         val filteredEvents = events.value?.filter { event ->
             val matchesSearch = event.name.contains(query ?: "", ignoreCase = true) //search part
-            val matchesFilter = eventType.isNullOrEmpty() || event.category == eventType //filtering pt
+            val matchesFilter =
+                eventType.isNullOrEmpty() || event.category == eventType //filtering pt
             matchesSearch && matchesFilter
         }
         filteredEvents?.let { updateEventsList(it, adapter) }
@@ -140,18 +145,36 @@ class EventsFragment : Fragment()  {
 
         // the all btn will always be selected first
         selectedBtn = view.findViewById(R.id.filterAllBtn)
-        selectedBtn.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.rounded_selected_btn, null))
+        selectedBtn.setBackgroundDrawable(
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.rounded_selected_btn,
+                null
+            )
+        )
         selectedBtn.isChecked = true
     }
 
     private fun selectBtn(btn: ToggleButton) {
         // deselect btn color
-        selectedBtn.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.rounded_btn, null))
+        selectedBtn.setBackgroundDrawable(
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.rounded_btn,
+                null
+            )
+        )
         selectedBtn.isChecked = false
         // select new button
         selectedBtn = btn
         selectedBtn.isChecked = true
-        selectedBtn.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.rounded_selected_btn, null))
+        selectedBtn.setBackgroundDrawable(
+            ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.rounded_selected_btn,
+                null
+            )
+        )
     }
 
 

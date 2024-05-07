@@ -1,4 +1,5 @@
 package com.snowman.neverlate.ui.profile
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,7 @@ import com.snowman.neverlate.databinding.FragmentProfileTabPersonalBinding
 import com.snowman.neverlate.model.shared.SharedUserViewModel
 import com.snowman.neverlate.model.types.IUser
 
-class ProfileTabPersonalFragment: Fragment() {
+class ProfileTabPersonalFragment : Fragment() {
     private var _binding: FragmentProfileTabPersonalBinding? = null
     private val binding get() = _binding!!
     private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
@@ -29,7 +30,7 @@ class ProfileTabPersonalFragment: Fragment() {
     }
 
     private fun setUpUI(user: IUser?) {
-        if(user == null) {
+        if (user == null) {
             throw Exception("ProfileTabPersonalFragment: user is null in sharedUserViewModel")
         }
         binding.aboutTv.text = user.status

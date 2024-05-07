@@ -50,7 +50,6 @@ data class Duration(
     val value: Int
 )
 
-
 data class Polyline(
     val points: String
 )

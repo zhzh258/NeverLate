@@ -19,10 +19,5 @@ interface IUser {
     val personalSignature: String
     val rate: Int
     val friendRequests: List<String>
-    // Assuming "About Me" and "Setting Config" are strings for simplicity; adjust as necessary
-//    val aboutMe: String
-    // ** val settingConfig: String
-    // ** val profile: String // Other information related to personal profile page; adjust type as necessary
-
     fun updateUserViewModel(viewModel: SharedUserViewModel)
 }

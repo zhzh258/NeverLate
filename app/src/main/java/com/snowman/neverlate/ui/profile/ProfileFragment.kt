@@ -58,6 +58,7 @@ class ProfileFragment : Fragment() {
             .error(R.mipmap.ic_launcher_round)
             .into(binding.profileIV)
     }
+
     private fun setUpBodyUI() {
         val viewPagerAdapter = ViewPagerAdapter(childFragmentManager)
         binding.viewPager.adapter = viewPagerAdapter
