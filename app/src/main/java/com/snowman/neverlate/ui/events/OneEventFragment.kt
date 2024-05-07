@@ -87,7 +87,7 @@ class OneEventFragment : Fragment() {
         override fun run() {
             if (isAdded && isVisible && binding != null) {
                 val currentDateTime = LocalDateTime.now()
-                binding.currentTimeTV.text = TimeUtil.localDateTime2FormattedString(currentDateTime)
+                //binding.currentTimeTV.text = TimeUtil.localDateTime2FormattedString(currentDateTime)
                 calculateRemainingTime()
                 handler.postDelayed(this, 1000) // schedule the next run
             }
@@ -133,8 +133,8 @@ class OneEventFragment : Fragment() {
                 event = it
                 view.findViewById<TextView>(R.id.text_title).text = it.name
                 view.findViewById<TextView>(R.id.textview_description).text = it.description
-                view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
-                view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
+                //view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
+                //view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
                 view.findViewById<TextView>(R.id.text_people_count).text = it.members.size.toString() + " people"
                 setUpFriends(view)
                 setUpMapNavigation(view)
@@ -222,13 +222,18 @@ class OneEventFragment : Fragment() {
             val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration
             val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance
             ett = Duration.ofSeconds(duration?.value?.toLong() ?: 0)
-            binding.ettTV.text = "Drive: " + duration?.text + " ( " + distance.toString() + " )"
-
+            binding.ettTV.text = "Drive: " + duration?.text // + " ( " + distance.toString() + " )"
+            val minutes = -1 * ett.toMinutes().toFloat()  // Convert minutes to Float once
+            binding.ETTSlider.value = when {
+                minutes < -100 -> -100f  // Ensure the value is a Float
+                minutes > 100 -> 100f    // Ensure the value is a Float
+                else -> minutes
+            }
             // ------ Setting Expected Time of Arrival ------ //
             val durationValue = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.value?: 0
             val currentDateTime = LocalDateTime.now()
             eta = currentDateTime.plusSeconds(durationValue.toLong())
-            binding.etaTV.text = TimeUtil.localDateTime2FormattedString(eta)
+            //binding.etaTV.text = TimeUtil.localDateTime2FormattedString(eta)
         }
     }
 
@@ -308,6 +313,23 @@ class OneEventFragment : Fragment() {
         val currentTime = LocalDateTime.now()
         rt = Duration.between(currentTime, givenTime)
         binding.remainingTimeTV.text = TimeUtil.duration2FormattedString(rt)
+        val rt_minutes = -1 * rt.toMinutes().toFloat()  // Convert minutes to Float once
+        binding.RTSlider.value = when {
+            rt_minutes < -100 -> -100f  // Ensure the value is a Float
+            rt_minutes > 100 -> 100f    // Ensure the value is a Float
+            else -> rt_minutes
+        }
+        val eta_minutes = -1 *  (rt.toMinutes().toFloat() - ett.toMinutes().toFloat())
+        binding.ETASlider.value = when {
+            eta_minutes < -100 -> -100f  // Ensure the value is a Float
+            eta_minutes > 100 -> 100f    // Ensure the value is a Float
+            else -> eta_minutes
+        }
+        binding.etaTV.text = when {
+            -1 * eta_minutes > 0 -> "${-1 * eta_minutes.toInt()} mins earlier"
+            -1 * eta_minutes < 0 -> "${eta_minutes.toInt()} mins late"
+            else -> "0 minutes late"
+        }
     }
 
     // ------ Punctual Status based on => Event Time - Expected Time of Arrival ------ //
