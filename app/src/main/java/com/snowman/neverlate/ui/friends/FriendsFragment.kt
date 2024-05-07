@@ -1,6 +1,7 @@
 package com.snowman.neverlate.ui.friends
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,59 +15,54 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.snowman.neverlate.R
+import com.snowman.neverlate.databinding.FragmentFriendsBinding
 import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IUser
 
 class FriendsFragment : Fragment() {
 
-    private lateinit var friendsListRv: RecyclerView
-    private lateinit var addFriendsBtn: ExtendedFloatingActionButton
-    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
+    private var _binding: FragmentFriendsBinding? = null
     private lateinit var adapter: FriendsListAdapter
-    private lateinit var searchFriendsSV: SearchView
+    private val binding get() = _binding!!
+    private val friendsViewModel: SharedFriendsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_friends, container, false)
+        Log.d("MY_DEBUG", "FriendsFragment: onCreateView")
+        _binding = FragmentFriendsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("MY_DEBUG", "FriendsFragment: onViewCreated")
 
         initViews(view)
-        observeFriends()
 
-        addFriendsBtn.setOnClickListener {
+        binding.addFriendsBtn.setOnClickListener {
             findNavController().navigate(R.id.action_friendsFragment_to_addFriendsFragment)
         }
 
         searchFriendsListener()
     }
 
-    private fun initViews(view: View) {
-        addFriendsBtn = view.findViewById(R.id.addFriendsBtn)
-        friendsListRv = view.findViewById(R.id.friendsListRv)
-        friendsListRv.layoutManager = LinearLayoutManager(context)
-        adapter = FriendsListAdapter(mutableListOf())
-        friendsListRv.adapter = adapter
-        searchFriendsSV = view.findViewById(R.id.searchFriendsSV)
-    }
 
-    private fun observeFriends() {
+
+    private fun initViews(view: View) {
+        binding.friendsListRv.layoutManager = LinearLayoutManager(context)
+        adapter = FriendsListAdapter(mutableListOf())
+        binding.friendsListRv.adapter = adapter
+        // observe friends changes
         friendsViewModel.friends.observe(viewLifecycleOwner) { friends ->
-            updateFriendsList(friends, adapter)
+            // update adapter
+            adapter.updateData(friends)
         }
     }
 
-    private fun updateFriendsList(friends: List<IUser>, adapter: FriendsListAdapter) {
-        adapter.updateData(friends)
-    }
-
     private fun searchFriendsListener() {
-        searchFriendsSV.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchFriendsSV.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -75,10 +71,15 @@ class FriendsFragment : Fragment() {
                 val filteredFriends = friendsViewModel.friends.value?.filter { friend ->
                     friend.displayName.contains(newText.orEmpty(), ignoreCase = true)
                 }
-                filteredFriends?.let { updateFriendsList(it, adapter) }
+                filteredFriends?.let { adapter.updateData(it) }
                 return true
             }
         })
+    }
+
+    // This method is reserved for usage in ProfileFragment - FriendsTab
+    fun setButtonVisibility(visible: Boolean) {
+        binding.addFriendsBtn.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
 }

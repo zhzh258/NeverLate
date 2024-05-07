@@ -1,5 +1,6 @@
 package com.snowman.neverlate.ui.profile
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,11 +22,17 @@ class ProfileTabFriendsFragment: Fragment() {
         _binding = FragmentProfileTabFriendsBinding.inflate(inflater, container, false)
 
         val friendsFragment = FriendsFragment()
+        Log.d("MY_DEBUG", "AAA")
         childFragmentManager.beginTransaction()
-            .add(R.id.friends_container, friendsFragment)
+            .replace(R.id.friends_container, friendsFragment)
             .commit()
+        childFragmentManager.executePendingTransactions()
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 
 }
