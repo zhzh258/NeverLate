@@ -133,8 +133,8 @@ class OneEventFragment : Fragment() {
                 event = it
                 view.findViewById<TextView>(R.id.text_title).text = it.name
                 view.findViewById<TextView>(R.id.textview_description).text = it.description
-                //view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
-                //view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
+//                view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
+//                view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
                 view.findViewById<TextView>(R.id.text_people_count).text = it.members.size.toString() + " people"
                 setUpFriends(view)
                 setUpMapNavigation(view)
