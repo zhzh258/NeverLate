@@ -19,7 +19,8 @@ class HistoryViewModel : ViewModel() {
                 Log.i(TAG, "unable to fetch events $exception")
             } else {
                 Log.d(TAG, "successfully fetched events! length: ${eventsList?.size}")
-                _events.value = eventsList.orEmpty()
+                val eventsList1 = eventsList.orEmpty().sortedBy { event -> event.date }
+                _events.value = eventsList1
             }
         }
     }
