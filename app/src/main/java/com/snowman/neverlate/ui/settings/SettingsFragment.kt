@@ -22,20 +22,19 @@ class SettingsFragment : Fragment() {
     private val sharedUserViewModel: SharedUserViewModel by activityViewModels()
     private val firebaseManager = FirebaseManager.getInstance()
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
-        binding.btnEditProfile.setOnClickListener(){
+        binding.btnEditProfile.setOnClickListener() {
             findNavController().navigate(R.id.action_settingsFragment_to_editProfileFragment)
         }
-        binding.btnRateUs.setOnClickListener(){
+        binding.btnRateUs.setOnClickListener() {
             findNavController().navigate(R.id.action_settingsFragment_to_rateUsFragment)
         }
-        binding.btnAboutUs.setOnClickListener(){
+        binding.btnAboutUs.setOnClickListener() {
             findNavController().navigate(R.id.nav_aboutus)
         }
         binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -82,5 +81,4 @@ class SettingsFragment : Fragment() {
             }
         }
     }
-
 }

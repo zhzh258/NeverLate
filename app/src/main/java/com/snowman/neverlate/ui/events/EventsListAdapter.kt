@@ -55,6 +55,4 @@ class EventsListAdapter(
         events.addAll(newFriends)
         notifyDataSetChanged()
     }
-
-
 }

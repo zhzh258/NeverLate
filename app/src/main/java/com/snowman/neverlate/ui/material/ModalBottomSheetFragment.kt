@@ -14,7 +14,8 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding: FragmentModalBottomSheetBinding = FragmentModalBottomSheetBinding.inflate(inflater)
+        val binding: FragmentModalBottomSheetBinding =
+            FragmentModalBottomSheetBinding.inflate(inflater)
         return binding.root
     }
 

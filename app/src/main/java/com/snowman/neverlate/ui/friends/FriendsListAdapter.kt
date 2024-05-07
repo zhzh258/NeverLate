@@ -27,31 +27,31 @@ class FriendsViewHolder(private val binding: ListItemFriendsBinding) :
 
     private fun setUpBadge(user: IUser) {
         user.userId.let {
-            FirebaseManager.getInstance().fetchAverageArrivalTimeForUser(user){ averageTime, error ->
-                error?.let { err: Exception ->
-                    Log.e("ProfileFragment", "Error fetching average arrive time: $err")
-                } ?: run {
-                    //binding.timeTVV.text = String.format("%.2f", averageTime)
-                    averageTime?.let {
-                        binding.badgeImg.setImageResource(
-                            when {
-                                averageTime > 30 -> R.drawable.badge_10
-                                averageTime > 20 -> R.drawable.badge_9
-                                averageTime > 15 -> R.drawable.badge_8
-                                averageTime > 5 -> R.drawable.badge_7
-                                averageTime > 0 -> R.drawable.badge_6
-                                averageTime > -5 -> R.drawable.badge_5
-                                averageTime > -15 -> R.drawable.badge_4
-                                averageTime > -20 -> R.drawable.badge_3
-                                averageTime > -30 -> R.drawable.badge_2
-                                else -> R.drawable.badge_1
-                            }
-                        )
+            FirebaseManager.getInstance()
+                .fetchAverageArrivalTimeForUser(user) { averageTime, error ->
+                    error?.let { err: Exception ->
+                        Log.e("ProfileFragment", "Error fetching average arrive time: $err")
+                    } ?: run {
+                        averageTime?.let {
+                            binding.badgeImg.setImageResource(
+                                when {
+                                    averageTime > 30 -> R.drawable.badge_10
+                                    averageTime > 20 -> R.drawable.badge_9
+                                    averageTime > 15 -> R.drawable.badge_8
+                                    averageTime > 5 -> R.drawable.badge_7
+                                    averageTime > 0 -> R.drawable.badge_6
+                                    averageTime > -5 -> R.drawable.badge_5
+                                    averageTime > -15 -> R.drawable.badge_4
+                                    averageTime > -20 -> R.drawable.badge_3
+                                    averageTime > -30 -> R.drawable.badge_2
+                                    else -> R.drawable.badge_1
+                                }
+                            )
+                        }
+                    } ?: run {
+                        binding.badgeImg.setImageResource(R.drawable.badge_5)
                     }
-                } ?: run {
-                    binding.badgeImg.setImageResource(R.drawable.badge_5)
                 }
-            }
         }
     }
 }

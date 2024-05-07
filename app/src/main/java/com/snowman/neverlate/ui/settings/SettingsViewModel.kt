@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.User
 
-class SettingsViewModel: ViewModel() {
+class SettingsViewModel : ViewModel() {
     private val firebaseManager = FirebaseManager.getInstance()
     private val _me = MutableLiveData<User?>()
     val me: LiveData<User?> = _me
     var isEdit: Boolean = false
+
     init {
         loadUserData()
     }

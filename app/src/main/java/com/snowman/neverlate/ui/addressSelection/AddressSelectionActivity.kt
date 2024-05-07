@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.LocationServices
@@ -32,7 +31,6 @@ import com.snowman.neverlate.databinding.ActivityAddressSelectionBinding
 import com.snowman.neverlate.util.getMetaData
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
 
 class AddressSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var map: GoogleMap
@@ -108,11 +106,11 @@ class AddressSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
         lifecycleScope.launch {
             getUserGPS()?.let { userLatLng ->
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
-                Toast.makeText(applicationContext, "locating the user...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "locating the user...", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -134,6 +132,7 @@ class AddressSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
     private suspend fun getUserGPS(): LatLng? {
         if (ActivityCompat.checkSelfPermission(
                 applicationContext,
@@ -143,7 +142,11 @@ class AddressSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) { // permission is NOT granted
-            Toast.makeText(applicationContext, "please enable location permissions in device settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                applicationContext,
+                "please enable location permissions in device settings",
+                Toast.LENGTH_SHORT
+            ).show()
             return null;
         } else { // permission is granted, show the location
             map.isMyLocationEnabled = true
@@ -151,16 +154,29 @@ class AddressSelectionActivity : AppCompatActivity(), OnMapReadyCallback {
             val priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
             val cancellationTokenSource = CancellationTokenSource()
 
-            val location = fusedLocationProviderClient.getCurrentLocation(priority, cancellationTokenSource.token).await()
-            if(location != null){
-                Log.d(TAG, "fusedLocationProviderClient successfully fetches a location ${location.toString()}")
+            val location = fusedLocationProviderClient.getCurrentLocation(
+                priority,
+                cancellationTokenSource.token
+            ).await()
+            if (location != null) {
+                Log.d(
+                    TAG,
+                    "fusedLocationProviderClient successfully fetches a location ${location.toString()}"
+                )
                 Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
                 val latLng = LatLng(location.latitude, location.longitude)
 
                 return latLng
-            } else{
-                Toast.makeText(applicationContext, "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.", Toast.LENGTH_LONG).show()
-                Log.d(TAG, "updateUserGPS is called and fusedLocationProviderClient failed to get a location")
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d(
+                    TAG,
+                    "updateUserGPS is called and fusedLocationProviderClient failed to get a location"
+                )
                 Log.d(TAG, "No location available at this time.")
                 return null
             }

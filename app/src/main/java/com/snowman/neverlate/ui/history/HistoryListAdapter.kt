@@ -10,8 +10,10 @@ import com.snowman.neverlate.model.types.IEvent
 import com.snowman.neverlate.util.TimeUtil
 import androidx.core.content.ContextCompat
 
-
-class HistoryViewHolder(private val binding: ListItemEventPastBinding, private val currentUserId: String) :
+class HistoryViewHolder(
+    private val binding: ListItemEventPastBinding,
+    private val currentUserId: String
+) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(event: IEvent) {
@@ -27,7 +29,12 @@ class HistoryViewHolder(private val binding: ListItemEventPastBinding, private v
             if (it.arriveTime > 0) R.color.colorPrimary else R.color.colorLate
         } ?: R.color.colorLate
 
-        binding.punctualityTV.setBackgroundColor(ContextCompat.getColor(binding.punctualityTV.context, colorId))
+        binding.punctualityTV.setBackgroundColor(
+            ContextCompat.getColor(
+                binding.punctualityTV.context,
+                colorId
+            )
+        )
         binding.punctualityTV.text = arriveStatus
         Glide.with(binding.imageEvent)
             .load(event.photoURL)
@@ -61,6 +68,5 @@ class HistoryListAdapter(
         events.addAll(newFriends)
         notifyDataSetChanged()
     }
-
 
 }

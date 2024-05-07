@@ -9,12 +9,8 @@ import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IEvent
 
 class AddressSelectionViewModel : ViewModel() {
-    private val TAG = "AddressSelectionViewModel"
-//    val cameraPos =  MutableLiveData<LatLng?>(null)
-//    val userLocation = MutableLiveData<LatLng?>(null)
     val selection = MutableLiveData<LatLng?>(null)
     val address = MutableLiveData<String?>(null)
     val id = MutableLiveData<String?>(null)
     val name = MutableLiveData<String?>(null)
-
 }

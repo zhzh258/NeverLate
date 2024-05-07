@@ -116,7 +116,10 @@ class MainActivity : AppCompatActivity() {
 
             // This will simply clear the popBackStack. It will solve our issue.
             // However, the price is that our app loses the stack of the back button. (We don't actually need it tho)
-            findNavController(R.id.nav_host_fragment_content_main).popBackStack(item.itemId, inclusive = false)
+            findNavController(R.id.nav_host_fragment_content_main).popBackStack(
+                item.itemId,
+                inclusive = false
+            )
 
             if (handled) {
                 val parent = binding.navView.parent

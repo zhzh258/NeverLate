@@ -30,7 +30,7 @@ class EventFriendsViewHolder(
             .into(binding.friendIV)
         binding.hurryBtn.setOnClickListener {
             if (binding.messageET.text.toString() == "") {
-                hurryFriend(user, "Hurry up!!")
+                hurryFriend(user, "Hurry up!!") // default msg to send to friend
             } else {
                 hurryFriend(user, binding.messageET.text.toString())
             }
@@ -72,7 +72,7 @@ class EventFriendsAdapter(
         val binding = ListItemAttendeeBinding.inflate(inflater, parent, false)
 
         val recyclerViewWidth = parent.measuredWidth
-        val itemWidth = (recyclerViewWidth * 0.9).toInt()
+        val itemWidth = (recyclerViewWidth * 0.9).toInt() // make sure cardview is never full parent width
 
         val viewHolder = EventFriendsViewHolder(binding, context)
         viewHolder.setItemWidth(itemWidth)

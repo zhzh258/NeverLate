@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.ListItemEventBinding
-import com.snowman.neverlate.model.FirebaseManager
 import com.snowman.neverlate.model.types.IEvent
 
 class AddEventsViewHolder(
@@ -18,14 +17,14 @@ class AddEventsViewHolder(
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(event: IEvent) {
-            binding.textEventTitle.text = event.name
-            binding.textEventLocation.text = event.address
-            binding.textEventTime.text = event.date.toString()
-            Glide.with(binding.imageEvent)
-                .load(event.photoURL)
-                .circleCrop()
-                .error(R.mipmap.ic_launcher_round)
-                .into(binding.imageEvent)
+        binding.textEventTitle.text = event.name
+        binding.textEventLocation.text = event.address
+        binding.textEventTime.text = event.date.toString()
+        Glide.with(binding.imageEvent)
+            .load(event.photoURL)
+            .circleCrop()
+            .error(R.mipmap.ic_launcher_round)
+            .into(binding.imageEvent)
     }
 
     private fun onSuccessEventCreation() {
@@ -72,10 +71,6 @@ class EventsCreationViewHolder(
             .circleCrop()
             .error(R.mipmap.ic_launcher_round)
             .into(binding.imageEvent)
-
-        val firebaseManager = FirebaseManager.getInstance()
-        val friendUserID = event.id
-
     }
 }
 

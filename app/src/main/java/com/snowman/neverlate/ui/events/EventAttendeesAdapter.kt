@@ -1,9 +1,7 @@
 package com.snowman.neverlate.ui.events
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.snowman.neverlate.R
@@ -56,7 +54,6 @@ class EventAttendeesAdapter(
         updatedList.removeAt(position)
         vm.attendees.value = updatedList  // Trigger LiveData update
         notifyItemRemoved(position)
-//        Log.d("AddEventFragment","remove ${vm.attendees.value!!.toString()}")
     }
 
     fun addAttendee(attendee: IUser) {
@@ -64,6 +61,5 @@ class EventAttendeesAdapter(
         updatedList.add(attendee)
         vm.attendees.value = updatedList  // Trigger LiveData update
         notifyItemInserted(vm.attendees.value!!.size - 1)
-//        Log.d("AddEventFragment","add ${vm.attendees.value!!.toString()}")
     }
 }

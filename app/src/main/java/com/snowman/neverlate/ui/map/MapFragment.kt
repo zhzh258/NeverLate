@@ -51,7 +51,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val mapViewModel get() = _mapViewModel!!
     private val sharedOneEventViewModel: SharedOneEventViewModel by activityViewModels()
 
-    private var _bottomSheetBehavior:  BottomSheetBehavior<FrameLayout>? = null
+    private var _bottomSheetBehavior: BottomSheetBehavior<FrameLayout>? = null
     private val bottomSheetBehavior get() = _bottomSheetBehavior!!
 
     private lateinit var map: GoogleMap
@@ -96,7 +96,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             origin?.let {
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(origin, 12f))
             }
-            if(origin != null){
+            if (origin != null) {
                 Log.d(TAG, "Moving camera to ${origin.toString()}")
                 observeMarkers()
             }
@@ -136,101 +136,111 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        map.setOnMarkerClickListener { marker: Marker -> lifecycleScope.launch {
-            val event = marker2event[marker] ?: throw Error("IEvent not found in the marker2event hashmap!")
-
-            marker.showInfoWindow()
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            val origin: LatLng? = getUserGPS()
-            // event card
-            binding.eventCard.setOnClickListener {
-                Toast.makeText(requireContext(), "Now navigating to event ${event.name}", Toast.LENGTH_SHORT).show()
-                sharedOneEventViewModel.setSelectedEvent(event)
-                findNavController().navigate(R.id.nav_eventDetails)
-            }
-            binding.eventNameTv.text = event.name
-            Glide.with(requireActivity())
-                .load(event.photoURL)
-                .circleCrop()
-                .error(R.mipmap.ic_launcher_round)
-                .into(binding.eventImageIv)
+        map.setOnMarkerClickListener { marker: Marker ->
             lifecycleScope.launch {
-                var counter = event.members.size
-                val usernameList = mutableListOf<String>()
-                for (memberStatus in event.members) {
-                    val userId = memberStatus.id
-                //for (userId in event.members) {
-                    firebaseManager.getUserDataForId(userId) { user ->
-                        Log.d(TAG, "The user we get from $userId is${user.toString()}")
+                val event = marker2event[marker]
+                    ?: throw Error("IEvent not found in the marker2event hashmap!")
 
-                        user?.let { usernameList.add(user.displayName) }
-                        if(--counter == 0) {
-                            binding.eventMembersTv.text = usernameList.joinToString(",")
-                            Log.d(TAG, usernameList.toString())
+                marker.showInfoWindow()
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                val origin: LatLng? = getUserGPS()
+                // event card
+                binding.eventCard.setOnClickListener {
+                    Toast.makeText(
+                        requireContext(),
+                        "Now navigating to event ${event.name}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    sharedOneEventViewModel.setSelectedEvent(event)
+                    findNavController().navigate(R.id.nav_eventDetails)
+                }
+                binding.eventNameTv.text = event.name
+                Glide.with(requireActivity())
+                    .load(event.photoURL)
+                    .circleCrop()
+                    .error(R.mipmap.ic_launcher_round)
+                    .into(binding.eventImageIv)
+                lifecycleScope.launch {
+                    var counter = event.members.size
+                    val usernameList = mutableListOf<String>()
+                    for (memberStatus in event.members) {
+                        val userId = memberStatus.id
+                        //for (userId in event.members) {
+                        firebaseManager.getUserDataForId(userId) { user ->
+                            Log.d(TAG, "The user we get from $userId is${user.toString()}")
+
+                            user?.let { usernameList.add(user.displayName) }
+                            if (--counter == 0) {
+                                binding.eventMembersTv.text = usernameList.joinToString(",")
+                                Log.d(TAG, usernameList.toString())
+                            }
                         }
                     }
                 }
-            }
-            binding.eventPeopleNumberTv.text = event.members.size.toString()
+                binding.eventPeopleNumberTv.text = event.members.size.toString()
 
-            // Start all fetches in parallel
-            val driving = async { fetchDirectionsResponse(origin, "driving", marker.position) }
-            val walking = async { fetchDirectionsResponse(origin, "walking", marker.position) }
-            val bicycling = async { fetchDirectionsResponse(origin, "bicycling", marker.position) }
-            val transit = async { fetchDirectionsResponse(origin, "transit", marker.position) }
+                // Start all fetches in parallel
+                val driving = async { fetchDirectionsResponse(origin, "driving", marker.position) }
+                val walking = async { fetchDirectionsResponse(origin, "walking", marker.position) }
+                val bicycling =
+                    async { fetchDirectionsResponse(origin, "bicycling", marker.position) }
+                val transit = async { fetchDirectionsResponse(origin, "transit", marker.position) }
 
-            // await all
-            val responses = awaitAll(driving, walking, bicycling, transit)
-            val (drivingResponse, walkingResponse, bicyclingResponse, transitResponse) = responses
-            binding.driveButton.apply {
-                this.setOnClickListener {
-                    handleTransportButtonClicked("drive", marker, drivingResponse)
+                // await all
+                val responses = awaitAll(driving, walking, bicycling, transit)
+                val (drivingResponse, walkingResponse, bicyclingResponse, transitResponse) = responses
+                binding.driveButton.apply {
+                    this.setOnClickListener {
+                        handleTransportButtonClicked("drive", marker, drivingResponse)
+                    }
+                    val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                    val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                    this.text = "Drive: " + duration
                 }
-                val duration = drivingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
-                val distance = drivingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Drive: " + duration
-            }
-            binding.walkButton.apply {
-                this.setOnClickListener {
-                    handleTransportButtonClicked("walk", marker, walkingResponse)
+                binding.walkButton.apply {
+                    this.setOnClickListener {
+                        handleTransportButtonClicked("walk", marker, walkingResponse)
+                    }
+                    val duration = walkingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                    val distance = walkingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                    this.text = "Walk: " + duration
                 }
-                val duration = walkingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
-                val distance = walkingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Walk: " + duration
-            }
-            binding.bikeButton.apply {
-                this.setOnClickListener {
-                    handleTransportButtonClicked("bike", marker, bicyclingResponse)
+                binding.bikeButton.apply {
+                    this.setOnClickListener {
+                        handleTransportButtonClicked("bike", marker, bicyclingResponse)
+                    }
+                    val duration = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                    val distance = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                    this.text = "Bike: " + duration
                 }
-                val duration = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
-                val distance = bicyclingResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Bike: " + duration
-            }
-            binding.transitButton.apply {
-                this.setOnClickListener {
-                    handleTransportButtonClicked("transit", marker, transitResponse)
+                binding.transitButton.apply {
+                    this.setOnClickListener {
+                        handleTransportButtonClicked("transit", marker, transitResponse)
+                    }
+                    val duration = transitResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
+                    val distance = transitResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
+                    this.text = "Transit: " + duration
                 }
-                val duration = transitResponse?.routes?.get(0)?.legs?.get(0)?.duration?.text
-                val distance = transitResponse?.routes?.get(0)?.legs?.get(0)?.distance?.text
-                this.text = "Transit: " + duration
-            }
 
-        }
+            }
             true
         }
 
         map.setOnMapClickListener {
-            if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
     }
 
-    private fun handleTransportButtonClicked(transport: String, marker: Marker, response: DirectionsResponse?) = lifecycleScope.launch {
+    private fun handleTransportButtonClicked(
+        transport: String,
+        marker: Marker,
+        response: DirectionsResponse?
+    ) = lifecycleScope.launch {
         this@MapFragment.map.isTrafficEnabled = true
         val origin: LatLng? = getUserGPS()
         this@MapFragment.polyline?.remove()
@@ -270,7 +280,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * @param destination The LatLng of the origin point
      * @return DirectionsResponse?
      */
-    private suspend fun fetchDirectionsResponse(origin: LatLng?, mode: String, destination: LatLng): DirectionsResponse? {
+    private suspend fun fetchDirectionsResponse(
+        origin: LatLng?,
+        mode: String,
+        destination: LatLng
+    ): DirectionsResponse? {
         Log.d(TAG, "Now fetching data with origin = ${origin}")
         origin ?: return null
 
@@ -283,10 +297,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         try {
             val apiKey = getMetaData("com.google.android.geo.API_KEY", context)
-            val response = service.getDirections("${origin.latitude},${origin.longitude}", "${destination.latitude},${destination.longitude}", mode, apiKey?:"" )
+            val response = service.getDirections(
+                "${origin.latitude},${origin.longitude}",
+                "${destination.latitude},${destination.longitude}",
+                mode,
+                apiKey ?: ""
+            )
 //            Log.d(TAG, response.body().toString())
             if (response.isSuccessful) {
-                if(response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0)
+                if (response.body() == null || response.body()?.routes == null || response.body()?.routes?.size == 0)
                     return null
                 else
                     return response.body()
@@ -308,24 +327,42 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) { // permission is NOT granted
-            Toast.makeText(requireContext(), "please enable location permissions in device settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "please enable location permissions in device settings",
+                Toast.LENGTH_SHORT
+            ).show()
             return null;
         } else { // permission is granted, show the location
             map.isMyLocationEnabled = true
-            val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+            val fusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity());
             val priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
             val cancellationTokenSource = CancellationTokenSource()
 
-            val location = fusedLocationProviderClient.getCurrentLocation(priority, cancellationTokenSource.token).await()
-            if(location != null){
-                Log.d(TAG, "fusedLocationProviderClient successfully fetches a location ${location.toString()}")
+            val location = fusedLocationProviderClient.getCurrentLocation(
+                priority,
+                cancellationTokenSource.token
+            ).await()
+            if (location != null) {
+                Log.d(
+                    TAG,
+                    "fusedLocationProviderClient successfully fetches a location ${location.toString()}"
+                )
                 Log.d(TAG, "updateUserGPS is called and the location is ${location.toString()}")
                 val latLng = LatLng(location.latitude, location.longitude)
 
                 return latLng
-            } else{
-                Toast.makeText(requireContext(), "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.", Toast.LENGTH_LONG).show()
-                Log.d(TAG, "updateUserGPS is called and fusedLocationProviderClient failed to get a location")
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Location not available. Is this a new phone??? Or you reboot it just now?? Try again later.",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d(
+                    TAG,
+                    "updateUserGPS is called and fusedLocationProviderClient failed to get a location"
+                )
                 Log.d(TAG, "No location available at this time.")
                 return null
             }

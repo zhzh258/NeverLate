@@ -67,6 +67,7 @@ import java.util.UUID
 
 class AddEventFragment : Fragment() {
     private val TAG = "AddEventFragment"
+
     companion object {
         private const val IMAGE_PICK_CODE = 1000
         private const val STORAGE_PERMISSION_CODE = 1001
@@ -82,7 +83,6 @@ class AddEventFragment : Fragment() {
     private lateinit var event_image: ImageView
 
 
-
     // Firebase
     private val firebaseManager = FirebaseManager.getInstance()
     private val db = FirebaseFirestore.getInstance()
@@ -90,11 +90,7 @@ class AddEventFragment : Fragment() {
     private val currentUser = auth.currentUser
 
     private val sharedFriendsViewModel: SharedFriendsViewModel by activityViewModels()
-//
     private val hashedIdToUserMap = mutableMapOf<Int, IUser>()
-//    private val searchList = mutableListOf<IEvent>()
-//    private var profileUri: Uri? = null
-//    private lateinit var latLng: LatLng
 
     private val vm: AddEventViewModel by viewModels()
     override fun onCreateView(
@@ -123,11 +119,13 @@ class AddEventFragment : Fragment() {
     }
 
     private fun addNewEventToFirebase(view: View) {
+        // make sure parameters are set
         if (vm.event.name.isEmpty() || vm.event.description.isEmpty()) {
             Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         } else if (vm.event.members.isEmpty()) {
-            Toast.makeText(requireContext(), "Please select at least 1 friend", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Please select at least 1 friend", Toast.LENGTH_SHORT)
+                .show()
             return
         } else if (vm.event.category == "") {
             Toast.makeText(requireContext(), "Please select a category", Toast.LENGTH_SHORT).show()
@@ -136,6 +134,7 @@ class AddEventFragment : Fragment() {
 
         val uri = vm.profileUri.value
         if (uri != null) {
+            // uploads image to storage and then save event
             firebaseManager.saveImageToStorage(uri, vm.event.id) { url ->
                 if (url != null) {
                     vm.event.photoURL = url
@@ -143,7 +142,8 @@ class AddEventFragment : Fragment() {
                 }
             }
         } else {
-            vm.event.photoURL = "https://funny-business.com/wp-content/uploads/2021/08/Choose-the-Right-Event-Host.jpg"
+            vm.event.photoURL =
+                "https://funny-business.com/wp-content/uploads/2021/08/Choose-the-Right-Event-Host.jpg"
             saveEvent(vm.event)
         }
     }
@@ -204,11 +204,11 @@ class AddEventFragment : Fragment() {
             Glide.with(this)
                 .load(vm.profileUri.value)
                 .into(event_image)
-        } else if (requestCode == ADDRESS_SELECTION_CODE && resultCode == Activity.RESULT_OK && data != null){ // address selection returns
+        } else if (requestCode == ADDRESS_SELECTION_CODE && resultCode == Activity.RESULT_OK && data != null) { // address selection returns
             val addressString: String = data.getStringExtra("addressString") ?: "No address found"
             val latitude: Double = data.getDoubleExtra("latitude", 70.0)
             val longitude: Double = data.getDoubleExtra("longitude", 70.0)
-            addressSelectorButton.text=  addressString
+            addressSelectorButton.text = addressString
             // update vm.event
             vm.event.address = addressString
             vm.event.location = GeoPoint(latitude, longitude)
@@ -268,6 +268,7 @@ class AddEventFragment : Fragment() {
             vm.event.description = it.toString()
         }
     }
+
     private fun setUpDateSelector(view: View) {
         val year = view.findViewById<TextView>(R.id.textViewYear)
         val month = view.findViewById<TextView>(R.id.textViewMonth)
@@ -286,12 +287,16 @@ class AddEventFragment : Fragment() {
             // show calendar
             val calendar = Calendar.getInstance()
             // this one requires 0-11 lol, while LocalDate requires 1-12
-            calendar.set(vm.selectedDate.value!!.year, vm.selectedDate.value!!.monthValue-1, vm.selectedDate.value!!.dayOfMonth)
+            calendar.set(
+                vm.selectedDate.value!!.year,
+                vm.selectedDate.value!!.monthValue - 1,
+                vm.selectedDate.value!!.dayOfMonth
+            )
             val datePickerDialog = DatePickerDialog(
                 requireContext(),
                 { _, year, month, dayOfMonth ->
                     // update vm.selectedDate
-                    vm.selectedDate.value = LocalDate.of(year, month+1, dayOfMonth)
+                    vm.selectedDate.value = LocalDate.of(year, month + 1, dayOfMonth)
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -301,6 +306,7 @@ class AddEventFragment : Fragment() {
         }
 
     }
+
     private fun setUpTimeSelector(view: View) {
         val hour = view.findViewById<TextView>(R.id.textViewHour)
         val minute = view.findViewById<TextView>(R.id.textViewMinute)
@@ -345,7 +351,8 @@ class AddEventFragment : Fragment() {
             vm.event.duration = value.toLong()
         }
     }
-    private fun setUpAddressSelector(view: View){
+
+    private fun setUpAddressSelector(view: View) {
         // please see onActivityResult()
         addressSelectorButton = view.findViewById(R.id.address_selector_button)
         addressSelectorButton.setOnClickListener {
@@ -354,6 +361,7 @@ class AddEventFragment : Fragment() {
             startActivityForResult(intent, ADDRESS_SELECTION_CODE)
         }
     }
+
     private fun setUpEventTypeSelector(view: View) {
 
         val chipGroup = view.findViewById<ChipGroup>(R.id.chipGroup)
@@ -376,19 +384,21 @@ class AddEventFragment : Fragment() {
             }
         }
     }
+
     private fun setUpAddAttendees(view: View) {
         addAttendeeCV = view.findViewById(R.id.addAttendeeCV)
         attendeeRV = view.findViewById(R.id.attendeeRV)
-        attendeeRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        attendeeRV.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         vm.attendees.observe(viewLifecycleOwner) {
             Log.d("AddEventFragment", "observe ${vm.attendees.value!!.size}")
             var eventMembers = mutableListOf<MemberStatus>()
-            for(attendee in vm.attendees.value!!) {
+            for (attendee in vm.attendees.value!!) {
                 eventMembers.add(MemberStatus(attendee.userId, false, "", 0L))
             }
             // remember to add yourself
-            if(currentUser != null) {
+            if (currentUser != null) {
                 eventMembers.add(MemberStatus(currentUser.uid, false, "", 0L))
             }
             // update vm.event
@@ -402,7 +412,7 @@ class AddEventFragment : Fragment() {
     }
 
     private fun addAttendeesClickListener() {
-        addAttendeeCV.setOnClickListener{
+        addAttendeeCV.setOnClickListener {
             val friendsList = sharedFriendsViewModel.friends.value ?: emptyList()
             Toast.makeText(requireContext(), "${friendsList.size}", Toast.LENGTH_SHORT).show()
 
@@ -426,11 +436,12 @@ class AddEventFragment : Fragment() {
                 }
                 popupMenu.show()
             } else {
-                Toast.makeText(requireContext(), "No friends to display, please add some friends first", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "No friends to display, please add some friends first",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
-
-
-
 }
