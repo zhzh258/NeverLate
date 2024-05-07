@@ -140,7 +140,7 @@ class OneEventFragment : Fragment() {
                 view.findViewById<TextView>(R.id.textview_description).text = it.description
                 view.findViewById<MaterialButton>(R.id.event_detail_button).setOnClickListener { _ ->
                     MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(resources.getString(R.string.title))
+                        .setTitle(it.name)
                         .setMessage("Date: ${TimeUtil.timestamp2FormattedString(it.date)}\n" +
                                 "Duration: ${it.duration} minutes\n")
                         .setPositiveButton("OK") { dialog, which ->
