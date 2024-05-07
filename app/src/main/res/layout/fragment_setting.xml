@@ -168,6 +168,7 @@
                 android:layout_weight="1"
                 android:background="@color/white"
                 android:scaleType="fitCenter"
+                android:id="@+id/btn_about_us"
                 android:src="@drawable/ic_util_vector" />
 
         </LinearLayout>
