@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:isScrollContainer="true"
-    >
+    android:isScrollContainer="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -39,9 +38,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:textSize="20sp"
             android:alpha="0.8"
-            android:hint="Your Event Name"
+            android:hint="@string/your_event_name"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="@id/event_image"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -51,7 +50,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/general_small_margin"
-            android:hint="Write A Short Description For The Event"
+            android:hint="@string/write_a_short_description_for_the_event"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/event_image" />
 
@@ -59,86 +59,109 @@
             android:id="@+id/date_and_time_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/general_small_margin"
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/event_description">
+
             <LinearLayout
                 android:id="@+id/date_row"
                 style="@style/Custom.LinearLayout.Vertical"
-
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="18dp"
                     android:text="@string/start_date" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/date_selector"
                     style="@style/Custom.MDC.Card.Elevated"
-                    android:layout_marginTop="8dp"
-                    >
+                    android:layout_marginTop="8dp">
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:padding="@dimen/general_xsmall_margin">
+
                         <ImageView
                             android:id="@+id/ic_calendar"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
+                            android:layout_gravity="center_vertical"
                             android:scaleType="fitCenter"
                             android:src="@drawable/ic_colorful_calendar" />
+
                         <TextView
                             android:id="@+id/textViewYear"
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:maxLength="4" />
+
                         <TextView
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:text="-" />
+
                         <TextView
                             android:id="@+id/textViewMonth"
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:maxLength="3" />
+
                         <TextView
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:text="-" />
+
                         <TextView
                             android:id="@+id/textViewDay"
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:maxLength="2" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/time_row"
                 style="@style/Custom.LinearLayout.Vertical"
                 android:layout_marginStart="50dp"
                 app:layout_constraintStart_toEndOf="@id/date_row"
                 app:layout_constraintTop_toTopOf="parent">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="18dp"
                     android:text="@string/start_time" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/time_selector"
                     style="@style/Custom.MDC.Card.Elevated"
-                    android:layout_marginTop="8dp"
-                    >
+                    android:layout_marginTop="8dp">
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:padding="@dimen/general_xsmall_margin">
+
                         <TextView
                             android:id="@+id/textViewHour"
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:maxLength="2" />
 
                         <TextView
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:text=":" />
 
                         <TextView
                             android:id="@+id/textViewMinute"
                             style="@style/Custom.TextView.p2"
+                            android:layout_gravity="center_vertical"
                             android:maxLength="2" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -163,9 +186,9 @@
                 android:id="@+id/duration_slider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:stepSize="10.0"
                 android:valueFrom="0.0"
-                android:valueTo="100.0"
-                android:stepSize="10.0"/>
+                android:valueTo="100.0" />
         </LinearLayout>
 
 
@@ -173,7 +196,7 @@
             android:id="@+id/address_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/general_small_margin"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/duration_row">
 
@@ -187,7 +210,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/general_small_margin"
-                android:text="@string/click_me_to_select_an_address"/>
+                android:text="@string/click_me_to_select_an_address" />
 
         </LinearLayout>
 
@@ -195,7 +218,7 @@
             android:id="@+id/event_type_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/general_small_margin"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/address_row">
 
@@ -205,14 +228,15 @@
                 android:text="@string/event_type" />
 
             <HorizontalScrollView
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chipGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:singleSelection="true"
-                    app:selectionRequired="true">
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
 
                     <!-- Chips can be declared here, or added dynamically. -->
 
@@ -226,7 +250,7 @@
             android:id="@+id/attendeeText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/general_small_margin"
             android:gravity="start"
             android:text="@string/attendees"
             app:layout_constraintEnd_toEndOf="parent"
@@ -289,12 +313,14 @@
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/addEventButton"
             style="@style/Custom.MDC.EFab.Medium"
-            android:contentDescription="Add New Event"
+            android:layout_marginBottom="@dimen/general_small_margin"
+            android:contentDescription="@string/add_new_event"
             android:text="@string/add_event"
-            app:icon="@drawable/ic_util_add"
             android:textColor="@color/white"
+            app:icon="@drawable/ic_util_add"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/addAttendeeCV"/>
+            app:layout_constraintTop_toBottomOf="@id/addAttendeeCV" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

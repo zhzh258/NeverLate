@@ -11,6 +11,7 @@ import com.snowman.neverlate.R
 import com.snowman.neverlate.databinding.ListItemAddFriendsBinding
 import com.snowman.neverlate.databinding.ListItemFriendRequestsBinding
 import com.snowman.neverlate.model.FirebaseManager
+import com.snowman.neverlate.model.shared.SharedFriendsViewModel
 import com.snowman.neverlate.model.types.IUser
 
 class AddFriendsViewHolder(
@@ -69,7 +70,8 @@ class AddFriendsAdapter(
 
 class FriendRequestsViewHolder(
     private val binding: ListItemFriendRequestsBinding,
-    private val adapter: FriendRequestsAdapter
+    private val adapter: FriendRequestsAdapter,
+    private val friendsViewModel: SharedFriendsViewModel
 ) :
     RecyclerView.ViewHolder(binding.root) {
 
@@ -111,6 +113,8 @@ class FriendRequestsViewHolder(
             { removeRequest() },
             { e -> onFailDecline(e) }
         )
+
+        friendsViewModel.fetchFriendsData()
     }
 
     private fun onFailureDecline(e: Exception) {
@@ -133,12 +137,15 @@ class FriendRequestsViewHolder(
     }
 }
 
-class FriendRequestsAdapter(private val requests: MutableList<IUser>) :
+class FriendRequestsAdapter(
+    private val requests: MutableList<IUser>,
+    private val friendsViewModel: SharedFriendsViewModel
+) :
     RecyclerView.Adapter<FriendRequestsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendRequestsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemFriendRequestsBinding.inflate(inflater, parent, false)
-        return FriendRequestsViewHolder(binding, this)
+        return FriendRequestsViewHolder(binding, this, friendsViewModel)
     }
 
     override fun getItemCount(): Int {
