@@ -43,6 +43,8 @@ import java.time.ZoneId;
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -133,8 +135,29 @@ class OneEventFragment : Fragment() {
                 event = it
                 view.findViewById<TextView>(R.id.text_title).text = it.name
                 view.findViewById<TextView>(R.id.textview_description).text = it.description
+
 //                view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
 //                view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
+
+                //view.findViewById<TextView>(R.id.text_event_time).text = TimeUtil.dateFormat.format(it.date.toDate())
+                //view.findViewById<TextView>(R.id.text_event_location).text = it.location.toString()
+                view.findViewById<MaterialButton>(R.id.event_detail_button).setOnClickListener { _ ->
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(resources.getString(R.string.title))
+                        .setMessage("Date: ${TimeUtil.timestamp2FormattedString(it.date)}\n" +
+                                "Duration: ${it.duration} minutes\n")
+//                        .setNeutralButton("neutral") { dialog, which ->
+//                            // Respond to neutral button press
+//                        }
+//                        .setNegativeButton("negative") { dialog, which ->
+//                            // Respond to negative button press
+//                        }
+                        .setPositiveButton("OK") { dialog, which ->
+                            // Respond to positive button press
+                        }
+                        .show()
+                }
+
                 view.findViewById<TextView>(R.id.text_people_count).text = it.members.size.toString() + " people"
                 setUpFriends(view)
                 setUpMapNavigation(view)
