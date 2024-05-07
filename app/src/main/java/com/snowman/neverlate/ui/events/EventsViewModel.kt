@@ -28,7 +28,7 @@ class EventsViewModel : ViewModel() {
                 Log.d(TAG, "successfully fetched events! length: ${eventsList?.size}")
                 var eventsList1 = mutableListOf<IEvent>()
                 for(event in eventsList.orEmpty()) {
-                    if(event.date.seconds >= System.currentTimeMillis()/1000) {
+                    if(event.active) {
                         eventsList1.add(event)
                     }
                 }
