@@ -150,6 +150,9 @@ class OneEventFragment : Fragment() {
         val btnArrived = view.findViewById<Button>(R.id.btn_arrived)
         btnArrived.setOnClickListener {
             markAsArrived()
+            Handler(Looper.getMainLooper()).postDelayed({
+                checkEventStatusAndDeactivateIfRequired()
+            }, 5000)
         }
 
 //        val args: EventDetailsFragmentArgs by navArgs()
@@ -250,7 +253,6 @@ class OneEventFragment : Fragment() {
     }
 
     private fun markAsArrived() {
-
         val currentUserID = auth.currentUser?.uid
         val minutes = rt.toMinutes()
         val status  = when {
@@ -289,20 +291,6 @@ class OneEventFragment : Fragment() {
                 Toast.makeText(context, "Not all members have arrived yet.", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-
-    private fun markEventAsInactive() {
-        val eventId = event.id // Assuming event is an instance of IEvent and has an id field
-
-        firebaseManager.updateEventActiveStatus(eventId, false,
-            onSuccess = {
-                Toast.makeText(context, "Event marked as inactive successfully.", Toast.LENGTH_SHORT).show()
-            },
-            onFailure = { e ->
-                Toast.makeText(context, "Failed to mark event as inactive: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        )
     }
 
 
