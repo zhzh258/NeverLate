@@ -299,9 +299,11 @@ class OneEventFragment : Fragment() {
     private fun checkEventStatusAndDeactivateIfRequired() {
         firebaseManager.checkAndDeactivateEventIfAllArrived(event.id) { allArrived ->
             if (allArrived) {
-                Toast.makeText(context, "All members have arrived, event marked as inactive.", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "All members have arrived, event marked as inactive.", Toast.LENGTH_SHORT).show()
+                Log.d("checkEventStatus","All members have arrived, event marked as inactive.")
             } else {
-                Toast.makeText(context, "Not all members have arrived yet.", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Not all members have arrived yet.", Toast.LENGTH_SHORT).show()
+                Log.d("checkEventStatus", "Not all members have arrived yet.")
             }
         }
     }
