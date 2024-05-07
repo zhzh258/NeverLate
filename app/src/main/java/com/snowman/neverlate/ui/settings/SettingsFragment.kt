@@ -35,6 +35,9 @@ class SettingsFragment : Fragment() {
         binding.btnRateUs.setOnClickListener(){
             findNavController().navigate(R.id.action_settingsFragment_to_rateUsFragment)
         }
+        binding.btnAboutUs.setOnClickListener(){
+            findNavController().navigate(R.id.nav_aboutus)
+        }
         binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 activity?.setTheme(R.style.Theme_NeverLate)
