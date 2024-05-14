@@ -13,6 +13,8 @@
      - Google Map
 4. Build with Gradle and run with emulator
 
+# Demo
+https://drive.google.com/file/d/1WYRKkBtSEovG3IaH8yr4UvEkGqYgdK2g/view?usp=sharing
 
 # Planning
 **Non Core Feature** (we should NOT work on this until we’re done with everything else)
